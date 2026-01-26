@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Building2, Users, Database, Settings, Plus, X, Check, Save, AlertTriangle, Edit, Trash2 } from 'lucide-react'
-import { createEmpresa, createUsuario, createUnidade, updateSystemParam, toggleUsuarioStatus, deleteUsuario, deleteVeiculo, deleteEmpresa, deleteUnidade, updateUsuario, updateVeiculo, updateEmpresa, updateUnidade } from '@/app/actions/admin-actions'
+import { createEmpresa, createUsuario, createUnidade, updateSystemParam, toggleUsuarioStatus, deleteUsuario, deleteVeiculo, deleteEmpresa, deleteUnidade, updateUsuario, updateVeiculo, updateEmpresa, updateUnidade, createOsMotivo, deleteOsMotivo, createOsSistema, deleteOsSistema, createOsSubSistema, deleteOsSubSistema } from '@/app/actions/admin-actions'
 
 interface Veiculo {
     id: string
@@ -44,11 +44,32 @@ interface SystemParam {
     group: string
 }
 
-export default function SettingsClient({ veiculos, usuarios, empresas, systemParams }: {
+interface OsMotivo {
+    id: string
+    nome: string
+    ativo: boolean
+}
+
+interface OsSubSistema {
+    id: string
+    nome: string
+    sistemaId: string
+    ativo: boolean
+}
+
+interface OsSistema {
+    id: string
+    nome: string
+    ativo: boolean
+    subSistemas: OsSubSistema[]
+}
+
+export default function SettingsClient({ veiculos, usuarios, empresas, systemParams, osOptions }: {
     veiculos: Veiculo[],
     usuarios: Usuario[],
     empresas: Empresa[],
-    systemParams: SystemParam[]
+    systemParams: SystemParam[],
+    osOptions: { motivos: OsMotivo[], sistemas: OsSistema[] }
 }) {
     const [activeTab, setActiveTab] = useState('database')
     const [showModal, setShowModal] = useState<string | null>(null) // 'user', 'company', 'unit'
@@ -106,7 +127,7 @@ export default function SettingsClient({ veiculos, usuarios, empresas, systemPar
                 {activeTab === 'database' && <DatabaseSection veiculos={veiculos} isAdmin={isAdmin} onDelete={handleDelete} onEdit={(type, data) => setEditItem({ type, data })} />}
                 {activeTab === 'users' && <UsersSection usuarios={usuarios} onNew={() => setShowModal('user')} isAdmin={isAdmin} onDelete={handleDelete} onEdit={(type, data) => setEditItem({ type, data })} />}
                 {activeTab === 'company' && <CompanySection empresas={empresas} onNew={() => setShowModal('company')} onNewUnit={handleNewUnit} isAdmin={isAdmin} onDelete={handleDelete} onEdit={(type, data) => setEditItem({ type: type as any, data: data as any })} />}
-                {activeTab === 'system' && <SystemSection params={systemParams} isAdmin={isAdmin} />}
+                {activeTab === 'system' && <SystemSection params={systemParams} osOptions={osOptions} isAdmin={isAdmin} />}
             </div>
 
             {/* Modais */}
@@ -510,68 +531,193 @@ function CompanySection({ empresas, onNew, onNewUnit, isAdmin, onDelete, onEdit 
     )
 }
 
-function SystemSection({ params, isAdmin }: { params: SystemParam[], isAdmin: boolean }) {
+function SystemSection({ params, osOptions, isAdmin }: { params: SystemParam[], osOptions: { motivos: OsMotivo[], sistemas: OsSistema[] }, isAdmin: boolean }) {
+    const [activeSubTab, setActiveSubTab] = useState('parameters') // 'parameters', 'motivos', 'sistemas'
+
     // Group params
     const groups = Array.from(new Set(params.map(p => p.group)))
 
     return (
         <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-500">
-            <div className="text-center mb-16">
-                <div className="w-24 h-24 bg-surface-highlight rounded-[2rem] flex items-center justify-center mx-auto mb-6 border border-border-color shadow-xl rotate-3">
-                    <Settings className="w-12 h-12 text-primary" />
+            <div className="text-center mb-8">
+                <div className="w-20 h-20 bg-surface-highlight rounded-[2rem] flex items-center justify-center mx-auto mb-6 border border-border-color shadow-xl rotate-3">
+                    <Settings className="w-10 h-10 text-primary" />
                 </div>
                 <h3 className="text-4xl font-black text-foreground tracking-tight">Parâmetros Mestre</h3>
-                <p className="text-gray-500 max-w-2xl mx-auto mt-4 text-base font-medium leading-relaxed">
-                    Configurações de infraestrutura e lógica computacional global. Ajustes aqui alteram o comportamento fundamental da plataforma.
+                <p className="text-gray-500 max-w-2xl mx-auto mt-4 text-sm font-medium leading-relaxed">
+                    Configurações de infraestrutura e lógica computacional global.
                 </p>
-                {!isAdmin && (
-                    <div className="mt-6 flex justify-center">
-                        <span className="bg-red-500/10 text-red-600 px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest border border-red-500/20">
-                            Apenas Leitura • Perfil Restrito
-                        </span>
-                    </div>
-                )}
             </div>
 
-            {groups.map(group => (
-                <div key={group} className="border border-border-color rounded-[2.5rem] overflow-hidden bg-surface shadow-xl border-t-[12px] border-t-primary">
-                    <div className="bg-surface-highlight/30 px-10 py-6 border-b border-border-color flex justify-between items-center">
-                        <h4 className="font-black text-sm text-gray-400 uppercase tracking-[0.3em]">{group} CONTROL GROUP</h4>
-                        <Database className="w-5 h-5 text-gray-300" />
-                    </div>
-                    <div className="divide-y divide-border-color">
-                        {params.filter(p => p.group === group).map(param => (
-                            <form key={param.id} action={async (formData) => {
-                                if (isAdmin) await updateSystemParam(formData)
-                            }} className="p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-10 hover:bg-surface-highlight/10 transition-all group/param">
-                                <input type="hidden" name="key" value={param.key} />
-                                <div className="flex-1">
-                                    <p className="font-black text-xl text-foreground mb-1 tracking-tight group-hover/param:text-primary transition-colors">{param.description || param.key}</p>
-                                    <p className="text-[10px] text-gray-400 font-black font-mono tracking-widest bg-surface-highlight inline-block px-2 py-0.5 rounded uppercase">{param.key}</p>
-                                </div>
-                                <div className="flex items-center gap-3 w-full md:w-auto">
-                                    <input
-                                        name="value"
-                                        readOnly={!isAdmin}
-                                        defaultValue={param.value}
-                                        className={`bg-surface-highlight border-2 border-border-color rounded-2xl px-6 py-4 text-base w-full md:w-64 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-right font-black text-foreground shadow-inner transition-all ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    />
-                                    {isAdmin && (
-                                        <div className="flex gap-2">
-                                            <button title="Salvar Alteração" className="p-4 bg-primary text-white hover:bg-orange-600 rounded-2xl shadow-lg shadow-orange-500/20 transition-all hover:scale-110 active:scale-90">
-                                                <Save className="w-6 h-6" />
-                                            </button>
-                                            <button type="button" title="Redefinir" className="p-4 text-gray-400 hover:text-red-500 rounded-2xl transition-all">
-                                                <Trash2 className="w-5 h-5" />
-                                            </button>
+            {/* Sub-Tabs Selector */}
+            <div className="flex justify-center gap-2 mb-8 bg-surface-highlight/20 p-2 rounded-2xl w-fit mx-auto border border-border-color shadow-sm">
+                <button
+                    onClick={() => setActiveSubTab('parameters')}
+                    className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeSubTab === 'parameters' ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105' : 'text-gray-400 hover:text-foreground hover:bg-surface-highlight'}`}
+                >
+                    Parâmetros Gerais
+                </button>
+                <button
+                    onClick={() => setActiveSubTab('motivos')}
+                    className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeSubTab === 'motivos' ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105' : 'text-gray-400 hover:text-foreground hover:bg-surface-highlight'}`}
+                >
+                    Motivos O.S.
+                </button>
+                <button
+                    onClick={() => setActiveSubTab('sistemas')}
+                    className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeSubTab === 'sistemas' ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105' : 'text-gray-400 hover:text-foreground hover:bg-surface-highlight'}`}
+                >
+                    Sistemas & Componentes
+                </button>
+            </div>
+
+            {activeSubTab === 'parameters' && (
+                <div className="space-y-12">
+                    {groups.map(group => (
+                        <div key={group} className="border border-border-color rounded-[2.5rem] overflow-hidden bg-surface shadow-xl border-t-[12px] border-t-primary">
+                            <div className="bg-surface-highlight/30 px-10 py-6 border-b border-border-color flex justify-between items-center">
+                                <h4 className="font-black text-sm text-gray-400 uppercase tracking-[0.3em]">{group} CONTROL GROUP</h4>
+                                <Database className="w-5 h-5 text-gray-300" />
+                            </div>
+                            <div className="divide-y divide-border-color">
+                                {params.filter(p => p.group === group).map(param => (
+                                    <form key={param.id} action={async (formData) => {
+                                        if (isAdmin) await updateSystemParam(formData)
+                                    }} className="p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-10 hover:bg-surface-highlight/10 transition-all group/param">
+                                        <input type="hidden" name="key" value={param.key} />
+                                        <div className="flex-1">
+                                            <p className="font-black text-xl text-foreground mb-1 tracking-tight group-hover/param:text-primary transition-colors">{param.description || param.key}</p>
+                                            <p className="text-[10px] text-gray-400 font-black font-mono tracking-widest bg-surface-highlight inline-block px-2 py-0.5 rounded uppercase">{param.key}</p>
                                         </div>
-                                    )}
+                                        <div className="flex items-center gap-3 w-full md:w-auto">
+                                            <input
+                                                name="value"
+                                                readOnly={!isAdmin}
+                                                defaultValue={param.value}
+                                                className={`bg-surface-highlight border-2 border-border-color rounded-2xl px-6 py-4 text-base w-full md:w-64 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-right font-black text-foreground shadow-inner transition-all ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            />
+                                            {isAdmin && (
+                                                <div className="flex gap-2">
+                                                    <button title="Salvar Alteração" className="p-4 bg-primary text-white hover:bg-orange-600 rounded-2xl shadow-lg shadow-orange-500/20 transition-all hover:scale-110 active:scale-90">
+                                                        <Save className="w-6 h-6" />
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </form>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {activeSubTab === 'motivos' && (
+                <div className="max-w-4xl mx-auto space-y-6">
+                    <div className="bg-surface border border-border-color rounded-3xl p-8 shadow-xl">
+                        <h4 className="text-xl font-black text-foreground mb-6">Cadastrar Novo Motivo</h4>
+                        <form action={async (formData) => {
+                            await createOsMotivo(formData)
+                        }} className="flex gap-4">
+                            <input
+                                name="nome"
+                                placeholder="Ex: Manutenção Preventiva de 250h"
+                                required
+                                className="flex-1 bg-surface-highlight border border-border-color rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary outline-none font-bold"
+                            />
+                            <button className="bg-primary hover:bg-orange-600 text-white px-8 py-4 rounded-xl font-black shadow-lg shadow-primary/20 transition-all">
+                                Adicionar
+                            </button>
+                        </form>
+                    </div>
+
+                    <div className="bg-surface border border-border-color rounded-3xl p-8 shadow-xl">
+                        <h4 className="text-xl font-black text-foreground mb-6">Motivos Ativos</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {osOptions.motivos.map(m => (
+                                <div key={m.id} className="flex justify-between items-center bg-surface-highlight/30 p-4 rounded-2xl border border-border-color group hover:border-primary/50 transition-all">
+                                    <span className="font-bold text-foreground">{m.nome}</span>
+                                    <button
+                                        onClick={() => deleteOsMotivo(m.id)}
+                                        className="p-2 text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                    >
+                                        <Trash2 className="w-5 h-5" />
+                                    </button>
                                 </div>
-                            </form>
+                            ))}
+                            {osOptions.motivos.length === 0 && <p className="text-gray-500 italic col-span-full text-center py-4">Nenhum motivo cadastrado.</p>}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {activeSubTab === 'sistemas' && (
+                <div className="max-w-5xl mx-auto space-y-8">
+                    <div className="bg-surface border border-border-color rounded-3xl p-8 shadow-xl">
+                        <h4 className="text-xl font-black text-foreground mb-6">Novo Sistema Operacional</h4>
+                        <form action={async (formData) => {
+                            await createOsSistema(formData)
+                        }} className="flex gap-4">
+                            <input
+                                name="nome"
+                                placeholder="Ex: Hidráulico, Motor, Transmissão"
+                                required
+                                className="flex-1 bg-surface-highlight border border-border-color rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary outline-none font-bold"
+                            />
+                            <button className="bg-primary hover:bg-orange-600 text-white px-8 py-4 rounded-xl font-black shadow-lg shadow-primary/20 transition-all">
+                                Adicionar Sistema
+                            </button>
+                        </form>
+                    </div>
+
+                    <div className="space-y-6">
+                        {osOptions.sistemas.map(s => (
+                            <div key={s.id} className="bg-surface border border-border-color rounded-[2.5rem] overflow-hidden shadow-xl border-l-[10px] border-l-primary/40">
+                                <div className="p-8 flex justify-between items-center border-b border-border-color bg-surface-highlight/10">
+                                    <h5 className="text-2xl font-black text-foreground leading-none">{s.nome}</h5>
+                                    <button
+                                        onClick={() => deleteOsSistema(s.id)}
+                                        className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"
+                                    >
+                                        <Trash2 className="w-5 h-5" />
+                                    </button>
+                                </div>
+                                <div className="p-8 space-y-6">
+                                    <div className="flex gap-3">
+                                        <form action={async (formData) => {
+                                            await createOsSubSistema(formData)
+                                        }} className="flex-1 flex gap-2">
+                                            <input type="hidden" name="sistemaId" value={s.id} />
+                                            <input
+                                                name="nome"
+                                                placeholder="Novo Sub-sistema / Componente"
+                                                required
+                                                className="flex-1 bg-surface-highlight/50 border border-border-color rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none font-bold"
+                                            />
+                                            <button className="bg-primary hover:bg-orange-600 text-white px-4 py-3 rounded-xl font-black text-xs transition-all">
+                                                Adicionar
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                        {s.subSistemas.map(sub => (
+                                            <div key={sub.id} className="flex justify-between items-center bg-surface-highlight/20 p-3 rounded-xl border border-border-color group/sub">
+                                                <span className="text-sm font-semibold text-gray-500 group-hover/sub:text-foreground">{sub.nome}</span>
+                                                <button
+                                                    onClick={() => deleteOsSubSistema(sub.id)}
+                                                    className="p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover/sub:opacity-100 transition-all"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 </div>
-            ))}
+            )}
         </div>
     )
 }

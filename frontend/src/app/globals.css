@@ -74,3 +74,14 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
 }
+
+/* Forçar remoção dos indicadores do Next.js */
+#nextjs-portal, 
+.nextjs-static-indicator,
+[hidden-indicator="true"],
+__next-prerender-indicator {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

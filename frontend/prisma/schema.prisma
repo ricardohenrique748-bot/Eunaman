@@ -115,7 +115,15 @@ model OrdemServico {
   tempoParada    Float?    @map("tempo_parada_horas")
   responsavelPcm String?   @map("responsavel_pcm")
 
-  veiculo Veiculo @relation(fields: [veiculoId], references: [id])
+  // Parâmetros Mestre
+  motivoId      String?   @map("motivo_id")
+  sistemaId     String?   @map("sistema_id")
+  subSistemaId  String?   @map("sub_sistema_id")
+
+  veiculo    Veiculo    @relation(fields: [veiculoId], references: [id])
+  motivo     OsMotivo?  @relation(fields: [motivoId], references: [id])
+  sistema    OsSistema? @relation(fields: [sistemaId], references: [id])
+  subSistema OsSubSistema? @relation(fields: [subSistemaId], references: [id])
 
   @@map("ordens_servico")
 }
@@ -176,7 +184,7 @@ model Pneu {
   @@map("pneus_frota")
 }
 
-model SystemParameter {
+model SystemParameters {
   id          String   @id @default(uuid())
   key         String   @unique
   value       String
@@ -186,4 +194,36 @@ model SystemParameter {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("system_parameters")
+}
+
+model OsMotivo {
+  id    String @id @default(uuid())
+  nome  String @unique
+  ativo Boolean @default(true)
+  os    OrdemServico[]
+
+  @@map("os_motivos")
+}
+
+model OsSistema {
+  id          String @id @default(uuid())
+  nome        String @unique
+  ativo       Boolean @default(true)
+  subSistemas OsSubSistema[]
+  os          OrdemServico[]
+
+  @@map("os_sistemas")
+}
+
+model OsSubSistema {
+  id        String @id @default(uuid())
+  nome      String
+  sistemaId String @map("sistema_id")
+  ativo     Boolean @default(true)
+
+  sistema   OsSistema @relation(fields: [sistemaId], references: [id])
+  os        OrdemServico[]
+
+  @@unique([nome, sistemaId])
+  @@map("os_sub_sistemas")
 }

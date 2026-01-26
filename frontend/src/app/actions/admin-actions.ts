@@ -94,7 +94,7 @@ export async function createUnidade(formData: FormData) {
 
 // --- SYSTEM PARAMS ---
 export async function getSystemParams() {
-    const params = await prisma.systemParameter.findMany()
+    const params = await prisma.systemParameters.findMany()
 
     // Lazy Seed
     if (params.length === 0) {
@@ -106,9 +106,9 @@ export async function getSystemParams() {
         ]
 
         for (const d of defaults) {
-            await prisma.systemParameter.create({ data: d })
+            await prisma.systemParameters.create({ data: d })
         }
-        return await prisma.systemParameter.findMany()
+        return await prisma.systemParameters.findMany()
     }
 
     return params
@@ -119,7 +119,7 @@ export async function updateSystemParam(formData: FormData) {
         const key = formData.get('key') as string
         const value = formData.get('value') as string
 
-        await prisma.systemParameter.update({
+        await prisma.systemParameters.update({
             where: { key },
             data: { value }
         })
@@ -251,5 +251,95 @@ export async function deleteUnidade(id: string) {
         return { success: true }
     } catch (_) {
         return { success: false, error: 'Erro ao excluir unidade' }
+    }
+}
+// --- OS OPTIONS ---
+
+export async function getOsOptions() {
+    try {
+        const motivos = await prisma.osMotivo.findMany({
+            orderBy: { nome: 'asc' }
+        })
+        const sistemas = await prisma.osSistema.findMany({
+            orderBy: { nome: 'asc' },
+            include: {
+                subSistemas: {
+                    orderBy: { nome: 'asc' }
+                }
+            }
+        })
+        return { motivos, sistemas }
+    } catch (_) {
+        return { motivos: [], sistemas: [] }
+    }
+}
+
+export async function createOsMotivo(formData: FormData) {
+    try {
+        const nome = formData.get('nome') as string
+        if (!nome) return { success: false }
+
+        await prisma.osMotivo.create({ data: { nome } })
+        revalidatePath('/dashboard/admin')
+        return { success: true }
+    } catch (_) {
+        return { success: false }
+    }
+}
+
+export async function deleteOsMotivo(id: string) {
+    try {
+        await prisma.osMotivo.delete({ where: { id } })
+        revalidatePath('/dashboard/admin')
+        return { success: true }
+    } catch (_) {
+        return { success: false }
+    }
+}
+
+export async function createOsSistema(formData: FormData) {
+    try {
+        const nome = formData.get('nome') as string
+        if (!nome) return { success: false }
+
+        await prisma.osSistema.create({ data: { nome } })
+        revalidatePath('/dashboard/admin')
+        return { success: true }
+    } catch (_) {
+        return { success: false }
+    }
+}
+
+export async function deleteOsSistema(id: string) {
+    try {
+        await prisma.osSistema.delete({ where: { id } })
+        revalidatePath('/dashboard/admin')
+        return { success: true }
+    } catch (_) {
+        return { success: false }
+    }
+}
+
+export async function createOsSubSistema(formData: FormData) {
+    try {
+        const nome = formData.get('nome') as string
+        const sistemaId = formData.get('sistemaId') as string
+        if (!nome || !sistemaId) return { success: false }
+
+        await prisma.osSubSistema.create({ data: { nome, sistemaId } })
+        revalidatePath('/dashboard/admin')
+        return { success: true }
+    } catch (_) {
+        return { success: false }
+    }
+}
+
+export async function deleteOsSubSistema(id: string) {
+    try {
+        await prisma.osSubSistema.delete({ where: { id } })
+        revalidatePath('/dashboard/admin')
+        return { success: true }
+    } catch (_) {
+        return { success: false }
     }
 }

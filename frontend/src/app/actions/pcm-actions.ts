@@ -28,6 +28,10 @@ export async function createOrdemServico(formData: FormData) {
     const descricao = formData.get('descricao') as string
     const prioridade = formData.get('prioridade') as string // Não estava no schema, mas vamos ignorar se não tiver
 
+    const motivoId = formData.get('motivoId') as string || null
+    const sistemaId = formData.get('sistemaId') as string || null
+    const subSistemaId = formData.get('subSistemaId') as string || null
+
     if (!veiculoId || !descricao) {
         return { success: false, error: 'Campos obrigatórios faltando' }
     }
@@ -40,6 +44,9 @@ export async function createOrdemServico(formData: FormData) {
                 status: 'ABERTA',
                 descricao,
                 origem: 'Manual',
+                motivoId,
+                sistemaId,
+                subSistemaId
             }
         })
 

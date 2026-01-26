@@ -1,14 +1,15 @@
-import { getAdminVeiculos, getAdminUsuarios, getAdminEmpresas, getSystemParams } from '@/app/actions/admin-actions'
+import { getAdminVeiculos, getAdminUsuarios, getAdminEmpresas, getSystemParams, getOsOptions } from '@/app/actions/admin-actions'
 import SettingsClient from './SettingsClient'
 
 export const dynamic = 'force-dynamic'
 
 export default async function SettingsPage() {
-    const [veiculos, usuarios, empresas, systemParams] = await Promise.all([
+    const [veiculos, usuarios, empresas, systemParams, osOptions] = await Promise.all([
         getAdminVeiculos(),
         getAdminUsuarios(),
         getAdminEmpresas(),
-        getSystemParams()
+        getSystemParams(),
+        getOsOptions()
     ])
 
     return (
@@ -17,6 +18,7 @@ export default async function SettingsPage() {
             usuarios={usuarios}
             empresas={empresas}
             systemParams={systemParams}
+            osOptions={osOptions}
         />
     )
 }

@@ -12,8 +12,31 @@ interface VeiculoDropdown {
     placa: string | null;
 }
 
-export default function NovaOSForm({ veiculos }: { veiculos: VeiculoDropdown[] }) {
+interface OsMotivo {
+    id: string;
+    nome: string;
+}
+
+interface OsSubSistema {
+    id: string;
+    nome: string;
+    sistemaId: string;
+}
+
+interface OsSistema {
+    id: string;
+    nome: string;
+    subSistemas: OsSubSistema[];
+}
+
+export default function NovaOSForm({ veiculos, osOptions }: {
+    veiculos: VeiculoDropdown[],
+    osOptions: { motivos: OsMotivo[], sistemas: OsSistema[] }
+}) {
     const [enviadoReserva, setEnviadoReserva] = useState(false)
+    const [selectedSistemaId, setSelectedSistemaId] = useState<string>('')
+
+    const filteredSubSistemas = osOptions.sistemas.find(s => s.id === selectedSistemaId)?.subSistemas || []
 
     return (
         <div className="max-w-4xl mx-auto py-6">
@@ -141,23 +164,34 @@ export default function NovaOSForm({ veiculos }: { veiculos: VeiculoDropdown[] }
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="space-y-1">
                             <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Motivo</label>
-                            <select className="w-full bg-surface-highlight border border-border-color rounded px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary appearance-none">
-                                <option>Selecione</option>
+                            <select name="motivoId" className="w-full bg-surface-highlight border border-border-color rounded px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary appearance-none">
+                                <option value="">Selecione</option>
+                                {osOptions.motivos.map(m => (
+                                    <option key={m.id} value={m.id}>{m.nome}</option>
+                                ))}
                             </select>
                         </div>
                         <div className="space-y-1">
                             <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Sistema</label>
-                            <select className="w-full bg-surface-highlight border border-border-color rounded px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary appearance-none">
-                                <option>Selecione</option>
-                                <option>Motor</option>
-                                <option>Elétrica</option>
-                                <option>Hidráulica</option>
+                            <select
+                                name="sistemaId"
+                                value={selectedSistemaId}
+                                onChange={(e) => setSelectedSistemaId(e.target.value)}
+                                className="w-full bg-surface-highlight border border-border-color rounded px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary appearance-none"
+                            >
+                                <option value="">Selecione</option>
+                                {osOptions.sistemas.map(s => (
+                                    <option key={s.id} value={s.id}>{s.nome}</option>
+                                ))}
                             </select>
                         </div>
                         <div className="space-y-1">
                             <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Sub-Sistema</label>
-                            <select className="w-full bg-surface-highlight border border-border-color rounded px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary appearance-none">
-                                <option>Selecione</option>
+                            <select name="subSistemaId" className="w-full bg-surface-highlight border border-border-color rounded px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary appearance-none">
+                                <option value="">Selecione</option>
+                                {filteredSubSistemas.map(ss => (
+                                    <option key={ss.id} value={ss.id}>{ss.nome}</option>
+                                ))}
                             </select>
                         </div>
                     </div>
