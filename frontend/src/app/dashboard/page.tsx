@@ -1,150 +1,168 @@
 'use client'
-import { ArrowUpRight, ArrowDownRight, Activity, Wrench, AlertTriangle, CheckCircle2, Clock } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, Activity, Wrench, AlertTriangle, CheckCircle2, Clock, FileText, Settings, AlertCircle } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 
-export default function DashboardPage() {
+
+import { getDashboardMetrics } from '../actions/dashboard-actions'
+
+export default async function DashboardPage() {
+    const { data } = await getDashboardMetrics()
+
+    // Fallback if data fails
+    const metrics = data?.kpis || { totalOS: 0, osAbertas: 0, osFechadas: 0, disponibilidadeGlobal: '0.0', mttr: '0.0', mtbf: '0.0' }
+    const chartData = data?.chartData || []
+
     return (
-        <div className="space-y-6">
-            {/* KPI Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <KpiCard
-                    title="Total de OS (Mês)"
-                    value="45"
-                    trend="+12%"
-                    trendPositive
-                    icon={Wrench}
-                    color="text-blue-500"
-                    footer="Todas as categorias"
+        <div className="space-y-8">
+            {/* KPI Grid - Style: Clean Modern */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+                <ModernKpiCard
+                    title="Total de OS"
+                    value={metrics.totalOS}
+                    sub="Clique para ver lista"
+                    icon={FileText}
+                    iconColor="text-blue-600"
+                    iconBg="bg-blue-100 dark:bg-blue-900/30"
                 />
-                <KpiCard
-                    title="OS em Andamento"
-                    value="12"
-                    trend="4 Atrasadas"
-                    trendPositive={false}
-                    icon={Activity}
-                    color="text-yellow-500"
-                    footer="8 Planejadas / 4 Execução"
-                />
-                <KpiCard
-                    title="OS Fechadas"
-                    value="33"
-                    trend="73% do total"
-                    trendPositive
-                    icon={CheckCircle2}
-                    color="text-emerald-500"
-                    footer="Concluídas este mês"
-                />
-                <KpiCard
-                    title="Disponibilidade Frota"
-                    value="94.2%"
-                    trend="+1.5%"
-                    trendPositive
-                    icon={CheckCircle2}
-                    color="text-emerald-500"
-                    footer="Meta: 95.0%"
-                />
-                <KpiCard
-                    title="MTTR (Médio)"
-                    value="4.2h"
-                    trend="-0.5h"
-                    trendPositive
+                <ModernKpiCard
+                    title="Em Andamento"
+                    value={metrics.osAbertas}
+                    sub="Clique para ver lista"
                     icon={Clock}
-                    color="text-orange-500"
-                    footer="Tempo Médio Reparo"
+                    iconColor="text-yellow-600"
+                    iconBg="bg-yellow-100 dark:bg-yellow-900/30"
                 />
-                <KpiCard
-                    title="MTBF (Médio)"
-                    value="245h"
-                    trend="+12h"
-                    trendPositive
+                <ModernKpiCard
+                    title="OS Fechadas"
+                    value={metrics.osFechadas}
+                    sub="Clique para ver lista"
+                    icon={CheckCircle2}
+                    iconColor="text-green-600"
+                    iconBg="bg-green-100 dark:bg-green-900/30"
+                />
+                <ModernKpiCard
+                    title="Disponibilidade"
+                    value={`${metrics.disponibilidadeGlobal}%`}
+                    sub="Meta: ≥ 95%"
                     icon={Activity}
-                    color="text-purple-500"
-                    footer="Tempo Médio entre Falhas"
+                    iconColor="text-emerald-600"
+                    iconBg="bg-emerald-100 dark:bg-emerald-900/30"
+                    isSuccess={Number(metrics.disponibilidadeGlobal) >= 95}
                 />
+                <ModernKpiCard
+                    title="MTTR"
+                    value={`${metrics.mttr}h`}
+                    sub="Tempo Médio Reparo"
+                    icon={Wrench}
+                    iconColor="text-purple-600"
+                    iconBg="bg-purple-100 dark:bg-purple-900/30"
+                />
+                <ModernKpiCard
+                    title="MTBF"
+                    value={`${metrics.mtbf}h`}
+                    sub="Tempo Entre Falhas"
+                    icon={Clock}
+                    iconColor="text-indigo-600"
+                    iconBg="bg-indigo-100 dark:bg-indigo-900/30"
+                />
+                <div className="bg-surface border border-border-color p-4 rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-primary/30 transition-all">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Docs</p>
+                            <div className="flex items-baseline gap-1.5 flex-wrap">
+                                <span className="text-xl font-bold text-green-600">26</span>
+                                <span className="text-xl font-bold text-yellow-500">2</span>
+                                <span className="text-xl font-bold text-red-500">16</span>
+                            </div>
+                            <p className="text-[10px] text-gray-400 mt-1">V / AV / Venc</p>
+                        </div>
+                        <div className={`p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600`}>
+                            <FileText className="w-5 h-5" />
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* Charts & Lists Area */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Availability Chart (2 Cols) */}
-                <div className="lg:col-span-2 bg-surface border border-border-color rounded-xl p-6 shadow-lg">
-                    <h3 className="text-gray-100 font-semibold mb-6 flex items-center justify-between">
-                        <span>Disponibilidade por Veículo</span>
-                        <span className="text-xs text-gray-500 bg-surface-highlight px-2 py-1 rounded">Top 5 Críticos</span>
-                    </h3>
-                    <div className="space-y-4">
-                        <BarRow label="Caminhão Volvo FH-540 (V-01)" percent={98} />
-                        <BarRow label="Escavadeira CAT 320 (E-03)" percent={92} warning />
-                        <BarRow label="Pá Carregadeira L120 (P-02)" percent={85} critical />
-                        <BarRow label="Caminhão Scania R450 (V-04)" percent={96} />
-                        <BarRow label="Trator John Deere 7200 (T-01)" percent={45} critical status="Em Manutenção (Motor)" />
+            {/* Main Chart Area */}
+            <div className="bg-surface border border-border-color rounded-xl p-6 shadow-sm">
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+                    <h3 className="text-foreground text-lg font-bold">Disponibilidade por Veículo</h3>
+                    <div className="flex items-center gap-4 text-xs font-medium">
+                        <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span className="text-gray-600 dark:text-gray-400">≥ 95%</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                            <span className="text-gray-600 dark:text-gray-400">90-94%</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                            <span className="text-gray-600 dark:text-gray-400">&lt; 90%</span>
+                        </div>
                     </div>
                 </div>
 
-                {/* Preventives Alert (1 Col) */}
-                <div className="bg-surface border border-border-color rounded-xl p-0 shadow-lg overflow-hidden flex flex-col">
-                    <div className="p-5 border-b border-border-color bg-surface-highlight/5 flex justify-between items-center">
-                        <h3 className="text-gray-100 font-semibold flex items-center gap-2">
-                            <AlertTriangle className="w-4 h-4 text-red-500" />
-                            Preventivas em Atraso
-                        </h3>
-                        <span className="text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded-full">3</span>
-                    </div>
-                    <div className="flex-1 overflow-auto max-h-[300px] custom-scrollbar">
-                        <div className="divide-y divide-border-color">
-                            <AlertItem
-                                vehicle="V-02"
-                                plan="Troca de Óleo Motor"
-                                overdue="500km"
-                                trigger="15.000km"
-                                date="2 dias atrás"
-                            />
-                            <AlertItem
-                                vehicle="E-03"
-                                plan="Revisão 500h"
-                                overdue="24h"
-                                trigger="500h"
-                                date="Ontem"
-                            />
-                            <AlertItem
-                                vehicle="T-01"
-                                plan="Lubrificação Geral"
-                                overdue="5 dias"
-                                trigger="Semanal"
-                                date="20/01"
-                            />
+                <div className="h-[400px] w-full">
+                    {chartData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.2)" />
+                                <XAxis
+                                    dataKey="placa"
+                                    angle={-45}
+                                    textAnchor="end"
+                                    interval={0}
+                                    tick={{ fontSize: 10, fill: '#6B7280', fontWeight: 600 }}
+                                    height={60}
+                                />
+                                <YAxis
+                                    domain={[0, 100]}
+                                    tick={{ fontSize: 11, fill: '#6B7280' }}
+                                    tickFormatter={(val) => `${val}%`}
+                                />
+                                <Tooltip
+                                    cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                                />
+                                <Bar dataKey="valor" radius={[4, 4, 0, 0]} animationDuration={1500}>
+                                    {chartData.map((entry: any, index: number) => {
+                                        let color = '#10B981'; // emerald-500
+                                        if (entry.valor < 90) color = '#EF4444'; // red-500
+                                        else if (entry.valor < 95) color = '#F59E0B'; // yellow-500
+
+                                        return <Cell key={`cell-${index}`} fill={color} />;
+                                    })}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="flex items-center justify-center h-full text-gray-500 bg-surface-highlight/10 rounded-lg">
+                            <div className="text-center">
+                                <Activity className="w-12 h-12 mx-auto mb-2 opacity-20" />
+                                <p>Sem dados de disponibilidade para exibir este mês.</p>
+                            </div>
                         </div>
-                    </div>
-                    <div className="p-3 bg-surface-highlight/5 border-t border-border-color text-center">
-                        <button className="text-xs text-primary font-medium hover:text-orange-400">Ver Cronograma Completo &rarr;</button>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>
     )
 }
 
-function KpiCard({ title, value, trend, trendPositive, icon: Icon, color, footer }: any) {
+function ModernKpiCard({ title, value, sub, icon: Icon, iconColor, iconBg, isSuccess }: any) {
     return (
-        <div className="bg-surface border border-border-color p-5 rounded-xl shadow-lg hover:border-primary/30 transition-colors group">
-            <div className="flex justify-between items-start mb-4">
-                <div className={`p-2.5 rounded-lg bg-surface-highlight border border-white/5 ${color} group-hover:scale-105 transition-transform`}>
-                    <Icon className="w-5 h-5" />
+        <div className="bg-surface border border-border-color p-4 rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-primary/30 transition-all hover:translate-y-[-2px]">
+            <div className="flex justify-between items-start">
+                <div className="flex flex-col">
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 leading-snug">{title}</p>
+                    <h3 className={`text-2xl font-bold text-foreground tracking-tight ${isSuccess ? 'text-emerald-600 dark:text-emerald-400' : ''}`}>{value}</h3>
+                    <p className="text-[10px] text-gray-400 mt-1 cursor-pointer hover:text-primary transition-colors">{sub}</p>
                 </div>
-                {trend && (
-                    <div className={`flex items-center text-xs font-medium px-2 py-1 rounded ${trendPositive ? 'text-emerald-400 bg-emerald-400/10' : 'text-red-400 bg-red-400/10'}`}>
-                        {trendPositive ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
-                        {trend}
-                    </div>
-                )}
-            </div>
-            <div>
-                <p className="text-gray-400 text-sm font-medium tracking-wide">{title}</p>
-                <h3 className="text-2xl font-bold text-white mt-1 tabular-nums tracking-tight">{value}</h3>
-            </div>
-            {footer && (
-                <div className="mt-4 pt-3 border-t border-dashed border-gray-700">
-                    <p className="text-xs text-gray-500">{footer}</p>
+                <div className={`p-2.5 rounded-xl ${iconBg} ${iconColor} mb-2`}>
+                    <Icon className="w-5 h-5 stroke-[2.5px]" />
                 </div>
-            )}
+            </div>
         </div>
     )
 }
@@ -157,13 +175,13 @@ function BarRow({ label, percent, warning, critical, status }: any) {
     return (
         <div className="group">
             <div className="flex justify-between text-sm mb-1.5">
-                <span className="text-gray-300 font-medium group-hover:text-white transition-colors">{label}</span>
+                <span className="text-gray-600 dark:text-gray-300 font-medium group-hover:text-foreground transition-colors">{label}</span>
                 <div className="flex items-center gap-2">
-                    {status && <span className="text-[10px] text-red-400 uppercase font-bold tracking-wider">{status}</span>}
-                    <span className={`font-mono font-bold ${critical ? 'text-red-500' : 'text-gray-200'}`}>{percent}%</span>
+                    {status && <span className="text-[10px] text-red-500 dark:text-red-400 uppercase font-bold tracking-wider">{status}</span>}
+                    <span className={`font-mono font-bold ${critical ? 'text-red-600 dark:text-red-500' : 'text-gray-700 dark:text-gray-200'}`}>{percent}%</span>
                 </div>
             </div>
-            <div className="h-2 w-full bg-surface-highlight rounded-full overflow-hidden border border-white/5">
+            <div className="h-2 w-full bg-surface-highlight rounded-full overflow-hidden border border-border-color">
                 <div className={`h-full ${color} rounded-full transition-all duration-1000 ease-out`} style={{ width: `${percent}%` }}></div>
             </div>
         </div>
@@ -172,20 +190,20 @@ function BarRow({ label, percent, warning, critical, status }: any) {
 
 function AlertItem({ vehicle, plan, overdue, trigger, date }: any) {
     return (
-        <div className="p-4 hover:bg-surface-highlight/10 transition-colors border-l-2 border-transparent hover:border-red-500">
+        <div className="p-4 hover:bg-surface-highlight/50 transition-colors border-l-2 border-transparent hover:border-red-500">
             <div className="flex justify-between items-start">
                 <div>
-                    <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                    <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
                         {vehicle}
-                        <span className="bg-surface-highlight text-gray-400 px-1.5 py-0.5 rounded text-[10px] uppercase font-normal">{trigger}</span>
+                        <span className="bg-surface-highlight text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded text-[10px] uppercase font-normal border border-border-color">{trigger}</span>
                     </h4>
-                    <p className="text-gray-400 text-sm mt-0.5">{plan}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">{plan}</p>
                 </div>
                 <div className="text-right">
-                    <span className="block text-xs font-bold text-red-500 bg-red-500/10 px-2 py-1 rounded">+{overdue}</span>
+                    <span className="block text-xs font-bold text-red-600 dark:text-red-500 bg-red-500/10 px-2 py-1 rounded">+{overdue}</span>
                 </div>
             </div>
-            <p className="text-[10px] text-gray-500 mt-2 flex items-center">
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-2 flex items-center">
                 <Clock className="w-3 h-3 mr-1" /> Venceu: {date}
             </p>
         </div>

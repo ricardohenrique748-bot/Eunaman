@@ -10,8 +10,8 @@ export default async function PcmPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Controle de Ordens de Serviço</h1>
-                    <p className="text-gray-400 text-sm">Gerencie todas as manutenções preventivas e corretivas da frota.</p>
+                    <h1 className="text-2xl font-bold text-foreground tracking-tight">Controle de Ordens de Serviço</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">Gerencie todas as manutenções preventivas e corretivas da frota.</p>
                 </div>
                 <div className="flex gap-2">
                     <Link href="/dashboard/pcm/os/nova">
@@ -30,7 +30,7 @@ export default async function PcmPage() {
                     <input
                         type="text"
                         placeholder="Buscar por Veículo ou OS..."
-                        className="w-full bg-surface-highlight border border-border-color rounded-md pl-9 pr-3 py-1.5 text-sm text-gray-200 focus:outline-none focus:border-primary placeholder-gray-600"
+                        className="w-full bg-surface-highlight border border-border-color rounded-md pl-9 pr-3 py-1.5 text-sm text-foreground focus:outline-none focus:border-primary placeholder-gray-500"
                     />
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto overflow-x-auto">
@@ -60,14 +60,14 @@ export default async function PcmPage() {
                             {ordens && ordens.length > 0 ? (
                                 ordens.map((os: any) => (
                                     <tr key={os.id} className="hover:bg-surface-highlight/10 transition-colors group">
-                                        <td className="px-6 py-4 font-mono text-gray-300">#{os.numeroOS.toString().padStart(4, '0')}</td>
+                                        <td className="px-6 py-4 font-mono text-gray-600 dark:text-gray-300">#{os.numeroOS.toString().padStart(4, '0')}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded bg-surface-highlight border border-white/5 flex items-center justify-center text-xs font-bold text-gray-400 group-hover:border-primary/50 group-hover:text-primary transition-colors">
+                                                <div className="w-8 h-8 rounded bg-surface-highlight border border-border-color flex items-center justify-center text-xs font-bold text-gray-500 group-hover:border-primary/50 group-hover:text-primary transition-colors">
                                                     {os.veiculo?.codigoInterno || '---'}
                                                 </div>
                                                 <div>
-                                                    <div className="font-medium text-white">{os.veiculo?.modelo || 'Veículo Desconhecido'}</div>
+                                                    <div className="font-medium text-foreground">{os.veiculo?.modelo || 'Veículo Desconhecido'}</div>
                                                     <div className="text-[10px] text-gray-500">{os.veiculo?.placa}</div>
                                                 </div>
                                             </div>
@@ -110,7 +110,7 @@ export default async function PcmPage() {
 
 function FilterButton({ label, active }: { label: string, active?: boolean }) {
     return (
-        <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors border ${active ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-surface-highlight border-transparent text-gray-400 hover:text-white hover:border-gray-600'}`}>
+        <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors border ${active ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-surface-highlight border-transparent text-gray-500 hover:text-foreground hover:border-gray-400 dark:hover:border-gray-600'}`}>
             {label}
         </button>
     )

@@ -6,10 +6,10 @@ export default function NovoPneuPage() {
     return (
         <div className="max-w-2xl mx-auto py-6">
             <div className="mb-6">
-                <Link href="/dashboard/pcm/pneus" className="text-gray-400 hover:text-white text-sm flex items-center gap-1 mb-2 transition-colors">
+                <Link href="/dashboard/pcm/pneus" className="text-gray-500 hover:text-foreground text-sm flex items-center gap-1 mb-2 transition-colors">
                     <ArrowLeft className="w-4 h-4" /> Voltar
                 </Link>
-                <h1 className="text-2xl font-bold text-white">Cadastrar Novo Pneu</h1>
+                <h1 className="text-2xl font-bold text-foreground">Cadastrar Novo Pneu</h1>
             </div>
 
             <div className="bg-surface border border-border-color rounded-xl p-6 shadow-lg">
@@ -20,22 +20,22 @@ export default function NovoPneuPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Código de Fogo (ID)</label>
-                            <input name="codigoPneu" required placeholder="Ex: 1200R24-001" className="w-full bg-surface-highlight border border-border-color rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                            <input name="codigoPneu" required placeholder="Ex: 1200R24-001" className="w-full bg-surface-highlight border border-border-color rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Medida</label>
-                            <input name="medida" required placeholder="Ex: 295/80R22.5" className="w-full bg-surface-highlight border border-border-color rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                            <input name="medida" required placeholder="Ex: 295/80R22.5" className="w-full bg-surface-highlight border border-border-color rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Sulco Inicial (mm)</label>
-                            <input type="number" step="0.1" name="sulco" required placeholder="Ex: 18.0" className="w-full bg-surface-highlight border border-border-color rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                            <input type="number" step="0.1" name="sulco" required placeholder="Ex: 18.0" className="w-full bg-surface-highlight border border-border-color rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Status Inicial</label>
-                            <select name="status" className="w-full bg-surface-highlight border border-border-color rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary">
+                            <select name="status" className="w-full bg-surface-highlight border border-border-color rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary">
                                 <option value="NOVO">NOVO (Estoque)</option>
                                 <option value="RECAPADO">RECAPADO</option>
                                 <option value="USADO">USADO</option>
