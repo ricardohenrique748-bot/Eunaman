@@ -1,0 +1,34 @@
+
+> frontend@0.1.0 build
+> next build
+
+▲ Next.js 16.1.4 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: C:\Users\luckh\Desktop\Eunaman\frontend\src\app\globals.css:39:3: Unknown word antialiased
+    at Input.error (node_modules/postcss/lib/input.js:135:16) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\node_modules_fe693df6._.js:4651:22]
+    at Parser.unknownWord (node_modules/postcss/lib/parser.js:595:22) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\node_modules_fe693df6._.js:5827:26]
+    at Parser.other (node_modules/postcss/lib/parser.js:437:12) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\node_modules_fe693df6._.js:5689:18]
+    at Parser.parse (node_modules/postcss/lib/parser.js:472:16) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\node_modules_fe693df6._.js:5716:26]
+    at parse (node_modules/postcss/lib/parse.js:11:12) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\node_modules_fe693df6._.js:5853:16]
+    at new LazyResult (node_modules/postcss/lib/lazy-result.js:165:16) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\node_modules_fe693df6._.js:6105:24]
+    at Processor.process (node_modules/postcss/lib/processor.js:53:14) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\node_modules_fe693df6._.js:6572:20]
+    at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\[root-of-the-server]__51225daf._.js:146:52]
+    at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\[root-of-the-server]__974941ed._.js:443:37]
+    at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\[root-of-the-server]__974941ed._.js:464:25]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+
+
+    at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\[root-of-the-server]__51225daf._.js:146:52])
+    at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\[root-of-the-server]__974941ed._.js:443:37])
+    at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11) [C:\Users\luckh\Desktop\Eunaman\frontend\.next\build\chunks\[root-of-the-server]__974941ed._.js:464:25])

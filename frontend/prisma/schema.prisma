@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. AUTENTICAÇÃO E PERFIS
+model Usuario {
+  id              String  @id @default(uuid())
+  nome            String
+  email           String  @unique
+  senha           String
+  perfil          Perfil
+  empresaPadraoId String? @map("empresa_padrao_id")
+  unidadePadraoId String? @map("unidade_padrao_id")
+  ativo           Boolean @default(true)
+
+  empresaPadrao Empresa? @relation(fields: [empresaPadraoId], references: [id])
+  unidadePadrao Unidade? @relation(fields: [unidadePadraoId], references: [id])
+
+  @@map("usuarios")
+}
+
+enum Perfil {
+  ADMIN
+  GESTOR
+  PCM
+  SEGURANCA
+  ESTOQUE
+  CUSTO
+  RH
+  OPERACIONAL
+}
+
+// 2. CADASTROS BASE
+model Empresa {
+  id           String  @id @default(uuid())
+  nomeFantasia String  @map("nome_fantasia")
+  razaoSocial  String  @map("razao_social")
+  cnpj         String  @unique
+  ativo        Boolean @default(true)
+
+  unidades  Unidade[]
+  veiculos  Veiculo[]
+  usuarios  Usuario[]
+
+  @@map("empresas")
+}
+
+model Unidade {
+  id          String  @id @default(uuid())
+  nomeUnidade String  @map("nome_unidade")
+  empresaId   String  @map("empresa_id")
+  cidade      String
+  estado      String
+  ativo       Boolean @default(true)
+
+  empresa   Empresa   @relation(fields: [empresaId], references: [id])
+  veiculos  Veiculo[]
+  usuarios  Usuario[]
+
+  @@map("unidades")
+}
+
+model Veiculo {
+  id              String            @id @default(uuid())
+  codigoInterno   String            @unique @map("codigo_interno")
+  placa           String?
+  tipoVeiculo     String            @map("tipo_veiculo")
+  fabricante      String
+  modelo          String
+  ano             Int
+  empresaId       String            @map("empresa_id")
+  unidadeId       String            @map("unidade_id")
+  status          StatusOperacional @map("status_operacional")
+  kmAtual         Int               @map("km_atual")
+  horimetroAtual  Int               @map("horimetro_atual")
+  critico         Boolean           @default(false)
+  observacoes     String?
+
+  empresa     Empresa     @relation(fields: [empresaId], references: [id])
+  unidade     Unidade     @relation(fields: [unidadeId], references: [id])
+  os          OrdemServico[]
+  planos      PlanoManutencao[]
+  pneus       Pneu[]
+
+  @@map("veiculos_frota")
+}
+
+enum StatusOperacional {
+  DISPONIVEL
+  EM_OPERACAO
+  EM_MANUTENCAO
+  PARADO
+  DESATIVADO
+}
+
+// 4. MÓDULO PCM
+model OrdemServico {
+  id             String    @id @default(uuid())
+  numeroOS       Int       @default(autoincrement()) @map("numero_os")
+  veiculoId      String    @map("veiculo_id")
+  tipoOS         TipoOS    @map("tipo_os")
+  origem         String?
+  descricao      String
+  dataAbertura   DateTime  @default(now()) @map("data_abertura")
+  dataPlanejada  DateTime? @map("data_planejada")
+  dataInicio     DateTime? @map("data_inicio")
+  dataConclusao  DateTime? @map("data_conclusao")
+  status         StatusOS  @map("status_os")
+  tempoParada    Float?    @map("tempo_parada_horas")
+  responsavelPcm String?   @map("responsavel_pcm")
+
+  veiculo Veiculo @relation(fields: [veiculoId], references: [id])
+
+  @@map("ordens_servico")
+}
+
+enum TipoOS {
+  PREVENTIVA
+  CORRETIVA
+  INSPECAO
+  MELHORIA
+}
+
+enum StatusOS {
+  ABERTA
+  PLANEJADA
+  EM_EXECUCAO
+  CONCLUIDA
+}
+
+model PlanoManutencao {
+  id             String           @id @default(uuid())
+  veiculoId      String           @map("veiculo")
+  tipoPlano      String           @map("tipo_plano")
+  gatilho        TipoGatilho
+  valorGatilho   Int              @map("valor_gatilho")
+  tolerancia     Int
+  ultimaExecucao DateTime?        @map("ultima_execucao")
+  status         StatusPreventiva @map("status_preventiva")
+
+  veiculo Veiculo @relation(fields: [veiculoId], references: [id])
+
+  @@map("planos_manutencao")
+}
+
+enum TipoGatilho {
+  KM
+  HORAS
+  DIAS
+}
+
+enum StatusPreventiva {
+  NO_PRAZO
+  ATENCAO
+  ATRASADO
+}
+
+model Pneu {
+  id             String  @id @default(uuid())
+  codigoPneu     String  @unique @map("codigo_pneu")
+  medida         String
+  vida           Int     @default(1) // 1ª vida, 2ª vida...
+  status         String
+  veiculoAtualId String? @map("veiculo_atual")
+  posicao        String?
+  sulcoAtualMm   Float   @map("sulco_atual_mm")
+
+  veiculo Veiculo? @relation(fields: [veiculoAtualId], references: [id])
+
+  @@map("pneus_frota")
+}
