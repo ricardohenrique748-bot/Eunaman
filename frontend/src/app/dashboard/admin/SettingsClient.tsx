@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Building2, Users, Database, Settings, Plus, X, Check, Save, AlertTriangle, Edit, Trash2 } from 'lucide-react'
+import { Building2, Users, Database, Settings, Plus, X, Check, Save, AlertTriangle, Edit, Trash2, FileSpreadsheet } from 'lucide-react'
 import { createEmpresa, createUsuario, createUnidade, updateSystemParam, toggleUsuarioStatus, deleteUsuario, deleteVeiculo, deleteEmpresa, deleteUnidade, updateUsuario, updateVeiculo, updateEmpresa, updateUnidade, createOsMotivo, deleteOsMotivo, createOsSistema, deleteOsSistema, createOsSubSistema, deleteOsSubSistema } from '@/app/actions/admin-actions'
+import { importVeiculosExcel } from '@/app/actions/frota-actions'
+import Link from 'next/link'
 
 interface Veiculo {
     id: string
@@ -11,6 +13,18 @@ interface Veiculo {
     placa?: string | null
     status: string
     unidade?: { nomeUnidade: string } | null
+    tipoVeiculo: string
+    categoria: string | null
+    moduloSistema: string | null
+    horimetroAtual: number
+    dataAtualizacaoHorimetro: string | null
+    documentos?: {
+        id: string
+        tipo: string
+        numero: string | null
+        dataEmissao: string | null
+        dataValidade: string | null
+    }[]
 }
 
 interface Usuario {
@@ -20,6 +34,8 @@ interface Usuario {
     perfil: string
     ativo: boolean
     empresaPadrao?: { nomeFantasia: string } | null
+    unidadePadraoId?: string | null
+    unidadePadrao?: { nomeUnidade: string } | null
 }
 
 interface Unidade {
@@ -64,12 +80,13 @@ interface OsSistema {
     subSistemas: OsSubSistema[]
 }
 
-export default function SettingsClient({ veiculos, usuarios, empresas, systemParams, osOptions }: {
+export default function SettingsClient({ veiculos, usuarios, empresas, systemParams, osOptions, userSession }: {
     veiculos: Veiculo[],
     usuarios: Usuario[],
     empresas: Empresa[],
     systemParams: SystemParam[],
-    osOptions: { motivos: OsMotivo[], sistemas: OsSistema[] }
+    osOptions: { motivos: OsMotivo[], sistemas: OsSistema[] },
+    userSession: any
 }) {
     const [activeTab, setActiveTab] = useState('database')
     const [showModal, setShowModal] = useState<string | null>(null) // 'user', 'company', 'unit'
@@ -82,7 +99,9 @@ export default function SettingsClient({ veiculos, usuarios, empresas, systemPar
         | null
     >(null)
 
-    const isAdmin = true;
+    const allUnits = empresas.flatMap(e => e.unidades)
+
+    const isAdmin = userSession.perfil === 'ADMIN';
 
     const handleNewUnit = (empresaId: string) => {
         setSelectedEmpresaId(empresaId)
@@ -133,7 +152,7 @@ export default function SettingsClient({ veiculos, usuarios, empresas, systemPar
             {/* Modais */}
             {(showModal || editItem) && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-surface border border-border-color p-8 rounded-xl shadow-2xl w-[500px]">
+                    <div className={editItem?.type === 'vehicle' ? "bg-surface border border-border-color p-8 rounded-xl shadow-2xl w-[900px] max-h-[90vh] overflow-y-auto" : "bg-surface border border-border-color p-8 rounded-xl shadow-2xl w-[500px]"}>
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-bold text-foreground">
                                 {showModal === 'user' && 'Novo Usuário'}
@@ -161,14 +180,25 @@ export default function SettingsClient({ veiculos, usuarios, empresas, systemPar
                                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Endereço de E-mail</label>
                                     <input name="email" required type="email" className="w-full p-3 rounded-lg bg-surface-highlight border border-border-color focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Perfil de Acesso</label>
-                                    <select name="perfil" className="w-full p-3 rounded-lg bg-surface-highlight border border-border-color focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                                        <option value="OPERACIONAL">Operacional (Básico)</option>
-                                        <option value="PCM">PCM (Planejamento)</option>
-                                        <option value="GESTOR">Gestor de Frota</option>
-                                        <option value="ADMIN">Administrador</option>
-                                    </select>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Perfil de Acesso</label>
+                                        <select name="perfil" className="w-full p-3 rounded-lg bg-surface-highlight border border-border-color focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                                            <option value="OPERACIONAL">Operacional</option>
+                                            <option value="PCM">PCM</option>
+                                            <option value="GESTOR">Gestor</option>
+                                            <option value="ADMIN">Administrador</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Filial / Unidade</label>
+                                        <select name="unidadePadraoId" className="w-full p-3 rounded-lg bg-surface-highlight border border-border-color focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                                            <option value="">Acesso Global / Sede</option>
+                                            {allUnits.map(u => (
+                                                <option key={u.id} value={u.id}>{u.nomeUnidade}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Senha</label>
@@ -224,21 +254,104 @@ export default function SettingsClient({ veiculos, usuarios, empresas, systemPar
                             <form action={async (formData) => {
                                 await updateVeiculo(formData)
                                 setEditItem(null)
-                            }} className="space-y-5">
+                            }} className="space-y-6">
                                 <input type="hidden" name="id" value={editItem.data.id} />
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Código Interno</label>
-                                    <input name="codigoInterno" defaultValue={editItem.data.codigoInterno} required className="w-full p-3 rounded-lg bg-surface-highlight border border-border-color" />
+
+                                <div className="grid grid-cols-2 gap-6">
+                                    {/* Esquerda: Básicos */}
+                                    <div className="space-y-4">
+                                        <h4 className="font-bold text-gray-500 text-xs border-b border-border-color pb-1 uppercase">Informações Operacionais</h4>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-bold text-gray-500">Cód. Interno</label>
+                                                <input name="codigoInterno" defaultValue={editItem.data.codigoInterno} required className="w-full p-2 text-sm rounded bg-surface-highlight border border-border-color" />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-bold text-gray-500">Placa</label>
+                                                <input name="placa" defaultValue={editItem.data.placa ?? ''} className="w-full p-2 text-sm rounded bg-surface-highlight border border-border-color" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-bold text-gray-500">Modelo</label>
+                                            <input name="modelo" defaultValue={editItem.data.modelo} required className="w-full p-2 text-sm rounded bg-surface-highlight border border-border-color" />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-bold text-gray-500">Tipo</label>
+                                                <select name="tipo" defaultValue={editItem.data.tipoVeiculo} className="w-full p-2 text-sm rounded bg-surface-highlight border border-border-color">
+                                                    <option value="LEVE">Leve</option>
+                                                    <option value="PESADO">Pesado</option>
+                                                    <option value="MAQUINA">Máquina</option>
+                                                </select>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-bold text-gray-500">Categoria</label>
+                                                <select name="categoria" defaultValue={editItem.data.categoria ?? 'PROPRIO'} className="w-full p-2 text-sm rounded bg-surface-highlight border border-border-color">
+                                                    <option value="PROPRIO">Próprio</option>
+                                                    <option value="ALUGADO">Alugado</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-bold text-gray-500">Módulo</label>
+                                                <input name="modulo" defaultValue={editItem.data.moduloSistema ?? 'BASE'} className="w-full p-2 text-sm rounded bg-surface-highlight border border-border-color" />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-bold text-gray-500">Horímetro Atual</label>
+                                                <input name="horimetro" type="number" defaultValue={editItem.data.horimetroAtual} className="w-full p-2 text-sm rounded bg-surface-highlight border border-border-color" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Direita: Documentos */}
+                                    <div className="space-y-4">
+                                        <h4 className="font-bold text-gray-500 text-xs border-b border-border-color pb-1 uppercase">Documentação</h4>
+                                        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                                            {[
+                                                { title: "Laudo Eletromecânico", prefix: "laudo", type: "LAUDO_ELETROMECANICO" },
+                                                { title: "CRLV", prefix: "crlv", type: "CRLV" },
+                                                { title: "Implemento", prefix: "implemento", type: "IMPLEMENTO" },
+                                                { title: "Tacógrafo", prefix: "tacografo", type: "TACOGRAFO" },
+                                                { title: "CIV/CIPP", prefix: "civ", type: "CIV_CIPP" }
+                                            ].map(docType => {
+                                                const doc = editItem.data.documentos?.find(d => d.tipo === docType.type);
+                                                return (
+                                                    <div key={docType.prefix} className="bg-surface-highlight p-3 rounded-lg border border-border-color">
+                                                        <p className="text-[10px] font-bold text-primary mb-2">{docType.title}</p>
+                                                        <div className="space-y-2">
+                                                            <input
+                                                                name={`${docType.prefix}_numero`}
+                                                                defaultValue={doc?.numero ?? ''}
+                                                                placeholder="Número"
+                                                                className="w-full p-2 text-xs rounded border border-border-color bg-surface"
+                                                            />
+                                                            <div className="grid grid-cols-2 gap-2">
+                                                                <input
+                                                                    type="date"
+                                                                    name={`${docType.prefix}_emissao`}
+                                                                    defaultValue={doc?.dataEmissao ? new Date(doc.dataEmissao).toISOString().split('T')[0] : ''}
+                                                                    className="w-full p-2 text-[10px] rounded border border-border-color bg-surface"
+                                                                />
+                                                                <input
+                                                                    type="date"
+                                                                    name={`${docType.prefix}_validade`}
+                                                                    defaultValue={doc?.dataValidade ? new Date(doc.dataValidade).toISOString().split('T')[0] : ''}
+                                                                    className="w-full p-2 text-[10px] rounded border border-border-color bg-surface"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Modelo</label>
-                                    <input name="modelo" defaultValue={editItem.data.modelo} required className="w-full p-3 rounded-lg bg-surface-highlight border border-border-color" />
+
+                                <div className="flex justify-end gap-3 pt-4 border-t border-border-color">
+                                    <button type="button" onClick={() => setEditItem(null)} className="px-6 py-2 rounded-lg border border-border-color text-sm">Cancelar</button>
+                                    <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-2 rounded-lg font-bold shadow-lg shadow-emerald-500/20">Atualizar Veículo</button>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Placa</label>
-                                    <input name="placa" defaultValue={editItem.data.placa ?? ''} className="w-full p-3 rounded-lg bg-surface-highlight border border-border-color" />
-                                </div>
-                                <button className="w-full bg-primary text-white py-3 rounded-lg font-bold">Atualizar Veículo</button>
                             </form>
                         )}
 
@@ -256,14 +369,25 @@ export default function SettingsClient({ veiculos, usuarios, empresas, systemPar
                                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">E-mail</label>
                                     <input name="email" type="email" defaultValue={editItem.data.email} required className="w-full p-3 rounded-lg bg-surface-highlight border border-border-color" />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Perfil</label>
-                                    <select name="perfil" defaultValue={editItem.data.perfil} className="w-full p-3 rounded-lg bg-surface-highlight border border-border-color">
-                                        <option value="OPERACIONAL">OPERACIONAL</option>
-                                        <option value="PCM">PCM</option>
-                                        <option value="GESTOR">GESTOR</option>
-                                        <option value="ADMIN">ADMIN</option>
-                                    </select>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Perfil</label>
+                                        <select name="perfil" defaultValue={editItem.data.perfil} className="w-full p-3 rounded-lg bg-surface-highlight border border-border-color">
+                                            <option value="OPERACIONAL">OPERACIONAL</option>
+                                            <option value="PCM">PCM</option>
+                                            <option value="GESTOR">GESTOR</option>
+                                            <option value="ADMIN">ADMIN</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Filial</label>
+                                        <select name="unidadePadraoId" defaultValue={editItem.data.unidadePadraoId ?? ''} className="w-full p-3 rounded-lg bg-surface-highlight border border-border-color">
+                                            <option value="">Acesso Global</option>
+                                            {allUnits.map(u => (
+                                                <option key={u.id} value={u.id}>{u.nomeUnidade}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nova Senha (deixe em branco para não alterar)</label>
@@ -334,9 +458,43 @@ function DatabaseSection({ veiculos, isAdmin, onDelete, onEdit }: { veiculos: Ve
                         {veiculos.length} Veículos
                     </div>
                     {isAdmin && (
-                        <button className="bg-primary text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-orange-600 transition-colors">
-                            <Plus className="w-4 h-4" /> Novo Ativo
-                        </button>
+                        <div className="flex gap-2">
+                            <label className="cursor-pointer bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20">
+                                <FileSpreadsheet className="w-4 h-4" /> Importar Excel
+                                <input
+                                    type="file"
+                                    accept=".xlsx, .xls"
+                                    className="hidden"
+                                    onChange={async (e) => {
+                                        const file = e.target.files?.[0]
+                                        if (!file) return
+
+                                        console.log('Iniciando importação direta...')
+                                        const formData = new FormData()
+                                        formData.append('file', file)
+
+                                        const res = await importVeiculosExcel(formData)
+                                        console.log('Resultado:', res)
+
+                                        if (res.success) {
+                                            const errorCount = res.errors?.length ?? 0
+                                            if (errorCount > 0) {
+                                                alert(`Importação concluída com avisos!\nSucesso: ${res.count}\nErros: ${errorCount}\nÚltimo Erro: ${res.error}`)
+                                            } else {
+                                                alert(`Importação concluída com sucesso!\n${res.count} veículos importados.`)
+                                            }
+                                        } else {
+                                            alert(`Erro Crítico: ${res.error}`)
+                                        }
+                                    }}
+                                />
+                            </label>
+                            <Link href="/dashboard/frota/novo">
+                                <button className="bg-primary text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-orange-600 transition-colors">
+                                    <Plus className="w-4 h-4" /> Novo Ativo
+                                </button>
+                            </Link>
+                        </div>
                     )}
                 </div>
             </div>
@@ -428,7 +586,7 @@ function UsersSection({ usuarios, onNew, isAdmin, onDelete, onEdit }: { usuarios
                                     </span>
                                 </td>
                                 <td className="px-8 py-5 text-gray-500 font-semibold text-sm">
-                                    {u.empresaPadrao?.nomeFantasia || 'NÃO VINCULADO'}
+                                    {u.unidadePadrao?.nomeUnidade || u.empresaPadrao?.nomeFantasia || 'NÃO VINCULADO'}
                                 </td>
                                 <td className="px-8 py-5">
                                     <div className="flex items-center gap-2.5">

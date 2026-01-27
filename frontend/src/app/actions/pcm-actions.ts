@@ -1,5 +1,6 @@
 'use server'
 
+import { getSession } from './auth-actions'
 import { TipoOS } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
@@ -7,7 +8,16 @@ import { redirect } from 'next/navigation'
 
 export async function getOrdensServico() {
     try {
+        const session = await getSession()
+        if (!session) return { success: false, error: 'Não autenticado' }
+
+        const where: any = {}
+        if (session.perfil !== 'ADMIN') {
+            where.veiculo = { unidadeId: session.unidadeId }
+        }
+
         const os = await prisma.ordemServico.findMany({
+            where,
             include: {
                 veiculo: true
             },
@@ -51,6 +61,7 @@ export async function createOrdemServico(formData: FormData) {
         })
 
         revalidatePath('/dashboard/pcm')
+        revalidatePath('/dashboard')
         return { success: true }
     } catch (error) {
         return { success: false, error: 'Erro ao criar ordem de serviço' }
@@ -58,8 +69,16 @@ export async function createOrdemServico(formData: FormData) {
 }
 
 export async function getVeiculosDropdown() {
+    const session = await getSession()
+    if (!session) return []
+
+    const where: any = { status: { not: 'DESATIVADO' } }
+    if (session.perfil !== 'ADMIN') {
+        where.unidadeId = session.unidadeId
+    }
+
     return await prisma.veiculo.findMany({
         select: { id: true, codigoInterno: true, modelo: true, placa: true },
-        where: { status: { not: 'DESATIVADO' } }
+        where
     })
 }

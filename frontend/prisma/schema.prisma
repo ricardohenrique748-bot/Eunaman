@@ -77,16 +77,21 @@ model Veiculo {
   empresaId       String            @map("empresa_id")
   unidadeId       String            @map("unidade_id")
   status          StatusOperacional @map("status_operacional")
-  kmAtual         Int               @map("km_atual")
-  horimetroAtual  Int               @map("horimetro_atual")
+  kmAtual         Int               @default(0) @map("km_atual")
+  horimetroAtual  Int               @default(0) @map("horimetro_atual")
   critico         Boolean           @default(false)
   observacoes     String?
+  categoria       String?
+  moduloSistema   String?           @map("modulo_sistema")
+  dataAtualizacaoHorimetro DateTime? @map("data_atualizacao_horimetro")
 
   empresa     Empresa     @relation(fields: [empresaId], references: [id])
   unidade     Unidade     @relation(fields: [unidadeId], references: [id])
   os          OrdemServico[]
   planos      PlanoManutencao[]
   pneus       Pneu[]
+  boletinsPneu BoletimPneu[]
+  documentos   DocumentoFrota[]
 
   @@map("veiculos_frota")
 }
@@ -180,6 +185,7 @@ model Pneu {
   sulcoAtualMm   Float   @map("sulco_atual_mm")
 
   veiculo Veiculo? @relation(fields: [veiculoAtualId], references: [id])
+  historicoInspecao ItemBoletimPneu[]
 
   @@map("pneus_frota")
 }
@@ -226,4 +232,46 @@ model OsSubSistema {
 
   @@unique([nome, sistemaId])
   @@map("os_sub_sistemas")
+}
+
+model BoletimPneu {
+  id          String   @id @default(uuid())
+  veiculoId   String   @map("veiculo_id")
+  data        DateTime
+  km          Int
+  condicao    String?
+  observacoes String?
+  criadoEm    DateTime @default(now()) @map("criado_em")
+
+  itens       ItemBoletimPneu[]
+  veiculo     Veiculo @relation(fields: [veiculoId], references: [id])
+
+  @@map("boletins_pneu")
+}
+
+model ItemBoletimPneu {
+  id        String @id @default(uuid())
+  boletimId String @map("boletim_id")
+  posicao   String
+  sulcoMm   Float  @map("sulco_mm")
+  pneuId    String? @map("pneu_id")
+
+  boletim   BoletimPneu @relation(fields: [boletimId], references: [id])
+  pneu      Pneu?       @relation(fields: [pneuId], references: [id])
+
+  @@map("itens_boletim_pneu")
+}
+
+model DocumentoFrota {
+  id           String    @id @default(uuid())
+  veiculoId    String    @map("veiculo_id")
+  tipo         String    // LAUDO, CRLV, IMPLEMENTO, TACOGRAFO, CIV_CIPP
+  numero       String?
+  dataEmissao  DateTime? @map("data_emissao")
+  dataValidade DateTime? @map("data_validade")
+  
+  veiculo      Veiculo   @relation(fields: [veiculoId], references: [id])
+  
+  @@unique([veiculoId, tipo])
+  @@map("documentos_frota")
 }

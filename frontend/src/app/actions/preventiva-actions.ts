@@ -4,6 +4,7 @@ import { StatusPreventiva } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { getSession } from './auth-actions'
 
 export async function createPreventiva(formData: FormData) {
     const veiculoId = formData.get('veiculoId') as string
@@ -50,6 +51,7 @@ export async function createPreventiva(formData: FormData) {
         })
 
         revalidatePath('/dashboard/pcm/preventivas')
+        revalidatePath('/dashboard')
         return { success: true }
     } catch (_) {
         return { success: false, error: 'Erro ao salvar dados' }
@@ -57,8 +59,16 @@ export async function createPreventiva(formData: FormData) {
 }
 
 export async function getVeiculosSimples() {
+    const session = await getSession()
+    if (!session) return []
+
+    const where: any = { status: { not: 'DESATIVADO' } }
+    if (session.perfil !== 'ADMIN') {
+        where.unidadeId = session.unidadeId
+    }
+
     return await prisma.veiculo.findMany({
-        where: { status: { not: 'DESATIVADO' } },
+        where,
         select: { id: true, modelo: true, placa: true, codigoInterno: true, horimetroAtual: true }
     })
 }

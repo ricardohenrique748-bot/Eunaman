@@ -5,18 +5,38 @@ import prisma from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
 // --- VEÍCULOS (BASE DE DADOS) ---
+import { getSession } from './auth-actions'
+
 export async function getAdminVeiculos() {
+    const session = await getSession()
+    if (!session) return []
+
+    const where: any = {}
+    if (session.perfil !== 'ADMIN') {
+        where.unidadeId = session.unidadeId
+    }
+
     return await prisma.veiculo.findMany({
+        where,
         orderBy: { codigoInterno: 'asc' },
-        include: { unidade: true }
+        // @ts-ignore
+        include: { unidade: true, documentos: true }
     })
 }
 
-// --- USUÁRIOS ---
 export async function getAdminUsuarios() {
+    const session = await getSession()
+    if (!session) return []
+
+    const where: any = {}
+    if (session.perfil !== 'ADMIN') {
+        where.unidadePadraoId = session.unidadeId
+    }
+
     return await prisma.usuario.findMany({
+        where,
         orderBy: { nome: 'asc' },
-        include: { empresaPadrao: true }
+        include: { empresaPadrao: true, unidadePadrao: true }
     })
 }
 
@@ -27,12 +47,15 @@ export async function createUsuario(formData: FormData) {
         const senha = formData.get('senha') as string || '123'
         const perfil = formData.get('perfil') as Perfil
 
+        const unidadePadraoId = formData.get('unidadePadraoId') as string
+
         await prisma.usuario.create({
             data: {
                 nome,
                 email,
                 senha,
                 perfil,
+                unidadePadraoId: unidadePadraoId !== '' ? unidadePadraoId : null,
                 ativo: true
             }
         })
@@ -151,8 +174,14 @@ export async function updateUsuario(formData: FormData) {
         const email = formData.get('email') as string
         const perfil = formData.get('perfil') as Perfil
         const senhaCandidate = formData.get('senha') as string
+        const unidadePadraoId = formData.get('unidadePadraoId') as string
 
-        const data: any = { nome, email, perfil }
+        const data: any = {
+            nome,
+            email,
+            perfil,
+            unidadePadraoId: unidadePadraoId !== '' ? unidadePadraoId : null
+        }
         if (senhaCandidate && senhaCandidate.trim() !== '') {
             data.senha = senhaCandidate
         }
@@ -174,16 +203,84 @@ export async function updateVeiculo(formData: FormData) {
         const modelo = formData.get('modelo') as string
         const placa = formData.get('placa') as string
         const codigoInterno = formData.get('codigoInterno') as string
+        const tipo = formData.get('tipo') as string
+        const categoria = formData.get('categoria') as string
+        const modulo = formData.get('modulo') as string
+        const horimetro = parseInt(formData.get('horimetro') as string) || 0
+        const dataAtualizacao = formData.get('dataAtualizacao') as string
 
-        await prisma.veiculo.update({
-            where: { id },
-            data: { modelo, placa, codigoInterno }
+        const docTypes = [
+            { prefix: 'laudo', type: 'LAUDO_ELETROMECANICO' },
+            { prefix: 'crlv', type: 'CRLV' },
+            { prefix: 'implemento', type: 'IMPLEMENTO' },
+            { prefix: 'tacografo', type: 'TACOGRAFO' },
+            { prefix: 'civ', type: 'CIV_CIPP' }
+        ]
+
+        await prisma.$transaction(async (tx) => {
+            // 1. Update Vehicle
+            await tx.veiculo.update({
+                where: { id },
+                data: {
+                    modelo,
+                    placa,
+                    codigoInterno,
+                    tipoVeiculo: typeMap(tipo),
+                    // @ts-ignore
+                    categoria,
+                    // @ts-ignore
+                    moduloSistema: modulo,
+                    horimetroAtual: horimetro,
+                    dataAtualizacaoHorimetro: dataAtualizacao ? new Date(dataAtualizacao) : new Date()
+                }
+            })
+
+            // 2. Handle Documents (Upsert per type)
+            for (const d of docTypes) {
+                const num = formData.get(`${d.prefix}_numero`) as string
+                const emissao = formData.get(`${d.prefix}_emissao`) as string
+                const validade = formData.get(`${d.prefix}_validade`) as string
+
+                if (num) {
+                    // @ts-ignore
+                    await tx.documentoFrota.upsert({
+                        where: {
+                            veiculoId_tipo: {
+                                veiculoId: id,
+                                tipo: d.type
+                            }
+                        },
+                        update: {
+                            numero: num,
+                            dataEmissao: emissao ? new Date(emissao) : null,
+                            dataValidade: validade ? new Date(validade) : null
+                        },
+                        create: {
+                            veiculoId: id,
+                            tipo: d.type,
+                            numero: num,
+                            dataEmissao: emissao ? new Date(emissao) : null,
+                            dataValidade: validade ? new Date(validade) : null
+                        }
+                    })
+                }
+            }
         })
+
         revalidatePath('/dashboard/admin')
         return { success: true }
-    } catch (_) {
-        return { success: false, error: 'Erro ao atualizar veículo' }
+    } catch (e: any) {
+        console.error(e)
+        return { success: false, error: 'Erro ao atualizar veículo: ' + e.message }
     }
+}
+
+function typeMap(val: string) {
+    if (!val) return 'LEVE'
+    const v = val.toUpperCase()
+    if (v.includes('PESADO')) return 'PESADO'
+    if (v.includes('MAQUINA')) return 'MAQUINA'
+    return 'LEVE'
 }
 
 export async function updateEmpresa(formData: FormData) {

@@ -1,20 +1,29 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Truck, Lock, User } from 'lucide-react'
+import { Lock, User, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
+import { login } from '@/app/actions/auth-actions'
 
 export default function LoginPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    // Mock login delay
-    setTimeout(() => {
+    setError(null)
+
+    const formData = new FormData(e.currentTarget)
+    const res = await login(formData)
+
+    if (res.success) {
       router.push('/dashboard')
-    }, 1000)
+    } else {
+      setError(res.error || 'Erro ao entrar')
+      setLoading(false)
+    }
   }
 
   return (
@@ -30,6 +39,13 @@ export default function LoginPage() {
           {/* Removed Text Title - Logo speaks for itself in minimalist design */}
         </div>
 
+        {error && (
+          <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+            <AlertCircle className="w-4 h-4" />
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-2">
             <label className="text-xs uppercase tracking-wider font-semibold text-gray-400">Email Corporativo</label>
@@ -37,7 +53,9 @@ export default function LoginPage() {
               <User className="absolute left-3 top-3 w-5 h-5 text-gray-500 group-focus-within:text-primary transition-colors" />
               <input
                 type="email"
+                name="email"
                 placeholder="usuario@eunaman.com"
+                required
                 className="w-full bg-surface-highlight border border-border-color rounded-lg py-2.5 pl-10 pr-4 text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
               />
             </div>
@@ -49,7 +67,9 @@ export default function LoginPage() {
               <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-500 group-focus-within:text-primary transition-colors" />
               <input
                 type="password"
+                name="password"
                 placeholder="••••••••"
+                required
                 className="w-full bg-surface-highlight border border-border-color rounded-lg py-2.5 pl-10 pr-4 text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
               />
             </div>

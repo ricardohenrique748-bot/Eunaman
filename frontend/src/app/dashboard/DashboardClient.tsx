@@ -1,22 +1,160 @@
 'use client'
 
-import { ArrowUpRight, ArrowDownRight, Activity, Wrench, AlertTriangle, CheckCircle2, Clock, FileText, Settings, AlertCircle } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, Activity, Wrench, AlertTriangle, CheckCircle2, Clock, FileText, Settings, AlertCircle, Filter, Search } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useCallback, useEffect } from 'react'
 
-export default function DashboardClient({ metrics, chartData }: {
+interface DashboardFilters {
+    mes?: number
+    ano?: number
+    placa?: string
+    status?: string
+    os?: string
+    tipo?: string
+}
+
+export default function DashboardClient({ metrics, chartData, filters }: {
     metrics: {
         totalOS: number;
         osAbertas: number;
         osFechadas: number;
         disponibilidadeGlobal: string;
         mttr: string;
-        mtbf: string
+        mtbf: string;
+        docs: {
+            valid: number;
+            attention: number;
+            expired: number;
+        }
     },
-    chartData: { placa: string; valor: number }[]
+    chartData: { placa: string; valor: number }[],
+    filters: DashboardFilters
 }) {
+    const router = useRouter()
+    const searchParams = useSearchParams()
+
+    const [localFilters, setLocalFilters] = useState(filters)
+
+    useEffect(() => {
+        setLocalFilters(filters)
+    }, [filters])
+
+    const applyFilters = useCallback(() => {
+        console.log('[Client] Aplicando filtros locais:', localFilters)
+        const params = new URLSearchParams()
+
+        if (localFilters.mes !== undefined) params.set('mes', localFilters.mes.toString())
+        if (localFilters.ano !== undefined) params.set('ano', localFilters.ano.toString())
+        if (localFilters.placa) params.set('placa', localFilters.placa)
+        if (localFilters.status) params.set('status', localFilters.status)
+        if (localFilters.os) params.set('os', localFilters.os)
+        if (localFilters.tipo) params.set('tipo', localFilters.tipo)
+
+        const finalUrl = `/dashboard?${params.toString()}`
+        console.log('[Client] Redirecionando para:', finalUrl)
+        window.location.href = finalUrl
+    }, [localFilters])
+
+    const meses = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ]
+
+    const anos = [2024, 2025, 2026]
+
     return (
         <div className="space-y-8">
-            {/* KPI Grid - Style: Clean Modern */}
+            {/* Filters Bar */}
+            <div className="bg-surface border border-border-color p-4 rounded-2xl shadow-sm flex flex-wrap gap-4 items-end">
+                <div className="space-y-1.5 flex-1 min-w-[140px]">
+                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Mês</label>
+                    <select
+                        value={localFilters.mes ?? ''}
+                        onChange={e => setLocalFilters(prev => ({ ...prev, mes: e.target.value === '' ? undefined : Number(e.target.value) }))}
+                        className="w-full bg-surface-highlight border border-border-color rounded-xl px-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all"
+                    >
+                        <option value="">Mês Atual</option>
+                        {meses.map((m, i) => (
+                            <option key={m} value={i}>{m}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="space-y-1.5 flex-1 min-w-[100px]">
+                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Ano</label>
+                    <select
+                        value={localFilters.ano ?? ''}
+                        onChange={e => setLocalFilters(prev => ({ ...prev, ano: e.target.value === '' ? undefined : Number(e.target.value) }))}
+                        className="w-full bg-surface-highlight border border-border-color rounded-xl px-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all"
+                    >
+                        {anos.map(a => (
+                            <option key={a} value={a}>{a}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="space-y-1.5 flex-1 min-w-[150px]">
+                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Placa</label>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                        <input
+                            placeholder="Buscar placa..."
+                            value={localFilters.placa || ''}
+                            onChange={e => setLocalFilters(prev => ({ ...prev, placa: e.target.value }))}
+                            className="w-full bg-surface-highlight border border-border-color rounded-xl pl-9 pr-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all"
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-1.5 flex-1 min-w-[140px]">
+                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Categoria</label>
+                    <select
+                        value={localFilters.tipo || ''}
+                        onChange={e => setLocalFilters(prev => ({ ...prev, tipo: e.target.value }))}
+                        className="w-full bg-surface-highlight border border-border-color rounded-xl px-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all"
+                    >
+                        <option value="">Todas</option>
+                        <option value="LEVE">LEVE</option>
+                        <option value="PESADO">PESADO</option>
+                        <option value="MAQUINA">MAQUINA</option>
+                    </select>
+                </div>
+
+                <div className="space-y-1.5 flex-1 min-w-[140px]">
+                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Status OS</label>
+                    <select
+                        value={localFilters.status || ''}
+                        onChange={e => setLocalFilters(prev => ({ ...prev, status: e.target.value }))}
+                        className="w-full bg-surface-highlight border border-border-color rounded-xl px-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all"
+                    >
+                        <option value="">Todos</option>
+                        <option value="ABERTA">Aberta</option>
+                        <option value="EM_EXECUCAO">Em Execução</option>
+                        <option value="CONCLUIDA">Concluída</option>
+                    </select>
+                </div>
+
+                <div className="space-y-1.5 flex-1 min-w-[100px]">
+                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Nº OS</label>
+                    <input
+                        placeholder="Ex: 001"
+                        value={localFilters.os || ''}
+                        onChange={e => setLocalFilters(prev => ({ ...prev, os: e.target.value }))}
+                        className="w-full bg-surface-highlight border border-border-color rounded-xl px-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all"
+                    />
+                </div>
+
+                <button
+                    onClick={applyFilters}
+                    className="bg-primary hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl font-black text-sm shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
+                >
+                    <Filter className="w-4 h-4" />
+                    Filtrar
+                </button>
+            </div>
+
+            {/* KPI Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
                 <ModernKpiCard
                     title="Total de OS"
@@ -72,9 +210,9 @@ export default function DashboardClient({ metrics, chartData }: {
                         <div>
                             <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Docs</p>
                             <div className="flex items-baseline gap-1.5 flex-wrap">
-                                <span className="text-xl font-bold text-green-600">26</span>
-                                <span className="text-xl font-bold text-yellow-500">2</span>
-                                <span className="text-xl font-bold text-red-500">16</span>
+                                <span className="text-xl font-bold text-green-600">{metrics.docs?.valid || 0}</span>
+                                <span className="text-xl font-bold text-yellow-500">{metrics.docs?.attention || 0}</span>
+                                <span className="text-xl font-bold text-red-500">{metrics.docs?.expired || 0}</span>
                             </div>
                             <p className="text-[10px] text-gray-400 mt-1">V / AV / Venc</p>
                         </div>
@@ -142,7 +280,7 @@ export default function DashboardClient({ metrics, chartData }: {
                         <div className="flex items-center justify-center h-full text-gray-500 bg-surface-highlight/10 rounded-lg">
                             <div className="text-center">
                                 <Activity className="w-12 h-12 mx-auto mb-2 opacity-20" />
-                                <p>Sem dados de disponibilidade para exibir este mês.</p>
+                                <p>Sem dados de disponibilidade para exibir com os filtros atuais.</p>
                             </div>
                         </div>
                     )}

@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { LayoutDashboard, Wrench, Shield, Package, DollarSign, Users, Settings, LogOut, ChevronDown, Disc, MapPin, CalendarClock, ListTodo } from 'lucide-react'
+import { LayoutDashboard, Wrench, Shield, Package, DollarSign, Users, Settings, LogOut, ChevronDown, Disc, MapPin, CalendarClock, ListTodo, Truck } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { ModeToggle } from '@/components/ui/mode-toggle'

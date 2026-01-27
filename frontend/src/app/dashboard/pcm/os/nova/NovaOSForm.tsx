@@ -1,9 +1,10 @@
 'use client'
 
-import { createOrdemServico } from '@/app/actions/pcm-actions' // Import server action
+import { createOrdemServico } from '@/app/actions/pcm-actions'
 import { ArrowLeft, Calendar, Clock } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface VeiculoDropdown {
     id: string;
@@ -33,6 +34,7 @@ export default function NovaOSForm({ veiculos, osOptions }: {
     veiculos: VeiculoDropdown[],
     osOptions: { motivos: OsMotivo[], sistemas: OsSistema[] }
 }) {
+    const router = useRouter()
     const [enviadoReserva, setEnviadoReserva] = useState(false)
     const [selectedSistemaId, setSelectedSistemaId] = useState<string>('')
 
@@ -49,10 +51,14 @@ export default function NovaOSForm({ veiculos, osOptions }: {
 
             <div className="bg-surface border border-border-color rounded-xl p-6 shadow-lg">
                 <form action={async (formData) => {
-                    await createOrdemServico(formData)
+                    const res = await createOrdemServico(formData)
+                    if (res.success) {
+                        router.push('/dashboard/pcm/os')
+                    } else {
+                        alert(res.error)
+                    }
                 }} className="space-y-6">
 
-                    {/* Linha 1: Datas e Status/Placa */}
                     {/* Linha 1: Datas e Status/Placa */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Datas */}
@@ -189,7 +195,7 @@ export default function NovaOSForm({ veiculos, osOptions }: {
                             <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Sub-Sistema</label>
                             <select name="subSistemaId" className="w-full bg-surface-highlight border border-border-color rounded px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary appearance-none">
                                 <option value="">Selecione</option>
-                                {filteredSubSistemas.map(ss => (
+                                {filteredSubSistemas.map((ss: OsSubSistema) => (
                                     <option key={ss.id} value={ss.id}>{ss.nome}</option>
                                 ))}
                             </select>
