@@ -25,12 +25,12 @@ export default function DashboardShell({ children, user }: { children: React.Rea
             <aside className="w-68 bg-surface border-r border-border-color flex flex-col z-20 shadow-2xl">
                 <div className="h-20 flex items-center px-8 border-b border-border-color/50">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/10 rounded-xl">
-                            <Wrench className="w-5 h-5 text-primary stroke-[2.5px]" />
+                        <div className="relative w-9 h-9">
+                            <Image src="/logo.png" alt="Logo" fill className="object-contain" />
                         </div>
                         <div>
-                            <span className="font-black text-sm tracking-tighter text-foreground block leading-none">MAINTX</span>
-                            <span className="text-[10px] font-black text-primary tracking-widest uppercase opacity-80">PRO v1.0</span>
+                            <span className="font-black text-sm tracking-tighter text-foreground block leading-none">EUNAMAN</span>
+                            <span className="text-[10px] font-black text-primary tracking-widest uppercase opacity-80">MaintX Pro</span>
                         </div>
                     </div>
                 </div>

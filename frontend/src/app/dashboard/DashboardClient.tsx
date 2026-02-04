@@ -312,30 +312,29 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
 
                     <div className="w-full">
                         {preventiveData.length > 0 ? (
-                            <div style={{ height: `${Math.max(300, preventiveData.length * 45)}px` }}>
+                            <div className="h-[350px] w-full mt-4">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
-                                        layout="vertical"
                                         data={preventiveData}
-                                        margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                                        margin={{ top: 20, right: 10, left: -20, bottom: 20 }}
                                     >
-                                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(128,128,128,0.1)" />
-                                        <XAxis type="number" hide />
-                                        <YAxis
-                                            dataKey="name"
-                                            type="category"
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.1)" />
+                                        <XAxis
+                                            dataKey="placa"
                                             tick={{ fontSize: 9, fill: '#6B7280', fontWeight: 800 }}
-                                            width={140}
-                                            stroke="transparent"
+                                            axisLine={false}
+                                            tickLine={false}
                                         />
+                                        <YAxis hide />
                                         <Tooltip
                                             contentStyle={{ backgroundColor: 'var(--surface)', borderRadius: '12px', border: '1px solid var(--border-color)', fontSize: '12px' }}
+                                            cursor={{ fill: 'rgba(0,0,0,0.02)' }}
                                             formatter={(val: number) => [`${val}h`, 'Horas Restantes']}
                                         />
-                                        <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={18}>
+                                        <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={32}>
                                             <LabelList
                                                 dataKey="value"
-                                                position="right"
+                                                position="top"
                                                 formatter={(val: number) => `${val}h`}
                                                 style={{ fill: '#6B7280', fontWeight: '800', fontSize: '10px' }}
                                             />
