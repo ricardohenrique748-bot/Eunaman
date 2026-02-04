@@ -17,14 +17,14 @@
 
 @layer base {
   :root {
-    /* Light Mode - Modern Glass */
-    --background: #f8fafc; /* Slate 50 */
-    --surface: rgba(255, 255, 255, 0.75);
-    --surface-highlight: rgba(241, 245, 249, 0.6); /* Slate 100 */
-    --border-color: rgba(226, 232, 240, 0.8); /* Slate 200 */
-    --foreground: #0f172a; /* Slate 900 */
+    /* Light Mode - Standard Clean SaaS */
+    --background: #f1f5f9;  /* Slate 100 */
+    --surface: #ffffff;
+    --surface-highlight: #e2e8f0; /* Slate 200 */
+    --border-color: #cbd5e1;    /* Slate 300 */
+    --foreground: #0f172a;      /* Slate 900 */
     
-    --primary: #ea580c; /* Orange 600 - More vibrant */
+    --primary: #2563eb;         /* Blue 600 */
     --primary-foreground: #ffffff;
     
     --status-ok: #10b981;
@@ -32,33 +32,35 @@
     --status-critical: #ef4444;
     --status-info: #3b82f6;
 
-    --radius: 1rem;
+    --radius: 0.75rem; /* 12px rounded corners */
   }
 
   .dark {
-    /* Dark Mode - Deep Glass */
-    --background: #020617; /* Slate 950 */
-    --surface: rgba(30, 41, 59, 0.6); /* Slate 800 */
-    --surface-highlight: rgba(51, 65, 85, 0.5); /* Slate 700 */
-    --border-color: rgba(71, 85, 105, 0.6); /* Slate 600 */
-    --foreground: #f8fafc; /* Slate 50 */
+    /* Dark Mode - MaintX Pro Aesthetic (Deep Navy) */
+    --background: #0f1219;      /* Very Dark Blue/Grey (Main bg) */
+    --surface: #1a1f2b;         /* Dark Blue/Grey (Cards & Sidebar) */
+    --surface-highlight: #252b3b; /* Lighter Blue/Grey (Inputs/Hovers) */
+    --border-color: #2e3648;    /* Border separating elements */
+    --foreground: #ffffff;      /* Pure white text */
     
-    --primary: #f97316; /* Orange 500 */
+    --primary: #3b82f6;         /* Electric Blue (Buttons/Accents) */
     --primary-foreground: #ffffff;
     
-    --status-ok: #34d399;
-    --status-warning: #fbbf24;
-    --status-critical: #f87171;
-    --status-info: #60a5fa;
+    --status-ok: #10b981;       /* Emerald */
+    --status-warning: #f59e0b;  /* Amber */
+    --status-critical: #ef4444; /* Red */
+    --status-info: #3b82f6;     /* Blue */
   }
 }
 
 @layer utilities {
-  .glass {
-    @apply backdrop-blur-xl bg-surface border border-white/20 shadow-xl;
+  .dashboard-card {
+    @apply bg-surface border border-border-color/50 rounded-xl shadow-sm;
   }
-  .glass-card {
-    @apply backdrop-blur-md bg-surface border border-border-color shadow-sm rounded-2xl;
+  
+  /* Gradiente suave apenas para destaque, não fundo total */
+  .bg-gradient-dark {
+    background: linear-gradient(135deg, #1a1f2b 0%, #0f1219 100%);
   }
 }
 
