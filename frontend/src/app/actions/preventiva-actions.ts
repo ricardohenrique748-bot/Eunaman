@@ -72,3 +72,100 @@ export async function getVeiculosSimples() {
         select: { id: true, modelo: true, placa: true, codigoInterno: true, horimetroAtual: true }
     })
 }
+
+export async function getPlanosManutencao() {
+    const session = await getSession()
+    if (!session) return []
+
+    const where: any = {}
+    if (session.perfil !== 'ADMIN') {
+        where.veiculo = {
+            unidadeId: session.unidadeId
+        }
+    }
+
+    return await prisma.planoManutencao.findMany({
+        where,
+        include: {
+            veiculo: {
+                select: {
+                    placa: true,
+                    modelo: true,
+                    codigoInterno: true,
+                    horimetroAtual: true
+                }
+            }
+        },
+        orderBy: {
+            status: 'desc'
+        }
+    })
+}
+
+export async function deletePreventiva(id: string) {
+    try {
+        await prisma.planoManutencao.delete({
+            where: { id }
+        })
+        revalidatePath('/dashboard/pcm/preventivas')
+        return { success: true }
+    } catch (error) {
+        return { success: false, error: 'Erro ao excluir plano' }
+    }
+}
+
+export async function getPreventivaById(id: string) {
+    return await prisma.planoManutencao.findUnique({
+        where: { id },
+        include: {
+            veiculo: {
+                select: { horimetroAtual: true, placa: true, codigoInterno: true, modelo: true }
+            }
+        }
+    })
+}
+
+export async function updatePreventiva(id: string, formData: FormData) {
+    const tipo = formData.get('tipo') as string
+    const modulo = formData.get('modulo') as string
+    const ultimoHorimetro = Number(formData.get('ultimoHorimetro'))
+    const intervalo = Number(formData.get('intervalo'))
+    const dataAtualizacao = new Date(formData.get('dataAtualizacao') as string)
+    const horimetroAtual = Number(formData.get('horimetroAtual'))
+    const veiculoId = formData.get('veiculoId') as string
+
+    try {
+        // Atualiza horimetro do veiculo se necessario
+        if (veiculoId && horimetroAtual > 0) {
+            await prisma.veiculo.update({
+                where: { id: veiculoId },
+                data: { horimetroAtual }
+            })
+        }
+
+        // Recalcula Status
+        let status: StatusPreventiva = 'NO_PRAZO'
+        if ((ultimoHorimetro + intervalo) < horimetroAtual) {
+            status = 'ATRASADO'
+        } else if ((ultimoHorimetro + intervalo) - horimetroAtual < 50) {
+            status = 'ATENCAO'
+        }
+
+        await prisma.planoManutencao.update({
+            where: { id },
+            data: {
+                tipo,
+                modulo,
+                ultimoHorimetro,
+                intervalo,
+                dataAtualizacao,
+                status
+            }
+        })
+
+        revalidatePath('/dashboard/pcm/preventivas')
+        return { success: true }
+    } catch (error) {
+        return { success: false, error: 'Erro ao atualizar dados' }
+    }
+}

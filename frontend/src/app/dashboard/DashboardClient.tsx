@@ -1,7 +1,7 @@
 'use client'
 
 import { ArrowUpRight, ArrowDownRight, Activity, Wrench, AlertTriangle, CheckCircle2, Clock, FileText, Settings, AlertCircle, Filter, Search } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useCallback, useEffect } from 'react'
 
@@ -243,47 +243,56 @@ export default function DashboardClient({ metrics, chartData, filters }: {
                     </div>
                 </div>
 
-                <div className="h-[400px] w-full">
-                    {chartData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.2)" />
-                                <XAxis
-                                    dataKey="placa"
-                                    angle={-45}
-                                    textAnchor="end"
-                                    interval={0}
-                                    tick={{ fontSize: 10, fill: '#6B7280', fontWeight: 600 }}
-                                    height={60}
-                                />
-                                <YAxis
-                                    domain={[0, 100]}
-                                    tick={{ fontSize: 11, fill: '#6B7280' }}
-                                    tickFormatter={(val) => `${val}%`}
-                                />
-                                <Tooltip
-                                    cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                                />
-                                <Bar dataKey="valor" radius={[4, 4, 0, 0]} animationDuration={1500}>
-                                    {chartData.map((entry: { placa: string; valor: number }, index: number) => {
-                                        let color = '#10B981'; // emerald-500
-                                        if (entry.valor < 90) color = '#EF4444'; // red-500
-                                        else if (entry.valor < 95) color = '#F59E0B'; // yellow-500
+                <div className="w-full overflow-x-auto pb-4">
+                    <div className="h-[400px]" style={{ minWidth: `${Math.max(100, chartData.length * 60)}px` }}>
+                        {chartData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 60 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.2)" />
+                                    <XAxis
+                                        dataKey="placa"
+                                        angle={-45}
+                                        textAnchor="end"
+                                        interval={0}
+                                        tick={{ fontSize: 12, fill: '#6B7280', fontWeight: 600 }}
+                                        height={60}
+                                        tickMargin={10}
+                                    />
+                                    <YAxis
+                                        domain={[0, 100]}
+                                        tick={{ fontSize: 11, fill: '#6B7280' }}
+                                        tickFormatter={(val) => `${val}%`}
+                                    />
+                                    <Tooltip
+                                        cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                                    />
+                                    <Bar dataKey="valor" radius={[4, 4, 0, 0]} animationDuration={1500} barSize={40}>
+                                        <LabelList
+                                            dataKey="valor"
+                                            position="insideTop"
+                                            formatter={(val: number) => `${val}%`}
+                                            style={{ fill: 'white', fontWeight: 'bold', fontSize: '12px' }}
+                                        />
+                                        {chartData.map((entry: { placa: string; valor: number }, index: number) => {
+                                            let color = '#10B981'; // emerald-500
+                                            if (entry.valor < 90) color = '#EF4444'; // red-500
+                                            else if (entry.valor < 95) color = '#F59E0B'; // yellow-500
 
-                                        return <Cell key={`cell-${index}`} fill={color} />;
-                                    })}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    ) : (
-                        <div className="flex items-center justify-center h-full text-gray-500 bg-surface-highlight/10 rounded-lg">
-                            <div className="text-center">
-                                <Activity className="w-12 h-12 mx-auto mb-2 opacity-20" />
-                                <p>Sem dados de disponibilidade para exibir com os filtros atuais.</p>
+                                            return <Cell key={`cell-${index}`} fill={color} />;
+                                        })}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="flex items-center justify-center h-full text-gray-500 bg-surface-highlight/10 rounded-lg">
+                                <div className="text-center">
+                                    <Activity className="w-12 h-12 mx-auto mb-2 opacity-20" />
+                                    <p>Sem dados de disponibilidade para exibir com os filtros atuais.</p>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
