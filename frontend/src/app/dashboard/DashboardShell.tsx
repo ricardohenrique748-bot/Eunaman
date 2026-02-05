@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { LayoutDashboard, Wrench, Shield, Package, DollarSign, Users, Settings, LogOut, ChevronDown, Disc, MapPin, CalendarClock, ListTodo } from 'lucide-react'
+import { LayoutDashboard, Wrench, Shield, Package, DollarSign, Users, Settings, LogOut, ChevronDown, Disc, MapPin, CalendarClock, ListTodo, Tractor, Trees, Sprout, Truck } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { ModeToggle } from '@/components/ui/mode-toggle'
@@ -43,12 +43,22 @@ export default function DashboardShell({ children, user }: { children: React.Rea
                         <div className="px-4 mb-2">
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Controle PCM</span>
                         </div>
+                        <NavItem href="/dashboard/frota" icon={Truck} label="Cadastro da Frota" active={isActive('/dashboard/frota')} />
                         <NavItem href="/dashboard/pcm/os" icon={Wrench} label="Gestão de O.S." active={isActive('/dashboard/pcm/os')} />
                         <NavItem href="/dashboard/pcm/semanal" icon={CalendarClock} label="Prog. Semanal" active={isActive('/dashboard/pcm/semanal')} />
                         <NavItem href="/dashboard/pcm/backlog" icon={ListTodo} label="Fila de Backlog" active={isActive('/dashboard/pcm/backlog')} />
                         <NavItem href="/dashboard/pcm/preventivas" icon={Settings} label="Planos de Preventiva" active={isActive('/dashboard/pcm/preventivas')} />
                         <NavItem href="/dashboard/pcm/pneus" icon={Disc} label="Controle de Pneus" active={isActive('/dashboard/pcm/pneus')} />
                         <NavItem href="/dashboard/pcm/localizacao" icon={MapPin} label="Localização" active={isActive('/dashboard/pcm/localizacao')} />
+                    </div>
+
+                    <div className="space-y-1">
+                        <div className="px-4 mb-2">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Operação</span>
+                        </div>
+                        <NavItem href="/dashboard/operacao/colheita" icon={Tractor} label="Colheita" active={isActive('/dashboard/operacao/colheita')} />
+                        <NavItem href="/dashboard/operacao/silvicultura" icon={Trees} label="Silvicultura" active={isActive('/dashboard/operacao/silvicultura')} />
+                        <NavItem href="/dashboard/operacao/carregamento" icon={Truck} label="Carregamento" active={isActive('/dashboard/operacao/carregamento')} />
                     </div>
 
                     <div className="space-y-1">
