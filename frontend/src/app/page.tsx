@@ -14,18 +14,47 @@ export default function LoginPage() {
   const [resetEmail, setResetEmail] = useState('')
   const [resetStatus, setResetStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
+  const [showChangePass, setShowChangePass] = useState(false)
+  const [emailForChange, setEmailForChange] = useState<string | null>(null)
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
     const formData = new FormData(e.currentTarget)
+    // @ts-ignore
     const res = await login(formData)
 
     if (res.success) {
       router.push('/dashboard')
+    } else if (res.mustChangePassword) {
+      setEmailForChange(res.email)
+      setShowChangePass(true)
+      setLoading(false)
     } else {
       setError(res.error || 'Erro ao entrar')
+      setLoading(false)
+    }
+  }
+
+  const handleChangePassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    const formData = new FormData(e.currentTarget)
+    const { updatePassword } = await import('@/app/actions/auth-actions')
+
+    // @ts-ignore
+    const res = await updatePassword(formData)
+
+    if (res.success) {
+      setLoading(false)
+      setShowChangePass(false)
+      router.push('/dashboard')
+    } else {
+      setError(res.error || 'Erro ao atualizar senha')
       setLoading(false)
     }
   }
@@ -106,6 +135,46 @@ export default function LoginPage() {
                 </button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Change Password Modal */}
+      {showChangePass && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="bg-surface border border-border-color p-8 rounded-2xl w-full max-w-md relative shadow-2xl animate-in zoom-in-95">
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-500">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground">Alteração de Senha Obrigatória</h3>
+              <p className="text-xs text-gray-500 mt-1">Por segurança, defina uma nova senha para continuar.</p>
+            </div>
+
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <input type="hidden" name="email" value={emailForChange || ''} />
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-wider font-semibold text-gray-400">Nova Senha</label>
+                <input
+                  type="password"
+                  name="newPassword"
+                  required
+                  minLength={6}
+                  placeholder="Mínimo 6 caracteres"
+                  className="w-full bg-surface-highlight border border-border-color rounded-lg p-3 text-foreground focus:ring-1 focus:ring-primary outline-none"
+                />
+              </div>
+              {error && (
+                <p className="text-xs text-red-500 text-center">{error}</p>
+              )}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-all disabled:opacity-50"
+              >
+                {loading ? 'ATUALIZANDO...' : 'ATUALIZAR SENHA'}
+              </button>
+            </form>
           </div>
         </div>
       )}
