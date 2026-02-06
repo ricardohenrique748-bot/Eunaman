@@ -21,6 +21,7 @@ model Usuario {
 
   empresaPadrao Empresa? @relation(fields: [empresaPadraoId], references: [id])
   unidadePadrao Unidade? @relation(fields: [unidadePadraoId], references: [id])
+  trocarSenha   Boolean  @default(true) @map("trocar_senha")
 
   @@map("usuarios")
 }

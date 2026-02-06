@@ -733,7 +733,13 @@ function SystemSection({ params, osOptions, isAdmin }: { params: SystemParam[], 
                     onClick={() => setActiveSubTab('sistemas')}
                     className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeSubTab === 'sistemas' ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105' : 'text-gray-400 hover:text-foreground hover:bg-surface-highlight'}`}
                 >
-                    Sistemas & Componentes
+                    Sistemas
+                </button>
+                <button
+                    onClick={() => setActiveSubTab('componentes')}
+                    className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeSubTab === 'componentes' ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105' : 'text-gray-400 hover:text-foreground hover:bg-surface-highlight'}`}
+                >
+                    Componentes
                 </button>
             </div>
 
@@ -747,30 +753,7 @@ function SystemSection({ params, osOptions, isAdmin }: { params: SystemParam[], 
                             </div>
                             <div className="divide-y divide-border-color">
                                 {params.filter(p => p.group === group).map(param => (
-                                    <form key={param.id} action={async (formData) => {
-                                        if (isAdmin) await updateSystemParam(formData)
-                                    }} className="p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-10 hover:bg-surface-highlight/10 transition-all group/param">
-                                        <input type="hidden" name="key" value={param.key} />
-                                        <div className="flex-1">
-                                            <p className="font-black text-xl text-foreground mb-1 tracking-tight group-hover/param:text-primary transition-colors">{param.description || param.key}</p>
-                                            <p className="text-[10px] text-gray-400 font-black font-mono tracking-widest bg-surface-highlight inline-block px-2 py-0.5 rounded uppercase">{param.key}</p>
-                                        </div>
-                                        <div className="flex items-center gap-3 w-full md:w-auto">
-                                            <input
-                                                name="value"
-                                                readOnly={!isAdmin}
-                                                defaultValue={param.value}
-                                                className={`bg-surface-highlight border-2 border-border-color rounded-2xl px-6 py-4 text-base w-full md:w-64 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-right font-black text-foreground shadow-inner transition-all ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                            />
-                                            {isAdmin && (
-                                                <div className="flex gap-2">
-                                                    <button title="Salvar Alteração" className="p-4 bg-primary text-white hover:bg-orange-600 rounded-2xl shadow-lg shadow-orange-500/20 transition-all hover:scale-110 active:scale-90">
-                                                        <Save className="w-6 h-6" />
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </form>
+                                    <SystemParamRow key={param.id} param={param} isAdmin={isAdmin} />
                                 ))}
                             </div>
                         </div>
@@ -818,11 +801,12 @@ function SystemSection({ params, osOptions, isAdmin }: { params: SystemParam[], 
             )}
 
             {activeSubTab === 'sistemas' && (
-                <div className="max-w-5xl mx-auto space-y-8">
+                <div className="max-w-4xl mx-auto space-y-8">
                     <div className="bg-surface border border-border-color rounded-3xl p-8 shadow-xl">
                         <h4 className="text-xl font-black text-foreground mb-6">Novo Sistema Operacional</h4>
                         <form action={async (formData) => {
-                            await createOsSistema(formData)
+                            const res = await createOsSistema(formData)
+                            if (!res.success) alert(res.error)
                         }} className="flex gap-4">
                             <input
                                 name="nome"
@@ -836,52 +820,76 @@ function SystemSection({ params, osOptions, isAdmin }: { params: SystemParam[], 
                         </form>
                     </div>
 
-                    <div className="space-y-6">
-                        {osOptions.sistemas.map(s => (
-                            <div key={s.id} className="bg-surface border border-border-color rounded-[2.5rem] overflow-hidden shadow-xl border-l-[10px] border-l-primary/40">
-                                <div className="p-8 flex justify-between items-center border-b border-border-color bg-surface-highlight/10">
-                                    <h5 className="text-2xl font-black text-foreground leading-none">{s.nome}</h5>
+                    <div className="bg-surface border border-border-color rounded-3xl p-8 shadow-xl">
+                        <h4 className="text-xl font-black text-foreground mb-6">Sistemas Cadastrados</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {osOptions.sistemas.map(s => (
+                                <div key={s.id} className="bg-surface-highlight/10 p-6 rounded-2xl border border-border-color flex justify-between items-center group hover:border-primary/50 transition-all">
+                                    <h5 className="text-lg font-black text-foreground leading-none">{s.nome}</h5>
                                     <button
                                         onClick={() => deleteOsSistema(s.id)}
-                                        className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"
+                                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                                        title="Excluir Sistema"
                                     >
                                         <Trash2 className="w-5 h-5" />
                                     </button>
                                 </div>
-                                <div className="p-8 space-y-6">
-                                    <div className="flex gap-3">
-                                        <form action={async (formData) => {
-                                            await createOsSubSistema(formData)
-                                        }} className="flex-1 flex gap-2">
-                                            <input type="hidden" name="sistemaId" value={s.id} />
-                                            <input
-                                                name="nome"
-                                                placeholder="Novo Sub-sistema / Componente"
-                                                required
-                                                className="flex-1 bg-surface-highlight/50 border border-border-color rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none font-bold"
-                                            />
-                                            <button className="bg-primary hover:bg-orange-600 text-white px-4 py-3 rounded-xl font-black text-xs transition-all">
-                                                Adicionar
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {activeSubTab === 'componentes' && (
+                <div className="max-w-5xl mx-auto space-y-6">
+                    {osOptions.sistemas.map(s => (
+                        <div key={s.id} className="bg-surface border border-border-color rounded-[2.5rem] overflow-hidden shadow-xl border-l-[10px] border-l-primary/40">
+                            <div className="p-8 flex justify-between items-center border-b border-border-color bg-surface-highlight/10">
+                                <h5 className="text-2xl font-black text-foreground leading-none">{s.nome}</h5>
+                                <span className="text-xs font-bold text-gray-400 bg-surface px-3 py-1 rounded-full border border-border-color">{s.subSistemas.length} COMPONENTES</span>
+                            </div>
+                            <div className="p-8 space-y-6">
+                                <div className="flex gap-3">
+                                    <form action={async (formData) => {
+                                        const res = await createOsSubSistema(formData)
+                                        if (!res.success) alert(res.error)
+                                    }} className="flex-1 flex gap-2">
+                                        <input type="hidden" name="sistemaId" value={s.id} />
+                                        <input
+                                            name="nome"
+                                            placeholder="Novo Componente / Sub-sistema"
+                                            required
+                                            className="flex-1 bg-surface-highlight/50 border border-border-color rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none font-bold"
+                                        />
+                                        <button className="bg-primary hover:bg-orange-600 text-white px-4 py-3 rounded-xl font-black text-xs transition-all">
+                                            Adicionar
+                                        </button>
+                                    </form>
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                    {s.subSistemas.map(sub => (
+                                        <div key={sub.id} className="flex justify-between items-center bg-surface-highlight/20 p-3 rounded-xl border border-border-color group/sub">
+                                            <span className="text-sm font-semibold text-gray-500 group-hover/sub:text-foreground">{sub.nome}</span>
+                                            <button
+                                                onClick={() => deleteOsSubSistema(sub.id)}
+                                                className="p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover/sub:opacity-100 transition-all"
+                                            >
+                                                <X className="w-4 h-4" />
                                             </button>
-                                        </form>
-                                    </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                        {s.subSistemas.map(sub => (
-                                            <div key={sub.id} className="flex justify-between items-center bg-surface-highlight/20 p-3 rounded-xl border border-border-color group/sub">
-                                                <span className="text-sm font-semibold text-gray-500 group-hover/sub:text-foreground">{sub.nome}</span>
-                                                <button
-                                                    onClick={() => deleteOsSubSistema(sub.id)}
-                                                    className="p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover/sub:opacity-100 transition-all"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
+                                        </div>
+                                    ))}
+                                    {s.subSistemas.length === 0 && <p className="col-span-full text-xs text-gray-400 italic text-center py-2 bg-surface-highlight/5 rounded-lg border border-dashed border-border-color">Nenhum componente cadastrado</p>}
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
+                    {osOptions.sistemas.length === 0 && (
+                        <div className="text-center py-10 opacity-50">
+                            <Settings className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                            <p className="font-bold text-gray-400">Nenhum sistema cadastrado.</p>
+                            <p className="text-xs text-gray-400">Você precisa criar um sistema antes de adicionar componentes.</p>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
@@ -908,5 +916,107 @@ function NavButton({ active, onClick, icon: Icon, label, description }: { active
                 </div>
             </div>
         </button>
+    )
+}
+
+function SystemParamRow({ param, isAdmin }: { param: SystemParam, isAdmin: boolean }) {
+    const isNotifyEmail = param.key === 'NOTIFY_EMAIL'
+    const [emails, setEmails] = useState<string[]>(isNotifyEmail && param.value ? param.value.split(',').map(s => s.trim()).filter(Boolean) : [])
+    const [inputValue, setInputValue] = useState('')
+
+    if (isNotifyEmail) {
+        return (
+            <form action={async (formData) => {
+                if (isAdmin) await updateSystemParam(formData)
+            }} className="p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-10 hover:bg-surface-highlight/10 transition-all group/param">
+                <input type="hidden" name="key" value={param.key} />
+                <input type="hidden" name="value" value={emails.join(',')} />
+
+                <div className="flex-1">
+                    <p className="font-black text-xl text-foreground mb-1 tracking-tight group-hover/param:text-primary transition-colors">{param.description || param.key}</p>
+                    <p className="text-[10px] text-gray-400 font-black font-mono tracking-widest bg-surface-highlight inline-block px-2 py-0.5 rounded uppercase">{param.key}</p>
+                </div>
+
+                <div className="w-full md:w-auto flex flex-col items-end gap-3">
+                    <div className="flex flex-wrap gap-2 justify-end max-w-md">
+                        {emails.map(email => (
+                            <div key={email} className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2 border border-primary/20">
+                                {email}
+                                {isAdmin && (
+                                    <button type="button" onClick={() => setEmails(emails.filter(e => e !== email))} className="hover:text-red-500">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    {isAdmin && (
+                        <div className="flex items-center gap-2 w-full md:w-auto">
+                            <div className="flex bg-surface-highlight border-2 border-border-color rounded-2xl overflow-hidden focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all">
+                                <input
+                                    value={inputValue}
+                                    onChange={e => setInputValue(e.target.value)}
+                                    placeholder="Adicionar email..."
+                                    className="bg-transparent px-4 py-3 text-sm outline-none w-full md:w-64 font-medium text-foreground"
+                                    onKeyDown={e => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault()
+                                            if (inputValue && inputValue.includes('@') && !emails.includes(inputValue)) {
+                                                setEmails([...emails, inputValue.trim()])
+                                                setInputValue('')
+                                            }
+                                        }
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (inputValue && inputValue.includes('@') && !emails.includes(inputValue)) {
+                                            setEmails([...emails, inputValue.trim()])
+                                            setInputValue('')
+                                        }
+                                    }}
+                                    className="px-4 bg-gray-100 dark:bg-gray-800 hover:bg-primary hover:text-white transition-colors border-l border-border-color"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            <button title="Salvar Alteração" className="p-4 bg-primary text-white hover:bg-orange-600 rounded-2xl shadow-lg shadow-orange-500/20 transition-all hover:scale-110 active:scale-90 h-full">
+                                <Save className="w-6 h-6" />
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </form>
+        )
+    }
+
+    return (
+        <form action={async (formData) => {
+            if (isAdmin) await updateSystemParam(formData)
+        }} className="p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-10 hover:bg-surface-highlight/10 transition-all group/param">
+            <input type="hidden" name="key" value={param.key} />
+            <div className="flex-1">
+                <p className="font-black text-xl text-foreground mb-1 tracking-tight group-hover/param:text-primary transition-colors">{param.description || param.key}</p>
+                <p className="text-[10px] text-gray-400 font-black font-mono tracking-widest bg-surface-highlight inline-block px-2 py-0.5 rounded uppercase">{param.key}</p>
+            </div>
+            <div className="flex items-center gap-3 w-full md:w-auto">
+                <input
+                    name="value"
+                    readOnly={!isAdmin}
+                    defaultValue={param.value}
+                    className={`bg-surface-highlight border-2 border-border-color rounded-2xl px-6 py-4 text-base w-full md:w-64 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-right font-black text-foreground shadow-inner transition-all ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`}
+                />
+                {isAdmin && (
+                    <div className="flex gap-2">
+                        <button title="Salvar Alteração" className="p-4 bg-primary text-white hover:bg-orange-600 rounded-2xl shadow-lg shadow-orange-500/20 transition-all hover:scale-110 active:scale-90">
+                            <Save className="w-6 h-6" />
+                        </button>
+                    </div>
+                )}
+            </div>
+        </form>
     )
 }

@@ -404,13 +404,16 @@ export async function deleteOsMotivo(id: string) {
 export async function createOsSistema(formData: FormData) {
     try {
         const nome = formData.get('nome') as string
-        if (!nome) return { success: false }
+        if (!nome) return { success: false, error: 'Nome obrigatório' }
 
         await prisma.osSistema.create({ data: { nome } })
         revalidatePath('/dashboard/admin')
         return { success: true }
-    } catch (_) {
-        return { success: false }
+    } catch (e: any) {
+        if (e.code === 'P2002') {
+            return { success: false, error: 'Sistema já cadastrado' }
+        }
+        return { success: false, error: 'Erro ao criar sistema' }
     }
 }
 
@@ -428,13 +431,16 @@ export async function createOsSubSistema(formData: FormData) {
     try {
         const nome = formData.get('nome') as string
         const sistemaId = formData.get('sistemaId') as string
-        if (!nome || !sistemaId) return { success: false }
+        if (!nome || !sistemaId) return { success: false, error: 'Dados incompletos' }
 
         await prisma.osSubSistema.create({ data: { nome, sistemaId } })
         revalidatePath('/dashboard/admin')
         return { success: true }
-    } catch (_) {
-        return { success: false }
+    } catch (e: any) {
+        if (e.code === 'P2002') {
+            return { success: false, error: 'Componente já existe neste sistema' }
+        }
+        return { success: false, error: 'Erro ao criar componente' }
     }
 }
 
