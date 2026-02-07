@@ -100,6 +100,14 @@ model Veiculo {
   moduloSistema   String?           @map("modulo_sistema")
   dataAtualizacaoHorimetro DateTime? @map("data_atualizacao_horimetro")
   semanaPreventiva Int?             @map("semana_preventiva")
+  
+  // Dados da Programação Semanal
+  programacaoStatus    String?   @default("PENDENTE") @map("prog_status")
+  programacaoProgresso Int?      @default(0) @map("prog_progresso")
+  programacaoModulo    String?   @map("prog_modulo")
+  programacaoDescricao String?   @map("prog_descricao")
+  programacaoDataInicio DateTime? @map("prog_data_inicio")
+  programacaoDataFim    DateTime? @map("prog_data_fim")
 
   empresa     Empresa     @relation(fields: [empresaId], references: [id])
   unidade     Unidade     @relation(fields: [unidadeId], references: [id])
@@ -290,4 +298,49 @@ model DocumentoFrota {
   
   @@unique([veiculoId, tipo])
   @@map("documentos_frota")
+}
+
+model Backlog {
+  id String @id @default(uuid())
+  semana String?
+  mes String?
+  ano String?
+  dataEvidencia DateTime? @map("data_evidencia")
+  modulo String?
+  regiaoProgramacao String? @map("regiao_programacao")
+  diasPendenciaAberta Int? @map("dias_pendencia_aberta")
+  frota String?
+  tag String?
+  tipo String?
+  descricaoAtividade String? @map("descricao_atividade")
+  origem String?
+  criticidade String?
+  tempoExecucaoPrevisto String? @map("tempo_execucao_previsto")
+  campoBase String? @map("campo_base")
+  os String?
+  material String?
+  numeroRc String? @map("numero_rc")
+  numeroOrdem String? @map("numero_ordem")
+  fornecedor String?
+  dataRc DateTime? @map("data_rc")
+  detalhamentoPedido String? @map("detalhamento_pedido")
+  dataNecessidadeMaterial DateTime? @map("data_necessidade_material")
+  tipoPedido String? @map("tipo_pedido")
+  previsaoMaterial DateTime? @map("previsao_material")
+  situacaoRc String? @map("situacao_rc")
+  diasAberturaReqCompras Int? @map("dias_abertura_req_compras")
+  dataProgramacao DateTime? @map("data_programacao")
+  maoDeObra String? @map("mao_de_obra")
+  deltaEvidenciaProgramacao Int? @map("delta_evidencia_programacao")
+  statusProgramacao String? @map("status_programacao")
+  previsaoConclusaoPendencia DateTime? @map("previsao_conclusao_pendencia")
+  dataConclusaoPendencia DateTime? @map("data_conclusao_pendencia")
+  diasResolucaoPendencia Int? @map("dias_resolucao_pendencia")
+  status String?
+  observacao String?
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("backlog_pcm")
 }

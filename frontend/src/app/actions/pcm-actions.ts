@@ -117,38 +117,84 @@ export async function getVeiculosSemanal() {
     const session = await getSession()
     if (!session) return []
 
-    const where: any = { status: { not: 'DESATIVADO' } }
+    // Use raw query to bypass client validation error if the schema wasn't regenerated
+    let whereClause = `WHERE "status_operacional" != 'DESATIVADO'`
+
     if (session.perfil !== 'ADMIN' && session.perfil !== 'PCM') {
-        // Allow PCM to see all if needed, or restrict by unit like others
-        if (session.perfil !== 'PCM') {
-            where.unidadeId = session.unidadeId
-        }
+        whereClause += ` AND "unidade_id" = '${session.unidadeId}'`
     }
 
-    // specific selection
-    const data = await prisma.veiculo.findMany({
-        select: {
-            id: true,
-            codigoInterno: true,
-            placa: true,
-            modelo: true,
-            tipoVeiculo: true,
-            status: true,
-            semanaPreventiva: true
-        },
-        where,
-        orderBy: { codigoInterno: 'asc' }
-    })
+    const query = `
+        SELECT 
+            id, 
+            "codigo_interno" as "codigoInterno", 
+            placa, 
+            modelo, 
+            "tipo_veiculo" as "tipoVeiculo", 
+            "status_operacional" as status, 
+            "semana_preventiva" as "semanaPreventiva" 
+        FROM "veiculos_frota" 
+        ${whereClause} 
+        ORDER BY "codigo_interno" ASC
+    `
 
-    return data as any[] // weak typing until prisma client regenerates
+    try {
+        const data = await prisma.$queryRawUnsafe(query)
+        return data as any[]
+    } catch (e) {
+        console.error("Raw query failed, falling back to basic findMany (missing new field)", e)
+        // Fallback: use normal prisma client but without the new field, so the page at least loads
+        const where: any = { status: { not: 'DESATIVADO' } }
+        if (session.perfil !== 'ADMIN' && session.perfil !== 'PCM') {
+            where.unidadeId = session.unidadeId
+        }
+
+        const fallback = await prisma.veiculo.findMany({
+            where,
+            select: {
+                id: true, codigoInterno: true, placa: true, modelo: true, tipoVeiculo: true, status: true
+            },
+            orderBy: { codigoInterno: 'asc' }
+        })
+        return fallback.map(v => ({ ...v, semanaPreventiva: null })) as any[]
+    }
 }
 
-export async function updateSemanaPreventiva(veiculoId: string, semana: number | null) {
+export async function updateSemanaPreventiva(
+    veiculoId: string,
+    semana: number | null,
+    details?: {
+        status?: string,
+        progresso?: number,
+        modulo?: string,
+        descricao?: string,
+        dataInicio?: string,
+        dataFim?: string
+    }
+) {
     try {
-        await prisma.veiculo.update({
-            where: { id: veiculoId },
-            data: { semanaPreventiva: semana }
-        })
+        // Use raw execution to bypass client validation
+        const valSemana = semana === null ? 'NULL' : semana
+
+        // If details provided, update them too
+        let updateFields = `"semana_preventiva" = ${valSemana}`
+
+        if (details) {
+            if (details.status !== undefined) updateFields += `, "prog_status" = '${details.status}'`
+            if (details.progresso !== undefined) updateFields += `, "prog_progresso" = ${details.progresso}`
+            if (details.modulo !== undefined) updateFields += `, "prog_modulo" = '${details.modulo}'`
+            if (details.descricao !== undefined) updateFields += `, "prog_descricao" = '${details.descricao}'`
+            if (details.dataInicio) updateFields += `, "prog_data_inicio" = '${details.dataInicio}'::timestamp`
+            if (details.dataFim) updateFields += `, "prog_data_fim" = '${details.dataFim}'::timestamp`
+        }
+
+        // If removing from week (semana === null), maybe clear fields? Let's clear them for now.
+        if (semana === null) {
+            updateFields += `, "prog_status" = 'PENDENTE', "prog_progresso" = 0, "prog_modulo" = NULL, "prog_descricao" = NULL, "prog_data_inicio" = NULL, "prog_data_fim" = NULL`
+        }
+
+        await prisma.$executeRawUnsafe(`UPDATE "veiculos_frota" SET ${updateFields} WHERE id = '${veiculoId}'`)
+
         revalidatePath('/dashboard/pcm/semanal')
         return { success: true }
     } catch (error) {

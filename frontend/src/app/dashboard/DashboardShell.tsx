@@ -115,7 +115,7 @@ export default function DashboardShell({ children, user }: { children: React.Rea
                     <div className="flex items-center gap-4">
                         <div className="w-1 h-6 bg-primary rounded-full hidden lg:block" />
                         <h2 className="text-sm font-black text-foreground uppercase tracking-widest opacity-70">
-                            MaintX Pro — Central de Controle
+                            Eunaman — Central de Controle
                         </h2>
                     </div>
 
