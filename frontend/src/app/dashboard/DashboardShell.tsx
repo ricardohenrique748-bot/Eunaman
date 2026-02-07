@@ -54,7 +54,6 @@ export default function DashboardShell({ children, user }: { children: React.Rea
                             <div className="px-4 mb-2">
                                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Controle PCM</span>
                             </div>
-                            {checkAccess(['FROTA', 'PCM']) && <NavItem href="/dashboard/frota" icon={Truck} label="Cadastro da Frota" active={isActive('/dashboard/frota')} />}
                             {checkAccess(['PCM']) && (
                                 <>
                                     <NavItem href="/dashboard/pcm/os" icon={Wrench} label="Gestão de O.S." active={isActive('/dashboard/pcm/os')} />
