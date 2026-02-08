@@ -296,11 +296,65 @@ export async function deleteBacklogItem(id: string) {
 
 export async function importBacklogItems(items: Omit<BacklogItem, 'id' | 'createdAt' | 'updatedAt'>[]) {
     try {
-        if (items.length === 0) return { success: true, count: 0 }
+        if (items.length === 0) return { success: true, count: 0, duplicates: 0 }
+
+        // Fetch existing items to filter duplicates
+        // We select key fields to identify uniqueness
+        const existingItems = await prisma.$queryRawUnsafe<any[]>(`
+            SELECT os, frota, descricao_atividade, data_evidencia FROM "backlog_pcm"
+        `)
+
+        const existingSet = new Set<string>()
+        existingItems.forEach((row: any) => {
+            // Create signatures. 
+            // Priority 1: OS (if present and valid)
+            if (row.os && row.os.trim().length > 0) {
+                existingSet.add(`os:${row.os.trim().toLowerCase()}`)
+            }
+            // Priority 2: Composite key (always valid as fallback or secondary check)
+            const composite = `comp:${row.frota?.toString().trim().toLowerCase()}|${row.descricao_atividade?.toString().trim().toLowerCase()}|${row.data_evidencia ? new Date(row.data_evidencia).toISOString().split('T')[0] : ''}`
+            existingSet.add(composite)
+        })
+
+        const uniqueItems = []
+        let duplicatesCount = 0
+
+        for (const item of items) {
+            let isDuplicate = false
+
+            // Check OS
+            if (item.os && item.os.toString().trim().length > 0) {
+                if (existingSet.has(`os:${item.os.toString().trim().toLowerCase()}`)) {
+                    isDuplicate = true
+                }
+            }
+
+            // Check Composite if not already found as duplicate by OS
+            if (!isDuplicate) {
+                const composite = `comp:${item.frota?.toString().trim().toLowerCase()}|${item.descricaoAtividade?.toString().trim().toLowerCase()}|${item.dataEvidencia ? new Date(item.dataEvidencia).toISOString().split('T')[0] : ''}`
+                if (existingSet.has(composite)) {
+                    isDuplicate = true
+                } else {
+                    // Add to set so we don't import duplicates properly within the same batch
+                    if (item.os && item.os.trim().length > 0) existingSet.add(`os:${item.os.trim().toLowerCase()}`)
+                    existingSet.add(composite)
+                }
+            }
+
+            if (isDuplicate) {
+                duplicatesCount++
+            } else {
+                uniqueItems.push(item)
+            }
+        }
+
+        if (uniqueItems.length === 0) {
+            return { success: true, count: 0, duplicates: duplicatesCount }
+        }
 
         const valuesList: string[] = []
 
-        for (const data of items) {
+        for (const data of uniqueItems) {
             const fields = [
                 'semana', 'mes', 'ano', 'modulo', 'regiao_programacao', 'dias_pendencia_aberta',
                 'frota', 'tag', 'tipo', 'descricao_atividade', 'origem', 'criticidade',
@@ -339,8 +393,8 @@ export async function importBacklogItems(items: Omit<BacklogItem, 'id' | 'create
 
                     if (val === undefined || val === null || val === '') return 'NULL'
                     if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`
-                    if (val instanceof Date) return `'${val.toISOString()}'` // Handle accidental dates in text fields
-                    if (typeof val === 'object') return `'${JSON.stringify(val).replace(/'/g, "''")}'` // Fallback for objects
+                    if (val instanceof Date) return `'${val.toISOString()}'`
+                    if (typeof val === 'object') return `'${JSON.stringify(val).replace(/'/g, "''")}'`
                     return val
                 }),
                 ...dateFields.map(f => {
@@ -382,7 +436,7 @@ export async function importBacklogItems(items: Omit<BacklogItem, 'id' | 'create
         ]
         const columns = [...fields, ...dateFields].map(f => `"${f}"`).join(', ')
 
-        // Batch insert in chunks of 50 to avoid query string limit issues
+        // Batch insert in chunks of 50
         const CHUNK_SIZE = 50
         for (let i = 0; i < valuesList.length; i += CHUNK_SIZE) {
             const chunk = valuesList.slice(i, i + CHUNK_SIZE)
@@ -394,7 +448,7 @@ export async function importBacklogItems(items: Omit<BacklogItem, 'id' | 'create
         }
 
         revalidatePath('/dashboard/pcm/backlog')
-        return { success: true, count: items.length }
+        return { success: true, count: uniqueItems.length, duplicates: duplicatesCount }
     } catch (e: any) {
         console.error('Import error:', e)
         return { success: false, error: e.message }

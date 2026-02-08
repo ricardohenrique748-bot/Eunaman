@@ -135,6 +135,7 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
                     try {
                         const CHUNK_SIZE = 20 // Reduced chunk size to be safe
                         let successCount = 0
+                        let duplicateCount = 0
                         const total = items.length
 
                         // Process in chunks
@@ -144,6 +145,7 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
 
                             if (result.success) {
                                 successCount += (result.count || 0)
+                                duplicateCount += (result.duplicates || 0)
                             } else {
                                 console.error('Chunk error:', result.error)
                                 // If one chunk fails, we continue trying others? Or stop?
@@ -152,7 +154,7 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
                             }
                         }
 
-                        alert(`Sucesso! ${successCount} itens foram importados.`)
+                        alert(`Processo concluído!\nImportados: ${successCount}\nDuplicados (Ignorados): ${duplicateCount}`)
                     } catch (error: any) {
                         console.error('Import error:', error)
                         alert('Erro durante a importação: ' + (error.message || 'Erro desconhecido'))
