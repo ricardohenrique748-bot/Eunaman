@@ -1,14 +1,17 @@
 'use client'
 
-import { ArrowUpRight, ArrowDownRight, Activity, Wrench, AlertTriangle, CheckCircle2, Clock, FileText, Settings, AlertCircle, Filter, Search } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, Activity, Wrench, AlertTriangle, CheckCircle2, Clock, FileText, Settings, AlertCircle, Filter, Search, Calendar } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useState, useCallback, useEffect } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { getVehicleDetails } from '../actions/frota-actions'
+import { Loader2 } from 'lucide-react'
 
 interface DashboardFilters {
-    mes?: number
-    ano?: number
+    dataInicio?: string
+    dataFim?: string
     placa?: string
     status?: string
     os?: string
@@ -43,17 +46,36 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
         setLocalFilters(filters)
     }, [filters])
 
+    const [selectedVehicle, setSelectedVehicle] = useState<any>(null)
+    const [isLoadingDetails, setIsLoadingDetails] = useState(false)
+    const [isDetailOpen, setIsDetailOpen] = useState(false)
+
+    const handleBarClick = async (data: any) => {
+        if (!data || !data.payload || !data.payload.id) return
+        setIsLoadingDetails(true)
+        setSelectedVehicle(null)
+        setIsDetailOpen(true)
+        try {
+            const res = await getVehicleDetails(data.payload.id)
+            if (res.success) {
+                setSelectedVehicle(res.data)
+            }
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setIsLoadingDetails(false)
+        }
+    }
+
     const applyFilters = useCallback(() => {
         console.log('[Client] Aplicando filtros locais:', localFilters)
         const params = new URLSearchParams()
-
-        if (localFilters.mes !== undefined) params.set('mes', localFilters.mes.toString())
-        if (localFilters.ano !== undefined) params.set('ano', localFilters.ano.toString())
+        if (localFilters.dataInicio) params.set('dataInicio', localFilters.dataInicio)
+        if (localFilters.dataFim) params.set('dataFim', localFilters.dataFim)
         if (localFilters.placa) params.set('placa', localFilters.placa)
         if (localFilters.status) params.set('status', localFilters.status)
         if (localFilters.os) params.set('os', localFilters.os)
         if (localFilters.tipo) params.set('tipo', localFilters.tipo)
-
         const finalUrl = `/dashboard?${params.toString()}`
         console.log('[Client] Redirecionando para:', finalUrl)
         window.location.href = finalUrl
@@ -71,31 +93,31 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
             {/* Filters Bar -> (same as before) ... */}
             <div className="bg-surface border border-border-color p-4 rounded-2xl shadow-sm flex flex-wrap gap-4 items-end">
                 {/* (Keeping existing filter inputs) */}
+                {/* Date Inputs */}
                 <div className="space-y-1.5 flex-1 min-w-[140px]">
-                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Mês</label>
-                    <select
-                        value={localFilters.mes ?? ''}
-                        onChange={e => setLocalFilters(prev => ({ ...prev, mes: e.target.value === '' ? undefined : Number(e.target.value) }))}
-                        className="w-full bg-surface-highlight border border-border-color rounded-xl px-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all"
-                    >
-                        <option value="">Mês Atual</option>
-                        {meses.map((m, i) => (
-                            <option key={m} value={i}>{m}</option>
-                        ))}
-                    </select>
+                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Data Inicial</label>
+                    <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                        <input
+                            type="date"
+                            value={localFilters.dataInicio || ''}
+                            onChange={e => setLocalFilters(prev => ({ ...prev, dataInicio: e.target.value }))}
+                            className="w-full bg-surface-highlight border border-border-color rounded-xl pl-9 pr-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-gray-400"
+                        />
+                    </div>
                 </div>
 
-                <div className="space-y-1.5 flex-1 min-w-[100px]">
-                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Ano</label>
-                    <select
-                        value={localFilters.ano ?? ''}
-                        onChange={e => setLocalFilters(prev => ({ ...prev, ano: e.target.value === '' ? undefined : Number(e.target.value) }))}
-                        className="w-full bg-surface-highlight border border-border-color rounded-xl px-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all"
-                    >
-                        {anos.map(a => (
-                            <option key={a} value={a}>{a}</option>
-                        ))}
-                    </select>
+                <div className="space-y-1.5 flex-1 min-w-[140px]">
+                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Data Final</label>
+                    <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                        <input
+                            type="date"
+                            value={localFilters.dataFim || ''}
+                            onChange={e => setLocalFilters(prev => ({ ...prev, dataFim: e.target.value }))}
+                            className="w-full bg-surface-highlight border border-border-color rounded-xl pl-9 pr-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-gray-400"
+                        />
+                    </div>
                 </div>
 
                 <div className="space-y-1.5 flex-1 min-w-[150px]">
@@ -278,7 +300,14 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
                                         contentStyle={{ backgroundColor: 'var(--surface)', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                                         itemStyle={{ fontWeight: 'bold' }}
                                     />
-                                    <Bar dataKey="valor" radius={[6, 6, 0, 0]} animationDuration={1000} barSize={32}>
+                                    <Bar
+                                        dataKey="valor"
+                                        radius={[6, 6, 0, 0]}
+                                        animationDuration={1000}
+                                        barSize={32}
+                                        onClick={handleBarClick}
+                                        cursor="pointer"
+                                    >
                                         <LabelList
                                             dataKey="valor"
                                             position="top"
@@ -409,6 +438,114 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
                     </div>
                 </div>
             </div>
+
+            <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Documentação do Veículo</DialogTitle>
+                        <DialogDescription>Detalhes e validade dos documentos</DialogDescription>
+                    </DialogHeader>
+
+                    {isLoadingDetails ? (
+                        <div className="flex justify-center items-center py-12">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        </div>
+                    ) : selectedVehicle ? (
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-surface-highlight/30 rounded-xl border border-border-color">
+                                <div>
+                                    <p className="text-[10px] font-bold text-gray-500 uppercase">Placa</p>
+                                    <p className="font-black text-lg">{selectedVehicle.placa}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-bold text-gray-500 uppercase">Frota</p>
+                                    <p className="font-bold">{selectedVehicle.codigoInterno}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-bold text-gray-500 uppercase">Modelo</p>
+                                    <p className="font-medium text-sm">{selectedVehicle.modelo}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-bold text-gray-500 uppercase">Categoria</p>
+                                    <p className="font-medium text-sm">{selectedVehicle.tipoVeiculo}</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 className="text-sm font-black uppercase mb-3 text-gray-500">Documentos Cadastrados</h4>
+                                {selectedVehicle.documentos && selectedVehicle.documentos.length > 0 ? (
+                                    <div className="border border-border-color rounded-xl overflow-hidden">
+                                        <table className="w-full text-left text-sm">
+                                            <thead className="bg-surface-highlight/50 border-b border-border-color">
+                                                <tr>
+                                                    <th className="p-3 font-bold text-gray-500">Tipo</th>
+                                                    <th className="p-3 font-bold text-gray-500">Número</th>
+                                                    <th className="p-3 font-bold text-gray-500">Validade</th>
+                                                    <th className="p-3 font-bold text-gray-500 text-center">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-border-color">
+                                                {selectedVehicle.documentos.map((doc: any) => {
+                                                    const today = new Date()
+                                                    today.setHours(0, 0, 0, 0)
+                                                    const validade = doc.dataValidade ? new Date(doc.dataValidade) : null
+                                                    let status = 'VALIDO'
+                                                    let statusColor = 'bg-emerald-500/10 text-emerald-600'
+                                                    let statusLabel = 'Válido'
+
+                                                    if (!validade) {
+                                                        status = 'PENDENTE'
+                                                        statusColor = 'bg-gray-100 text-gray-500'
+                                                        statusLabel = 'Indefinido'
+                                                    } else {
+                                                        if (validade < today) {
+                                                            status = 'VENCIDO'
+                                                            statusColor = 'bg-red-500/10 text-red-600'
+                                                            statusLabel = 'Vencido'
+                                                        } else {
+                                                            const diffTime = Math.abs(validade.getTime() - today.getTime());
+                                                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                                            if (diffDays <= 30) {
+                                                                status = 'ATENCAO'
+                                                                statusColor = 'bg-amber-500/10 text-amber-600'
+                                                                statusLabel = 'A vencer'
+                                                            }
+                                                        }
+                                                    }
+
+                                                    return (
+                                                        <tr key={doc.id} className="hover:bg-surface-highlight/20 transition-colors">
+                                                            <td className="p-3 font-medium">{doc.tipo}</td>
+                                                            <td className="p-3 font-mono text-xs">{doc.numero}</td>
+                                                            <td className="p-3">
+                                                                {validade ? validade.toLocaleDateString('pt-BR') : '-'}
+                                                            </td>
+                                                            <td className="p-3 text-center">
+                                                                <span className={`px-2 py-1 rounded text-[10px] font-black uppercase ${statusColor}`}>
+                                                                    {statusLabel}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <div className="p-8 text-center border-2 border-dashed border-border-color rounded-xl opacity-50">
+                                        <AlertCircle className="mx-auto h-8 w-8 mb-2" />
+                                        <p>Nenhum documento cadastrado</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="p-8 text-center text-red-500">
+                            Erro ao carregar detalhes.
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

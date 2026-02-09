@@ -16,8 +16,8 @@ export default async function DashboardPage(props: any) {
     }
 
     const filters = {
-        mes: getVal('mes') !== undefined ? Number(getVal('mes')) : undefined,
-        ano: getVal('ano') !== undefined ? Number(getVal('ano')) : undefined,
+        dataInicio: getVal('dataInicio'),
+        dataFim: getVal('dataFim'),
         placa: getVal('placa'),
         status: getVal('status'),
         os: getVal('os'),

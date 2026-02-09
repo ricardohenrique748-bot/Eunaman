@@ -241,3 +241,20 @@ function typeMap(val: string) {
     if (v.includes('MAQUINA')) return 'MAQUINA'
     return 'LEVE'
 }
+
+export async function getVehicleDetails(id: string) {
+    try {
+        const veiculo = await prisma.veiculo.findUnique({
+            where: { id },
+            include: {
+                documentos: {
+                    orderBy: { tipo: 'asc' }
+                }
+            }
+        })
+        if (!veiculo) return { success: false, error: 'Veículo não encontrado.' }
+        return { success: true, data: veiculo }
+    } catch (e: any) {
+        return { success: false, error: 'Erro ao buscar veículo: ' + e.message }
+    }
+}

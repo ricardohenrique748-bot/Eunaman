@@ -6,8 +6,8 @@ import { getSession } from './auth-actions'
 import { revalidatePath, unstable_noStore as noStore } from 'next/cache'
 
 export interface DashboardFilters {
-    mes?: number
-    ano?: number
+    dataInicio?: string
+    dataFim?: string
     placa?: string
     status?: string
     os?: string
@@ -21,17 +21,33 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
         if (!session) return { success: false, error: 'Não autenticado' }
 
         const now = new Date()
-        const targetYear = (filters.ano !== undefined && !isNaN(Number(filters.ano))) ? Number(filters.ano) : now.getFullYear()
-        const targetMonth = (filters.mes !== undefined && !isNaN(Number(filters.mes))) ? Number(filters.mes) : now.getMonth()
 
-        // Period Definition
-        const firstDay = new Date(targetYear, targetMonth, 1)
-        const lastDay = endOfMonth(firstDay)
+        // Date Range Logic
+        let firstDay: Date
+        let lastDay: Date
 
-        // If it's a past month, calculate until the end of that month. 
-        // If it's the current month, calculate until 'now'.
-        const isCurrentMonth = (targetYear === now.getFullYear() && targetMonth === now.getMonth())
-        const referenceEnd = isCurrentMonth ? now : lastDay
+        if (filters.dataInicio) {
+            firstDay = new Date(filters.dataInicio)
+            // Fix timezone offset issue by treating string as local date or just ensuring hours 00:00
+            // Assuming string is YYYY-MM-DD, new Date(str) might be UTC. 
+            // Better to use YYYY-MM-DD + 'T00:00:00' to assume local if strict, or just use as is.
+            // Let's stick to simple parsing.
+            firstDay.setHours(0, 0, 0, 0)
+        } else {
+            // Default: First day of current month
+            firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
+        }
+
+        if (filters.dataFim) {
+            lastDay = new Date(filters.dataFim)
+            lastDay.setHours(23, 59, 59, 999)
+        } else {
+            // Default: Last day of current month
+            lastDay = endOfMonth(now)
+        }
+
+        // If the query range ends in the future or includes the current partial month, cap avail calc at 'now'
+        const referenceEnd = (lastDay > now) ? now : lastDay
 
         const unitWhere: any = {}
         if (session.perfil !== 'ADMIN') {
@@ -113,6 +129,7 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
             const availability = Math.max(0, ((totalHoursInPeriod - totalDowntimeHours) / totalHoursInPeriod) * 100)
 
             return {
+                id: v.id,
                 placa: v.placa || v.codigoInterno || 'N/A',
                 valor: Number(availability.toFixed(1))
             }
