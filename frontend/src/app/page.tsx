@@ -280,9 +280,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="absolute bottom-8 text-center w-full z-10 pointer-events-none opacity-40">
-        <p className="text-[10px] text-slate-400 uppercase tracking-[0.5em] font-black">EUNAMAN CORP — OPERATIONAL EXCELLENCE</p>
-      </div>
+
 
       <style jsx global>{`
         body {
