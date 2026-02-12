@@ -154,7 +154,7 @@ export default function LoginPage() {
         {/* Left Side: Branding/Visual - Full Bleed Photo */}
         <div className="hidden lg:flex flex-col relative overflow-hidden bg-slate-100">
           <Image
-            src="/background-photo.jpg"
+            src="/unidade.jpg"
             alt="Eunaman Unidade Operacional"
             fill
             className="object-cover transition-transform duration-[20s] hover:scale-110"
