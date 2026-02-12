@@ -188,7 +188,7 @@ export default function LoginPage() {
               />
             </div>
             <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase text-center">Acesse sua conta</h2>
-            <p className="text-slate-500 font-medium mt-2 text-center">Bem-vindo(a) de volta ao Hub Eunaman.</p>
+            <p className="text-slate-500 font-medium mt-2 text-center">Bem-vindo(a) de volta à Eunaman.</p>
           </div>
 
           {error && (
