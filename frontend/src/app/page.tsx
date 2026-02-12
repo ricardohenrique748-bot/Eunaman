@@ -172,18 +172,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="relative z-10 flex gap-4">
-            <div className="p-4 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md flex-1">
-              <span className="text-2xl font-black text-white block">99.9%</span>
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-black">Uptime Operacional</span>
-            </div>
-            <div className="p-4 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md flex-1">
-              <span className="text-2xl font-black text-white block">+2.4k</span>
-              <span className="text-[10px] text-gray-400 uppercase tracking-widest font-black inline-flex items-center gap-1">
-                Ativos Monitorados
-              </span>
-            </div>
-          </div>
+
         </div>
 
         {/* Right Side: Login Form */}
