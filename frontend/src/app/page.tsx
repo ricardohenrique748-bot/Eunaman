@@ -164,12 +164,7 @@ export default function LoginPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60" />
 
           <div className="relative z-10 p-12 h-full flex flex-col justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center shadow-lg">
-                <div className="w-5 h-5 bg-primary rounded-sm rotate-45" />
-              </div>
-              <span className="text-sm font-black text-white tracking-[0.3em] uppercase drop-shadow-md">Enterprise v1.0</span>
-            </div>
+            <div />
 
             <div className="space-y-4">
               <span className="inline-flex px-4 py-2 rounded-full bg-primary/90 backdrop-blur-md text-[10px] font-black text-white uppercase tracking-widest shadow-2xl border border-white/20">
