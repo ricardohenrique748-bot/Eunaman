@@ -43,7 +43,7 @@ export default function DashboardShell({ children, user }: { children: React.Rea
                                 className="object-contain animate-logo-spin hover:pause-animation animate-logo-glow"
                             />
                         </div>
-                        <div className="overflow-hidden">
+                        <div className="overflow-hidden -ml-2">
                             <span className="font-black text-base tracking-tighter text-[#000000] dark:text-white block leading-none transition-all duration-500 group-hover/logo:translate-x-1 group-hover/logo:text-primary">UNAMAN</span>
                         </div>
                     </div>
