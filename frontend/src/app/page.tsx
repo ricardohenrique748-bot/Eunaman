@@ -151,37 +151,33 @@ export default function LoginPage() {
       {/* Login Container */}
       <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-0 z-10 relative bg-white border border-slate-200 rounded-[40px] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] mx-4">
 
-        {/* Left Side: Branding/Visual */}
-        <div className="hidden lg:flex flex-col justify-between p-12 bg-gradient-to-br from-primary/5 via-transparent to-emerald-500/5 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(59,130,246,0.05)_0%,transparent_70%)]" />
+        {/* Left Side: Branding/Visual - Full Bleed Photo */}
+        <div className="hidden lg:flex flex-col relative overflow-hidden bg-slate-100">
+          <Image
+            src="/background-photo.jpg"
+            alt="Eunaman Unidade Operacional"
+            fill
+            className="object-cover transition-transform duration-[20s] hover:scale-110"
+            priority
+          />
+          {/* Subtle Overlay for Readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60" />
 
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-12">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <div className="w-4 h-4 bg-white rounded-sm rotate-45" />
+          <div className="relative z-10 p-12 h-full flex flex-col justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center shadow-lg">
+                <div className="w-5 h-5 bg-primary rounded-sm rotate-45" />
               </div>
-              <span className="text-sm font-black text-slate-400 tracking-[0.3em] uppercase">Enterprise v1.0</span>
+              <span className="text-sm font-black text-white tracking-[0.3em] uppercase drop-shadow-md">Enterprise v1.0</span>
             </div>
 
-            {/* Visual Branding: Eunaman Unit Photo */}
-            <div className="relative w-full aspect-[5/4] rounded-[32px] overflow-hidden shadow-2xl border border-slate-200 transition-transform duration-500 hover:scale-[1.02] group/banner">
-              <Image
-                src="/background-photo.jpg"
-                alt="Eunaman Unidade Operacional"
-                fill
-                className="object-cover transition-transform duration-[10s] group-hover/banner:scale-110"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent opacity-0 group-hover/banner:opacity-100 transition-opacity duration-500" />
-              <div className="absolute bottom-6 left-6 z-20">
-                <span className="px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-black text-primary uppercase tracking-widest shadow-lg">
-                  Unidade Operacional
-                </span>
-              </div>
+            <div className="space-y-4">
+              <span className="inline-flex px-4 py-2 rounded-full bg-primary/90 backdrop-blur-md text-[10px] font-black text-white uppercase tracking-widest shadow-2xl border border-white/20">
+                Unidade Operacional
+              </span>
+              <p className="text-[10px] text-white/60 uppercase tracking-[0.5em] font-black drop-shadow-sm">EUNAMAN CORP © 2026</p>
             </div>
           </div>
-
-
         </div>
 
         {/* Right Side: Login Form */}
