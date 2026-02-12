@@ -35,7 +35,7 @@ export default function DashboardShell({ children, user }: { children: React.Rea
             <aside className="w-68 bg-surface border-r border-border-color flex flex-col z-20 shadow-2xl">
                 <div className="h-20 flex items-center px-8 border-b border-border-color/50 group/logo">
                     <div className="flex items-center gap-0">
-                        <div className="relative w-11 h-11 transform transition-transform duration-500 group-hover/logo:scale-110">
+                        <div className="relative w-14 h-14 transform transition-transform duration-500 group-hover/logo:scale-110">
                             <Image
                                 src="/logo.png"
                                 alt="Logo"
@@ -43,8 +43,8 @@ export default function DashboardShell({ children, user }: { children: React.Rea
                                 className="object-contain animate-logo-spin hover:pause-animation animate-logo-glow"
                             />
                         </div>
-                        <div className="overflow-hidden -ml-2">
-                            <span className="font-black text-base tracking-tighter text-[#000000] dark:text-white block leading-none transition-all duration-500 group-hover/logo:translate-x-1 group-hover/logo:text-primary">UNAMAN</span>
+                        <div className="overflow-hidden -ml-3">
+                            <span className="font-black text-xl tracking-tighter text-[#000000] dark:text-white block leading-none transition-all duration-500 group-hover/logo:translate-x-1 group-hover/logo:text-primary">UNAMAN</span>
                         </div>
                     </div>
                 </div>
