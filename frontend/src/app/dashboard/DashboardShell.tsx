@@ -34,7 +34,7 @@ export default function DashboardShell({ children, user }: { children: React.Rea
             {/* Sidebar */}
             <aside className="w-68 bg-surface border-r border-border-color flex flex-col z-20 shadow-2xl">
                 <div className="h-20 flex items-center px-8 border-b border-border-color/50 group/logo">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-0">
                         <div className="relative w-11 h-11 transform transition-transform duration-500 group-hover/logo:scale-110">
                             <Image
                                 src="/logo.png"
@@ -44,7 +44,7 @@ export default function DashboardShell({ children, user }: { children: React.Rea
                             />
                         </div>
                         <div className="overflow-hidden">
-                            <span className="font-black text-base tracking-tighter text-foreground block leading-none transition-all duration-500 group-hover/logo:translate-x-1 group-hover/logo:text-primary">EUNAMAN</span>
+                            <span className="font-black text-base tracking-tighter text-[#000000] dark:text-white block leading-none transition-all duration-500 group-hover/logo:translate-x-1 group-hover/logo:text-primary">UNAMAN</span>
                         </div>
                     </div>
                 </div>
