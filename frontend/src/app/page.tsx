@@ -188,7 +188,7 @@ export default function LoginPage() {
 
         {/* Right Side: Login Form */}
         <div className="p-8 lg:p-16 bg-[#0b1121]/80 border-l border-white/5 relative flex flex-col justify-center">
-          <div className="mb-12 flex flex-col items-center lg:items-start">
+          <div className="mb-12 flex flex-col items-center">
             <div className="relative w-24 h-24 mb-10 group">
               <div className="absolute inset-0 bg-primary/40 rounded-full blur-3xl group-hover:bg-primary/60 transition-colors duration-1000 animate-pulse" />
               <Image
@@ -198,8 +198,8 @@ export default function LoginPage() {
                 className="object-contain drop-shadow-[0_0_20px_rgba(59,130,246,0.5)] animate-logo-spin animate-logo-glow relative z-10 transition-transform duration-700 group-hover:scale-110"
               />
             </div>
-            <h2 className="text-3xl font-black text-white tracking-tight uppercase lg:text-left text-center">Acesse sua conta</h2>
-            <p className="text-gray-500 font-medium mt-2">Bem-vindo(a) de volta ao Hub Eunaman.</p>
+            <h2 className="text-3xl font-black text-white tracking-tight uppercase text-center">Acesse sua conta</h2>
+            <p className="text-gray-500 font-medium mt-2 text-center">Bem-vindo(a) de volta ao Hub Eunaman.</p>
           </div>
 
           {error && (
