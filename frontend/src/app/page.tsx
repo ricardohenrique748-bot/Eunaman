@@ -181,8 +181,14 @@ export default function LoginPage() {
 
       <div className="w-full max-w-sm p-8 z-10 relative">
         <div className="flex flex-col items-center mb-10">
-          <div className="relative w-32 h-32 mb-6">
-            <Image src="/logo.png" alt="Eunaman" fill className="object-contain drop-shadow-2xl" />
+          <div className="relative w-32 h-32 mb-6 group">
+            <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl group-hover:bg-primary/40 transition-colors duration-1000 animate-pulse" />
+            <Image
+              src="/logo.png"
+              alt="Eunaman"
+              fill
+              className="object-contain drop-shadow-2xl animate-logo-spin animate-logo-glow relative z-10 transition-transform duration-700 group-hover:scale-110"
+            />
           </div>
           {/* Removed Text Title - Logo speaks for itself in minimalist design */}
         </div>

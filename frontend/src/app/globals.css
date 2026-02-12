@@ -85,6 +85,25 @@ body {
   background: var(--primary);
 }
 
+/* Logo Animations */
+@keyframes logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes logo-glow {
+  0%, 100% { filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.5)); }
+  50% { filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.8)); }
+}
+
+.animate-logo-spin {
+  animation: logo-spin 12s linear infinite;
+}
+
+.animate-logo-glow {
+  animation: logo-glow 3s ease-in-out infinite;
+}
+
 /* Forçar remoção dos indicadores do Next.js */
 #nextjs-portal, 
 .nextjs-static-indicator,
