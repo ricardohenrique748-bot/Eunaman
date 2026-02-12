@@ -163,13 +163,22 @@ export default function LoginPage() {
               <span className="text-sm font-black text-slate-400 tracking-[0.3em] uppercase">Enterprise v1.0</span>
             </div>
 
-            <h1 className="text-5xl font-black text-slate-900 leading-tight tracking-tighter mb-6">
-              Gestão Inteligente<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-500">Para Ativos de Alta Performance</span>
-            </h1>
-            <p className="text-lg text-slate-500 font-medium max-w-sm">
-              Potencialize sua operação com a plataforma centralizada da Eunaman. Controle total em tempo real.
-            </p>
+            {/* Visual Branding: Eunaman Unit Photo */}
+            <div className="relative w-full aspect-[5/4] rounded-[32px] overflow-hidden shadow-2xl border border-slate-200 transition-transform duration-500 hover:scale-[1.02] group/banner">
+              <Image
+                src="/background-photo.jpg"
+                alt="Eunaman Unidade Operacional"
+                fill
+                className="object-cover transition-transform duration-[10s] group-hover/banner:scale-110"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent opacity-0 group-hover/banner:opacity-100 transition-opacity duration-500" />
+              <div className="absolute bottom-6 left-6 z-20">
+                <span className="px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-black text-primary uppercase tracking-widest shadow-lg">
+                  Unidade Operacional
+                </span>
+              </div>
+            </div>
           </div>
 
 
