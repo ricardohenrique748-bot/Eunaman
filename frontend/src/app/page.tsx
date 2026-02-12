@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Lock, User, AlertCircle } from 'lucide-react'
+import { Lock, User, AlertCircle, Shield } from 'lucide-react'
 import Image from 'next/image'
 import { login } from '@/app/actions/auth-actions'
 
