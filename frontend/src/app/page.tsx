@@ -264,19 +264,20 @@ export default function LoginPage() {
                 {loading ? 'Aguarde...' : 'ENTRAR NO SISTEMA'}
               </span>
             </button>
-          </form>
 
-          <div className="mt-12 flex items-center justify-center gap-6 opacity-40 hover:opacity-100 transition-all duration-500">
-            <div className="flex items-center gap-2 text-[10px] font-black text-slate-900 uppercase tracking-widest">
-              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-              SSL Cryptography
+            {/* Security Info moved below button */}
+            <div className="pt-2 flex items-center justify-center gap-6 opacity-40 hover:opacity-80 transition-all duration-500">
+              <div className="flex items-center gap-2 text-[9px] font-black text-slate-900 uppercase tracking-widest">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                SSL Secured
+              </div>
+              <div className="w-px h-3 bg-slate-200" />
+              <div className="flex items-center gap-2 text-[9px] font-black text-slate-900 uppercase tracking-widest">
+                <Shield className="w-3 h-3 text-primary" />
+                Safe Login
+              </div>
             </div>
-            <div className="w-px h-3 bg-slate-200" />
-            <div className="flex items-center gap-2 text-[10px] font-black text-slate-900 uppercase tracking-widest">
-              <Shield className="w-3 h-3 text-primary" />
-              Threat Detection
-            </div>
-          </div>
+          </form>
         </div>
       </div>
 
