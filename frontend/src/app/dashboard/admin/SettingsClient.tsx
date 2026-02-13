@@ -759,7 +759,7 @@ function UsersSection({ usuarios, onNew, isAdmin, onDelete, onEdit }: { usuarios
                                 </td>
                                 {isAdmin && (
                                     <td className="px-8 py-5 text-right">
-                                        <div className="flex justify-end gap-3 translate-x-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                                        <div className="flex justify-end gap-3 transition-all">
                                             <button onClick={() => onEdit('user', u)} title="Editar dados" className="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors border border-transparent hover:border-primary/20">
                                                 <Edit className="w-4 h-4" />
                                             </button>
@@ -838,7 +838,7 @@ function CompanySection({ empresas, onNew, onNewUnit, isAdmin, onDelete, onEdit 
                                                 <p className="font-bold text-foreground text-sm tracking-tight">{u.nomeUnidade}</p>
                                             </div>
                                             {isAdmin && (
-                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="flex gap-1 transition-opacity">
                                                     <button onClick={() => onEdit('unit', u)} className="p-1 text-gray-400 hover:text-blue-500"><Edit className="w-3.5 h-3.5" /></button>
                                                     <button onClick={() => onDelete('unit', u.id)} className="p-1 text-gray-400 hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button>
                                                 </div>
