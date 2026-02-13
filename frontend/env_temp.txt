@@ -1,0 +1,1 @@
+﻿DATABASE_URL="postgresql://postgres:Synyster852@db.uwizfmhdhmwepzbffsvi.supabase.co:5432/postgres"
