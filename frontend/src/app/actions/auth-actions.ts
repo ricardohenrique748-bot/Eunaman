@@ -4,8 +4,13 @@ import prisma from '@/lib/prisma'
 import { cookies } from 'next/headers'
 
 export async function login(formData: FormData) {
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
+    const email = (formData.get('email') as string).trim()
+    const password = (formData.get('password') as string).trim()
+
+    // Debug DB connection
+    const dbUrl = process.env.DATABASE_URL || ''
+    const dbHost = dbUrl.includes('@') ? dbUrl.split('@')[1] : 'Unknown (local/sqlite?)'
+    console.log(`[Login Attempt] Email: '${email}' | Password length: ${password.length} | DB Host: ${dbHost}`)
 
     // In a real app, we would hash/verify the password
     const user = await prisma.usuario.findUnique({
@@ -15,8 +20,14 @@ export async function login(formData: FormData) {
         }
     })
 
-    if (!user || user.senha !== password) {
-        return { success: false, error: 'Credenciais inválidas' }
+    if (!user) {
+        console.log(`[Login Failed] User not found: '${email}'`)
+        return { success: false, error: 'Usuário não encontrado' }
+    }
+
+    if (user.senha !== password) {
+        console.log(`[Login Failed] Password mismatch for '${email}'`)
+        return { success: false, error: 'Senha incorreta' }
     }
 
     if (!user.ativo) {
