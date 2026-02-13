@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-export async function getOrdensServico(filters: { status?: string, q?: string } = {}) {
+export async function getOrdensServico(filters: { status?: string, q?: string, tipo?: string } = {}) {
     try {
         const session = await getSession()
         if (!session) return { success: false, error: 'Não autenticado' }
@@ -21,6 +21,11 @@ export async function getOrdensServico(filters: { status?: string, q?: string } 
         // Status Filter
         if (filters.status && filters.status !== 'TODAS') {
             where.status = filters.status
+        }
+
+        // Tipo OS Filter
+        if (filters.tipo && filters.tipo !== 'TODOS') {
+            where.tipoOS = filters.tipo as any
         }
 
         // Search Query

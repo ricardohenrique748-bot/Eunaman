@@ -9,10 +9,12 @@ type OrdemServicoComVeiculo = OrdemServico & { veiculo: Veiculo }
 export default async function PcmPage(props: any) {
     const searchParams = await props.searchParams
     const statusFilter = (searchParams.status as string) || 'TODAS'
+    const tipoFilter = (searchParams.tipo as string) || 'TODOS'
     const queryFilter = (searchParams.q as string) || ''
 
     const { data: ordens } = await getOrdensServico({
         status: statusFilter,
+        tipo: tipoFilter,
         q: queryFilter
     })
 
@@ -45,15 +47,27 @@ export default async function PcmPage(props: any) {
                             className="w-full bg-surface border border-border-color rounded-2xl pl-12 pr-4 py-3.5 text-xs font-black text-foreground focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-gray-600 placeholder:uppercase placeholder:tracking-tighter"
                         />
                         {statusFilter !== 'TODAS' && <input type="hidden" name="status" value={statusFilter} />}
+                        {tipoFilter !== 'TODOS' && <input type="hidden" name="tipo" value={tipoFilter} />}
                     </form>
                 </div>
 
-                <div className="xl:col-span-8 flex gap-2 overflow-x-auto pb-2 xl:pb-0 scrollbar-none scroll-smooth">
-                    <FilterButton label="Todas" value="TODAS" active={statusFilter === 'TODAS'} q={queryFilter} />
-                    <FilterButton label="Abertas" value="ABERTA" active={statusFilter === 'ABERTA'} q={queryFilter} />
-                    <FilterButton label="Em Execução" value="EM_EXECUCAO" active={statusFilter === 'EM_EXECUCAO'} q={queryFilter} />
-                    <FilterButton label="Planejadas" value="PLANEJADA" active={statusFilter === 'PLANEJADA'} q={queryFilter} />
-                    <FilterButton label="Concluídas" value="CONCLUIDA" active={statusFilter === 'CONCLUIDA'} q={queryFilter} />
+                <div className="xl:col-span-8 space-y-3">
+                    <div className="flex gap-2 overflow-x-auto pb-2 xl:pb-0 scrollbar-none scroll-smooth">
+                        <span className="shrink-0 flex items-center px-4 text-[9px] font-black uppercase text-gray-400 border-r border-border-color mr-2">Status</span>
+                        <FilterButton label="Todas" value="TODAS" active={statusFilter === 'TODAS'} q={queryFilter} currentStatus="TODAS" currentTipo={tipoFilter} filterType="status" />
+                        <FilterButton label="Abertas" value="ABERTA" active={statusFilter === 'ABERTA'} q={queryFilter} currentStatus={statusFilter} currentTipo={tipoFilter} filterType="status" />
+                        <FilterButton label="Em Execução" value="EM_EXECUCAO" active={statusFilter === 'EM_EXECUCAO'} q={queryFilter} currentStatus={statusFilter} currentTipo={tipoFilter} filterType="status" />
+                        <FilterButton label="Planejadas" value="PLANEJADA" active={statusFilter === 'PLANEJADA'} q={queryFilter} currentStatus={statusFilter} currentTipo={tipoFilter} filterType="status" />
+                        <FilterButton label="Concluídas" value="CONCLUIDA" active={statusFilter === 'CONCLUIDA'} q={queryFilter} currentStatus={statusFilter} currentTipo={tipoFilter} filterType="status" />
+                    </div>
+                    <div className="flex gap-2 overflow-x-auto pb-2 xl:pb-0 scrollbar-none scroll-smooth">
+                        <span className="shrink-0 flex items-center px-4 text-[9px] font-black uppercase text-gray-400 border-r border-border-color mr-2">Tipo OS</span>
+                        <FilterButton label="Todos" value="TODOS" active={tipoFilter === 'TODOS'} q={queryFilter} currentStatus={statusFilter} currentTipo="TODOS" filterType="tipo" />
+                        <FilterButton label="Preventiva" value="PREVENTIVA" active={tipoFilter === 'PREVENTIVA'} q={queryFilter} currentStatus={statusFilter} currentTipo={tipoFilter} filterType="tipo" />
+                        <FilterButton label="Corretiva" value="CORRETIVA" active={tipoFilter === 'CORRETIVA'} q={queryFilter} currentStatus={statusFilter} currentTipo={tipoFilter} filterType="tipo" />
+                        <FilterButton label="Inspeção" value="INSPECAO" active={tipoFilter === 'INSPECAO'} q={queryFilter} currentStatus={statusFilter} currentTipo={tipoFilter} filterType="tipo" />
+                        <FilterButton label="Melhoria" value="MELHORIA" active={tipoFilter === 'MELHORIA'} q={queryFilter} currentStatus={statusFilter} currentTipo={tipoFilter} filterType="tipo" />
+                    </div>
                 </div>
             </div>
 
@@ -151,12 +165,23 @@ export default async function PcmPage(props: any) {
     )
 }
 
-function FilterButton({ label, value, active, q }: { label: string, value: string, active?: boolean, q?: string }) {
-    const url = `/dashboard/pcm/os?status=${value}${q ? `&q=${q}` : ''}`
+function FilterButton({ label, value, active, q, currentStatus, currentTipo, filterType }: { label: string, value: string, active?: boolean, q?: string, currentStatus: string, currentTipo: string, filterType: 'status' | 'tipo' }) {
+    const params = new URLSearchParams()
+    if (q) params.set('q', q)
+
+    if (filterType === 'status') {
+        if (value !== 'TODAS') params.set('status', value)
+        if (currentTipo !== 'TODOS') params.set('tipo', currentTipo)
+    } else {
+        if (currentStatus !== 'TODAS') params.set('status', currentStatus)
+        if (value !== 'TODOS') params.set('tipo', value)
+    }
+
+    const url = `/dashboard/pcm/os?${params.toString()}`
 
     return (
-        <Link href={url} className={`px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border whitespace-nowrap flex items-center gap-2 group ${active ? 'bg-primary border-primary text-white shadow-lg shadow-primary/25' : 'bg-surface border-border-color text-gray-500 hover:text-foreground hover:bg-surface-highlight'}`}>
-            <div className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-white shadow-[0_0_8px_white]' : 'bg-gray-400 group-hover:bg-primary transition-colors'}`} />
+        <Link href={url} className={`px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border whitespace-nowrap flex items-center gap-2 group ${active ? 'bg-primary border-primary text-white shadow-lg shadow-primary/25' : 'bg-surface border-border-color text-gray-500 hover:text-foreground hover:bg-surface-highlight'}`}>
+            <div className={`w-1 h-1 rounded-full ${active ? 'bg-white shadow-[0_0_8px_white]' : 'bg-gray-400 group-hover:bg-primary transition-colors'}`} />
             {label}
         </Link>
     )
