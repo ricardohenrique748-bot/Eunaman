@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma'
 import { cookies } from 'next/headers'
 
 export async function login(formData: FormData) {
-    const email = (formData.get('email') as string).trim()
+    const email = (formData.get('email') as string).trim().toLowerCase()
     const password = (formData.get('password') as string).trim()
 
     // Debug DB connection
