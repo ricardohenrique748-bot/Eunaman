@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getOrdensServico } from '@/app/actions/pcm-actions'
 import { OrdemServico, Veiculo } from '@prisma/client'
 import OsRowActions from './OsRowActions'
+import SearchInput from './SearchInput'
 
 type OrdemServicoComVeiculo = OrdemServico & { veiculo: Veiculo }
 
@@ -36,19 +37,8 @@ export default async function PcmPage(props: any) {
 
             {/* Filters & Command Bar */}
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
-                <div className="xl:col-span-4 relative group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" />
-                    <form action="" method="GET">
-                        <input
-                            type="text"
-                            name="q"
-                            defaultValue={queryFilter}
-                            placeholder="Buscar placa, TAG ou problema..."
-                            className="w-full bg-surface border border-border-color rounded-2xl pl-12 pr-4 py-3.5 text-xs font-black text-foreground focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-gray-600 placeholder:uppercase placeholder:tracking-tighter"
-                        />
-                        {statusFilter !== 'TODAS' && <input type="hidden" name="status" value={statusFilter} />}
-                        {tipoFilter !== 'TODOS' && <input type="hidden" name="tipo" value={tipoFilter} />}
-                    </form>
+                <div className="xl:col-span-4">
+                    <SearchInput defaultValue={queryFilter} />
                 </div>
 
                 <div className="xl:col-span-8 space-y-3">

@@ -86,9 +86,8 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
         console.log('[Dashboard] OS Query:', JSON.stringify(osWhere, null, 2))
         console.log('[Dashboard] Veiculo Query:', JSON.stringify(veiculoWhere, null, 2))
 
-        // --- 2. Database Fetching ---
-
-        const [osList, veiculos] = await Promise.all([
+        // --- 2. Database Fetching (Parallel) ---
+        const [osList, veiculos, docs, preventivePlanos, recentActivity] = await Promise.all([
             prisma.ordemServico.findMany({
                 where: osWhere,
                 include: { veiculo: true }
@@ -103,6 +102,31 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
                         }
                     }
                 }
+            }),
+            prisma.documentoFrota.findMany({
+                where: {
+                    veiculo: veiculoWhere,
+                    dataValidade: { not: null }
+                },
+                select: { dataValidade: true }
+            }),
+            prisma.planoManutencao.findMany({
+                where: { veiculo: veiculoWhere },
+                include: {
+                    veiculo: {
+                        select: { placa: true, codigoInterno: true, horimetroAtual: true }
+                    }
+                }
+            }),
+            prisma.ordemServico.findMany({
+                where: {
+                    veiculo: {
+                        unidadeId: session.perfil !== 'ADMIN' ? session.unidadeId : undefined
+                    }
+                },
+                take: 5,
+                orderBy: { dataAbertura: 'desc' },
+                include: { veiculo: true }
             })
         ])
 
@@ -149,14 +173,6 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
         const totalPossibleHours = totalHoursInPeriod * Math.max(1, veiculos.length)
         const mtbf = correctiveOS > 0 ? (totalPossibleHours / correctiveOS).toFixed(1) : '0.0'
 
-        // Docs Logic
-        const docs = await prisma.documentoFrota.findMany({
-            where: {
-                veiculo: veiculoWhere,
-                dataValidade: { not: null }
-            },
-            select: { dataValidade: true }
-        })
 
         const today = new Date()
         today.setHours(0, 0, 0, 0)
@@ -180,6 +196,25 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
             return acc
         }, { valid: 0, attention: 0, expired: 0 })
 
+
+        // Preventive Data Formatting
+        const preventiveData = preventivePlanos.map(p => {
+            const proximaRevisao = p.ultimoHorimetro + p.intervalo
+            const horasRestantes = proximaRevisao - p.veiculo.horimetroAtual
+
+            let fill = '#10B981' // Green
+            if (horasRestantes < 0) fill = '#EF4444' // Red
+            else if (horasRestantes < 50) fill = '#F59E0B' // Yellow
+
+            return {
+                name: `${p.veiculo.placa || p.veiculo.codigoInterno} - ${p.tipo}`,
+                value: horasRestantes,
+                originalStatus: p.status,
+                fill,
+                placa: p.veiculo.placa || p.veiculo.codigoInterno
+            }
+        }).sort((a, b) => a.value - b.value)
+
         return {
             success: true,
             data: {
@@ -193,45 +228,8 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
                     docs: docStats
                 },
                 chartData: availabilityData,
-                preventiveData: await (async () => {
-                    const planos = await prisma.planoManutencao.findMany({
-                        where: {
-                            veiculo: veiculoWhere
-                        },
-                        include: {
-                            veiculo: {
-                                select: { placa: true, codigoInterno: true, horimetroAtual: true }
-                            }
-                        }
-                    })
-
-                    return planos.map(p => {
-                        const proximaRevisao = p.ultimoHorimetro + p.intervalo
-                        const horasRestantes = proximaRevisao - p.veiculo.horimetroAtual
-
-                        let fill = '#10B981' // Green
-                        if (horasRestantes < 0) fill = '#EF4444' // Red
-                        else if (horasRestantes < 50) fill = '#F59E0B' // Yellow
-
-                        return {
-                            name: `${p.veiculo.placa || p.veiculo.codigoInterno} - ${p.tipo}`,
-                            value: horasRestantes,
-                            originalStatus: p.status, // Database status might differ if heavy logic, but let's trust calc
-                            fill,
-                            placa: p.veiculo.placa || p.veiculo.codigoInterno
-                        }
-                    }).sort((a, b) => a.value - b.value) // Sort by urgency (lowest/negative hours first)
-                })(),
-                recentActivity: await prisma.ordemServico.findMany({
-                    where: {
-                        veiculo: {
-                            unidadeId: session.perfil !== 'ADMIN' ? session.unidadeId : undefined
-                        }
-                    },
-                    take: 5,
-                    orderBy: { dataAbertura: 'desc' },
-                    include: { veiculo: true }
-                })
+                preventiveData,
+                recentActivity
             }
         }
     } catch (e: any) {
