@@ -78,8 +78,8 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
         if (localFilters.tipo) params.set('tipo', localFilters.tipo)
         const finalUrl = `/dashboard?${params.toString()}`
         console.log('[Client] Redirecionando para:', finalUrl)
-        window.location.href = finalUrl
-    }, [localFilters])
+        router.push(finalUrl)
+    }, [localFilters, router])
 
     const meses = [
         "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",

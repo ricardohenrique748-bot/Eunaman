@@ -1,0 +1,11 @@
+﻿--- Measuring Database Performance ---
+Usuario: 2 records
+Empresa: 1 records
+Unidade: 1 records
+Veiculo: 0 records
+OrdemServico: 0 records
+PlanoManutencao: 0 records
+DocumentoFrota: 0 records
+Backlog: 0 records
+Typical query (100 OS + veiculo) took: 1273ms
+Total measurement took: 6236ms
