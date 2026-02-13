@@ -103,7 +103,7 @@ export default function SettingsClient({ veiculos, usuarios, empresas, systemPar
 
     const allUnits = empresas.flatMap(e => e.unidades)
 
-    const isAdmin = userSession.perfil === 'ADMIN';
+    const canManage = userSession.perfil === 'ADMIN' || userSession.perfil === 'GESTOR';
 
     const handleNewUnit = (empresaId: string) => {
         setSelectedEmpresaId(empresaId)
@@ -145,10 +145,10 @@ export default function SettingsClient({ veiculos, usuarios, empresas, systemPar
 
             {/* Conteúdo */}
             <div className="flex-1 overflow-auto bg-[#f9fafb] p-10 relative">
-                {activeTab === 'database' && <DatabaseSection veiculos={veiculos} isAdmin={isAdmin} onDelete={handleDelete} onEdit={(type, data) => setEditItem({ type, data })} />}
-                {activeTab === 'users' && <UsersSection usuarios={usuarios} onNew={() => setShowModal('user')} isAdmin={isAdmin} onDelete={handleDelete} onEdit={(type, data) => setEditItem({ type, data })} />}
-                {activeTab === 'company' && <CompanySection empresas={empresas} onNew={() => setShowModal('company')} onNewUnit={handleNewUnit} isAdmin={isAdmin} onDelete={handleDelete} onEdit={(type, data) => setEditItem({ type: type as any, data: data as any })} />}
-                {activeTab === 'system' && <SystemSection params={systemParams} osOptions={osOptions} isAdmin={isAdmin} />}
+                {activeTab === 'database' && <DatabaseSection veiculos={veiculos} isAdmin={canManage} onDelete={handleDelete} onEdit={(type, data) => setEditItem({ type, data })} />}
+                {activeTab === 'users' && <UsersSection usuarios={usuarios} onNew={() => setShowModal('user')} isAdmin={canManage} onDelete={handleDelete} onEdit={(type, data) => setEditItem({ type, data })} />}
+                {activeTab === 'company' && <CompanySection empresas={empresas} onNew={() => setShowModal('company')} onNewUnit={handleNewUnit} isAdmin={canManage} onDelete={handleDelete} onEdit={(type, data) => setEditItem({ type: type as any, data: data as any })} />}
+                {activeTab === 'system' && <SystemSection params={systemParams} osOptions={osOptions} isAdmin={canManage} />}
             </div>
 
             {/* Modais */}
