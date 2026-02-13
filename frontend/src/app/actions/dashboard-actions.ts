@@ -223,7 +223,7 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
                     }).sort((a, b) => a.value - b.value) // Sort by urgency (lowest/negative hours first)
                 })(),
                 recentActivity: await prisma.ordemServico.findMany({
-                    where: unitWhere,
+                    where: { veiculo: veiculoSubWhere },
                     take: 5,
                     orderBy: { dataAbertura: 'desc' },
                     include: { veiculo: true }
