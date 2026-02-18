@@ -137,7 +137,14 @@ export async function getVeiculosSemanal() {
             modelo, 
             "tipo_veiculo" as "tipoVeiculo", 
             "status_operacional" as status, 
-            "semana_preventiva" as "semanaPreventiva" 
+            "semana_preventiva" as "semanaPreventiva",
+            "modulo_sistema" as "moduloSistema",
+            "prog_status" as "programacaoStatus",
+            "prog_progresso" as "programacaoProgresso",
+            "prog_modulo" as "programacaoModulo",
+            "prog_descricao" as "programacaoDescricao",
+            "prog_data_inicio" as "programacaoDataInicio",
+            "prog_data_fim" as "programacaoDataFim"
         FROM "veiculos_frota" 
         ${whereClause} 
         ORDER BY "codigo_interno" ASC
@@ -178,7 +185,6 @@ export async function updateSemanaPreventiva(
     }
 ) {
     try {
-        // Use raw execution to bypass client validation
         const valSemana = semana === null ? 'NULL' : semana
 
         // If details provided, update them too
@@ -201,10 +207,50 @@ export async function updateSemanaPreventiva(
         await prisma.$executeRawUnsafe(`UPDATE "veiculos_frota" SET ${updateFields} WHERE id = '${veiculoId}'`)
 
         revalidatePath('/dashboard/pcm/semanal')
+        revalidatePath('/share/pcm/semanal')
         return { success: true }
     } catch (error) {
         console.error('Error updating weekly schedule:', error)
         return { success: false, error: 'Failed to update schedule' }
+    }
+}
+
+export async function getPublicVeiculosSemanal(unidadeId?: string) {
+    // Public access - read only
+    // Use raw query
+    let whereClause = `WHERE "status_operacional" != 'DESATIVADO'`
+
+    if (unidadeId) {
+        whereClause += ` AND "unidade_id" = '${unidadeId}'`
+    }
+
+    const query = `
+        SELECT 
+            id, 
+            "codigo_interno" as "codigoInterno", 
+            placa, 
+            modelo, 
+            "tipo_veiculo" as "tipoVeiculo", 
+            "status_operacional" as status, 
+            "semana_preventiva" as "semanaPreventiva",
+            "modulo_sistema" as "moduloSistema",
+            "prog_status" as "programacaoStatus",
+            "prog_progresso" as "programacaoProgresso",
+            "prog_modulo" as "programacaoModulo",
+            "prog_descricao" as "programacaoDescricao",
+            "prog_data_inicio" as "programacaoDataInicio",
+            "prog_data_fim" as "programacaoDataFim"
+        FROM "veiculos_frota" 
+        ${whereClause} 
+        ORDER BY "codigo_interno" ASC
+    `
+
+    try {
+        const data = await prisma.$queryRawUnsafe(query)
+        return data as any[]
+    } catch (e) {
+        console.error("Public raw query failed", e)
+        return []
     }
 }
 

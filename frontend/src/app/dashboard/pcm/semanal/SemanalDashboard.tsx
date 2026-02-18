@@ -9,7 +9,7 @@ import { Veiculo } from './SemanalClient'
 
 interface SemanalDashboardProps {
     veiculos: Veiculo[]
-    onBack: () => void
+    onBack?: () => void
 }
 
 export default function SemanalDashboard({ veiculos, onBack }: SemanalDashboardProps) {
@@ -52,12 +52,14 @@ export default function SemanalDashboard({ veiculos, onBack }: SemanalDashboardP
     return (
         <div className="h-full flex flex-col space-y-6">
             <div className="flex items-center gap-4">
-                <button
-                    onClick={onBack}
-                    className="px-4 py-2 bg-surface border border-border-color rounded-lg text-xs font-black uppercase tracking-widest hover:bg-surface-highlight transition-colors"
-                >
-                    Voltar
-                </button>
+                {onBack && (
+                    <button
+                        onClick={onBack}
+                        className="px-4 py-2 bg-surface border border-border-color rounded-lg text-xs font-black uppercase tracking-widest hover:bg-surface-highlight transition-colors"
+                    >
+                        Voltar
+                    </button>
+                )}
                 <h2 className="text-xl font-black text-foreground">Dashboard de Aderência Semanal</h2>
             </div>
 

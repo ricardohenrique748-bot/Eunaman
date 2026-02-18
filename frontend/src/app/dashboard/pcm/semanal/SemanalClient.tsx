@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { updateSemanaPreventiva } from '@/app/actions/pcm-actions'
-import { Truck, AlertCircle, CalendarClock, ChevronRight, GripVertical, CheckCircle2, X, LayoutDashboard } from 'lucide-react'
+import { Truck, AlertCircle, CalendarClock, ChevronRight, GripVertical, CheckCircle2, X, LayoutDashboard, Share2 } from 'lucide-react'
 import SemanalDashboard from './SemanalDashboard'
 
 // --- Types ---
@@ -21,6 +21,7 @@ export interface Veiculo {
     programacaoDescricao?: string
     programacaoDataInicio?: string
     programacaoDataFim?: string
+    moduloSistema?: string
 }
 
 interface ProgrammingDetails {
@@ -41,7 +42,7 @@ const DEFAULT_DETAILS: ProgrammingDetails = {
     dataFim: ''
 }
 
-export default function SemanalClient({ initialData }: { initialData: Veiculo[] }) {
+export default function SemanalClient({ initialData, unidadeId }: { initialData: Veiculo[], unidadeId?: string }) {
     const [veiculos, setVeiculos] = useState<Veiculo[]>(initialData)
     const [draggedVeiculo, setDraggedVeiculo] = useState<string | null>(null)
     const [loadingId, setLoadingId] = useState<string | null>(null)
@@ -114,7 +115,7 @@ export default function SemanalClient({ initialData }: { initialData: Veiculo[] 
         setDetails({
             status: currentVeiculo?.programacaoStatus || 'PENDENTE',
             progresso: currentVeiculo?.programacaoProgresso || 0,
-            modulo: currentVeiculo?.programacaoModulo || '',
+            modulo: currentVeiculo?.programacaoModulo || currentVeiculo?.moduloSistema || '',
             descricao: currentVeiculo?.programacaoDescricao || '',
             dataInicio: currentVeiculo?.programacaoDataInicio ? new Date(currentVeiculo.programacaoDataInicio).toISOString().split('T')[0] : '',
             dataFim: currentVeiculo?.programacaoDataFim ? new Date(currentVeiculo.programacaoDataFim).toISOString().split('T')[0] : ''
@@ -179,6 +180,16 @@ export default function SemanalClient({ initialData }: { initialData: Veiculo[] 
             .filter(v => filter === 'TODOS' || v.tipoVeiculo === filter)
     }
 
+    const handleShare = () => {
+        if (!unidadeId) {
+            alert("Não foi possível identificar a unidade para gerar o link.")
+            return
+        }
+        const url = `${window.location.origin}/share/pcm/semanal?u=${unidadeId}`
+        navigator.clipboard.writeText(url)
+        alert("Link de visitante copiado para a área de transferência!")
+    }
+
     const weeks = [
         { id: 1, label: 'Semana 1', color: 'border-l-blue-500', bg: 'bg-blue-500/5' },
         { id: 2, label: 'Semana 2', color: 'border-l-emerald-500', bg: 'bg-emerald-500/5' },
@@ -210,6 +221,15 @@ export default function SemanalClient({ initialData }: { initialData: Veiculo[] 
                     >
                         <LayoutDashboard className="w-4 h-4" />
                         Dashboard
+                    </button>
+
+                    <button
+                        onClick={handleShare}
+                        className="flex items-center gap-2 px-3 py-2 bg-blue-500/10 text-blue-600 border border-blue-500/20 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-blue-500/20 transition-colors"
+                        title="Link para Visitante (Visualização)"
+                    >
+                        <Share2 className="w-4 h-4" />
+                        Compartilhar
                     </button>
 
                     <div className="flex bg-surface-highlight rounded-lg p-1 border border-border-color">
