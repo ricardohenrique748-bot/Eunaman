@@ -171,8 +171,12 @@ export default function SettingsClient({ veiculos, usuarios, empresas, systemPar
                         {/* Formulário de Criação (EXISTENTE) */}
                         {showModal === 'user' && (
                             <form action={async (formData) => {
-                                await createUsuario(formData)
-                                setShowModal(null)
+                                const result = await createUsuario(formData)
+                                if (!result.success) {
+                                    alert(result.error)
+                                } else {
+                                    setShowModal(null)
+                                }
                             }} className="space-y-5">
                                 <div className="flex gap-2 mb-4 p-1 bg-surface-highlight/50 rounded-lg border border-border-color">
                                     <button type="button" onClick={() => setUserTab('info')} className={`flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-md transition-all ${userTab === 'info' ? 'bg-white dark:bg-surface shadow-sm text-primary' : 'text-gray-400 hover:text-gray-600'}`}>Dados Pessoais</button>
@@ -389,8 +393,12 @@ export default function SettingsClient({ veiculos, usuarios, empresas, systemPar
 
                         {editItem?.type === 'user' && (
                             <form action={async (formData) => {
-                                await updateUsuario(formData)
-                                setEditItem(null)
+                                const result = await updateUsuario(formData)
+                                if (!result.success) {
+                                    alert(result.error)
+                                } else {
+                                    setEditItem(null)
+                                }
                             }} className="space-y-5">
                                 <input type="hidden" name="id" value={editItem.data.id} />
 

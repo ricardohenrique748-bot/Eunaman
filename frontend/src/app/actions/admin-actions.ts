@@ -44,6 +44,11 @@ export async function createUsuario(formData: FormData) {
     try {
         const nome = formData.get('nome') as string
         const email = formData.get('email') as string
+
+        if (!nome || !nome.trim() || !email || !email.trim()) {
+            return { success: false, error: 'O Nome e o E-mail são obrigatórios. Por favor, preencha a aba Dados Pessoais.' }
+        }
+
         const senha = formData.get('senha') as string || '123'
         const perfil = formData.get('perfil') as Perfil
         // @ts-ignore
@@ -65,7 +70,8 @@ export async function createUsuario(formData: FormData) {
         })
         revalidatePath('/dashboard/admin')
         return { success: true }
-    } catch (_) {
+    } catch (e) {
+        console.error("ERRO AO CRIAR USUARIO:", e)
         return { success: false, error: 'Erro ao criar usuário' }
     }
 }
@@ -176,6 +182,11 @@ export async function updateUsuario(formData: FormData) {
         const id = formData.get('id') as string
         const nome = formData.get('nome') as string
         const email = formData.get('email') as string
+
+        if (!nome || !nome.trim() || !email || !email.trim()) {
+            return { success: false, error: 'O Nome e o E-mail são obrigatórios.' }
+        }
+
         const perfil = formData.get('perfil') as Perfil
         // @ts-ignore
         const area = formData.get('area')
