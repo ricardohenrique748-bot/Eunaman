@@ -901,7 +901,7 @@ function SystemSection({ params, osOptions, isAdmin }: { params: SystemParam[], 
                     onClick={() => setActiveSubTab('componentes')}
                     className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeSubTab === 'componentes' ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105' : 'text-gray-400 hover:text-foreground hover:bg-surface-highlight'}`}
                 >
-                    Componentes
+                    Sub-Sistema
                 </button>
             </div>
 
@@ -1008,7 +1008,7 @@ function SystemSection({ params, osOptions, isAdmin }: { params: SystemParam[], 
                         <div key={s.id} className="bg-surface border border-border-color rounded-[2.5rem] overflow-hidden shadow-xl border-l-[10px] border-l-primary/40">
                             <div className="p-8 flex justify-between items-center border-b border-border-color bg-surface-highlight/10">
                                 <h5 className="text-2xl font-black text-foreground leading-none">{s.nome}</h5>
-                                <span className="text-xs font-bold text-gray-400 bg-surface px-3 py-1 rounded-full border border-border-color">{s.subSistemas.length} COMPONENTES</span>
+                                <span className="text-xs font-bold text-gray-400 bg-surface px-3 py-1 rounded-full border border-border-color">{s.subSistemas.length} SUB-SISTEMAS</span>
                             </div>
                             <div className="p-8 space-y-6">
                                 <div className="flex gap-3">
@@ -1049,7 +1049,7 @@ function SystemSection({ params, osOptions, isAdmin }: { params: SystemParam[], 
                         <div className="text-center py-10 opacity-50">
                             <Settings className="w-12 h-12 text-gray-300 mx-auto mb-2" />
                             <p className="font-bold text-gray-400">Nenhum sistema cadastrado.</p>
-                            <p className="text-xs text-gray-400">Você precisa criar um sistema antes de adicionar componentes.</p>
+                            <p className="text-xs text-gray-400">Você precisa criar um sistema antes de adicionar sub-sistemas.</p>
                         </div>
                     )}
                 </div>
