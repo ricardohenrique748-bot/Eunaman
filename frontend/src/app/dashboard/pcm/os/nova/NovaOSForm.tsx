@@ -42,6 +42,7 @@ export default function NovaOSForm({ veiculos, osOptions }: {
     const [isFetchingBacklog, setIsFetchingBacklog] = useState(false)
     const [isSuccess, setIsSuccess] = useState(false)
     const [lastCreatedOS, setLastCreatedOS] = useState<string | null>(null)
+    const [statusOS, setStatusOS] = useState('ABERTA')
 
     const filteredSubSistemas = osOptions.sistemas.find(s => s.id === selectedSistemaId)?.subSistemas || []
 
@@ -183,7 +184,7 @@ export default function NovaOSForm({ veiculos, osOptions }: {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                             <div className="space-y-2">
                                 <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Data/Hora Abertura *</label>
                                 <div className="relative">
@@ -192,18 +193,40 @@ export default function NovaOSForm({ veiculos, osOptions }: {
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Horímetro Atual</label>
-                                <input type="number" name="horimetro" placeholder="Ex: 1450" className="w-full bg-background border border-border-color rounded-xl px-4 py-3 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all" />
+                            <div className="space-y-2 animate-in fade-in zoom-in-95 duration-300">
+                                <label className="text-[10px] uppercase font-black text-primary tracking-widest ml-1">
+                                    Data/Hora Fechamento {statusOS === 'FECHADA' && '*'}
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type="datetime-local"
+                                        name="dataConclusao"
+                                        defaultValue={statusOS === 'FECHADA' ? new Date().toISOString().slice(0, 16) : ''}
+                                        required={statusOS === 'FECHADA'}
+                                        className="w-full bg-background border border-primary/30 rounded-xl px-4 py-3 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all pl-11"
+                                    />
+                                    <Calendar className="absolute left-3.5 top-3.5 w-5 h-5 text-gray-500 pointer-events-none" />
+                                </div>
                             </div>
 
                             <div className="space-y-2">
                                 <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Status Inicial</label>
-                                <select name="status" className="w-full bg-background border border-border-color rounded-xl px-4 py-3.5 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all appearance-none cursor-pointer">
+                                <select
+                                    name="status"
+                                    value={statusOS}
+                                    onChange={(e) => setStatusOS(e.target.value)}
+                                    className="w-full bg-background border border-border-color rounded-xl px-4 py-3.5 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all appearance-none cursor-pointer"
+                                >
                                     <option value="ABERTA">ABERTA</option>
                                     <option value="EM_EXECUCAO">EM EXECUÇÃO</option>
                                     <option value="PLANEJADA">PLANEJADA</option>
+                                    <option value="FECHADA">FECHADA</option>
                                 </select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Horímetro Atual</label>
+                                <input type="number" name="horimetro" placeholder="Ex: 1450" className="w-full bg-background border border-border-color rounded-xl px-4 py-3 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all" />
                             </div>
                         </div>
                     </div>

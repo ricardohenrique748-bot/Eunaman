@@ -59,6 +59,7 @@ export async function createOrdemServico(formData: FormData) {
     const descricao = formData.get('descricao') as string
     const status = (formData.get('status') as any) || 'ABERTA'
     const dataAberturaStr = formData.get('dataAbertura') as string
+    const dataConclusaoStr = formData.get('dataConclusao') as string | null
 
     const horimetro = Number(formData.get('horimetro')) || null
     const motivoId = formData.get('motivoId') as string || null
@@ -71,6 +72,11 @@ export async function createOrdemServico(formData: FormData) {
 
     try {
         const dataAbertura = dataAberturaStr ? new Date(dataAberturaStr) : new Date()
+        let dataConclusao = null;
+
+        if (status === 'FECHADA' && dataConclusaoStr) {
+            dataConclusao = new Date(dataConclusaoStr);
+        }
 
         // Sync horimetro if provided
         if (horimetro) {
@@ -84,9 +90,10 @@ export async function createOrdemServico(formData: FormData) {
             data: {
                 veiculoId,
                 tipoOS,
-                status: status as any,
+                status: status === 'FECHADA' ? 'CONCLUIDA' : (status as any),
                 descricao,
                 dataAbertura,
+                dataConclusao,
                 origem: 'MANUAL',
                 motivoId,
                 sistemaId,

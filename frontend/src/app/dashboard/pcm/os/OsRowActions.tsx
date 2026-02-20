@@ -37,48 +37,29 @@ export default function OsRowActions({ osId, osNumero }: OsRowActionsProps) {
     }
 
     return (
-        <div className="relative">
+        <div className="flex items-center justify-end gap-2">
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                disabled={isDeleting}
+                onClick={handlePrint}
+                title="Imprimir O.S."
                 className="w-8 h-8 rounded-xl bg-surface-highlight hover:bg-primary/10 text-gray-400 hover:text-primary transition-all flex items-center justify-center"
             >
-                <MoreHorizontal className="w-4 h-4" />
+                <Printer className="w-4 h-4" />
             </button>
-
-            {isOpen && (
-                <>
-                    <div
-                        className="fixed inset-0 z-10"
-                        onClick={() => setIsOpen(false)}
-                    />
-                    <div className="absolute right-0 mt-2 w-48 bg-surface border border-border-color rounded-2xl shadow-2xl z-20 py-2 animate-in fade-in zoom-in-95 duration-200">
-                        <button
-                            onClick={handlePrint}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-primary hover:bg-primary/5 transition-all"
-                        >
-                            <Printer className="w-4 h-4" />
-                            Imprimir O.S.
-                        </button>
-                        <button
-                            onClick={() => alert('Edição em desenvolvimento...')}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/5 transition-all"
-                        >
-                            <Pencil className="w-4 h-4" />
-                            Editar Dados
-                        </button>
-                        <div className="h-px bg-border-color/50 my-1 mx-2" />
-                        <button
-                            onClick={handleDelete}
-                            disabled={isDeleting}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-red-400 hover:text-red-500 hover:bg-red-500/5 transition-all disabled:opacity-50"
-                        >
-                            <Trash2 className="w-4 h-4" />
-                            {isDeleting ? 'Excluindo...' : 'Excluir O.S.'}
-                        </button>
-                    </div>
-                </>
-            )}
+            <button
+                onClick={() => alert('Edição em desenvolvimento...')}
+                title="Editar O.S."
+                className="w-8 h-8 rounded-xl bg-surface-highlight hover:bg-emerald-500/10 text-gray-400 hover:text-emerald-500 transition-all flex items-center justify-center"
+            >
+                <Pencil className="w-4 h-4" />
+            </button>
+            <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                title="Excluir O.S."
+                className="w-8 h-8 rounded-xl bg-surface-highlight hover:bg-red-500/10 text-gray-400 hover:text-red-500 transition-all flex items-center justify-center disabled:opacity-50"
+            >
+                <Trash2 className="w-4 h-4" />
+            </button>
         </div>
     )
 }
