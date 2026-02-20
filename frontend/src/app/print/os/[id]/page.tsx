@@ -34,96 +34,102 @@ export default async function PrintOSPage(props: any) {
                   body { background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                   nav, aside, header, footer, .no-print { display: none !important; }
                 }
-                body { background: white; }
+                body { background: white; font-family: Arial, Helvetica, sans-serif !important; }
                 .border-black { border-color: #000 !important; border-width: 1px !important; }
                 .text-black { color: #000 !important; }
                 .border-collapse { border-collapse: collapse; }
                 th, td { padding: 4px; }
             `}} />
 
-            <div className="max-w-[1123px] mx-auto p-4 md:p-8 bg-white" style={{ maxWidth: '297mm' }}>
+            <div className="max-w-[1123px] mx-auto p-4 md:p-8 bg-white" style={{ maxWidth: '297mm', fontFamily: 'Arial, Helvetica, sans-serif' }}>
 
                 {/* Auto Print Script */}
                 <script dangerouslySetInnerHTML={{ __html: `window.onload = () => window.print();` }} />
 
-                {/* Header Container */}
-                <div className="flex items-center gap-4 mb-2">
-                    <div className="w-48 shrink-0">
-                        {/* Logo placeholder, using the app's standard logo if available, or just text */}
-                        <div className="font-black text-2xl text-green-700 tracking-tighter flex items-center gap-1">
-                            <span className="text-3xl">⚙️</span>
+                {/* Top Header Row */}
+                <div className="flex items-center justify-between gap-4 mb-4">
+                    {/* Logo */}
+                    <div className="w-64 shrink-0 pl-2 flex items-center h-12">
+                        <span className="font-sans font-black tracking-tighter" style={{ color: '#116327', fontSize: '38px', transform: 'scaleX(1.15)', transformOrigin: 'left', fontStyle: 'italic', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact', textShadow: '1px 1px 0px rgba(0,0,0,0.1)' }}>
                             EUNAMAN
-                        </div>
+                        </span>
                     </div>
-                    <div className="flex-1 flex flex-col gap-1 border border-black h-full">
-                        <div className="text-center font-bold text-sm border-b border-black py-1">ORDEM DE MANUTENÇÃO</div>
-                        <div className="text-center text-[9px] font-bold py-1 uppercase">Preencher de acordo com as especificações listadas</div>
+
+                    {/* Title Box */}
+                    <div className="flex-1 max-w-3xl flex flex-col border border-black h-12 justify-center">
+                        <div className="text-center font-bold text-[13px] border-b border-black py-0.5 tracking-wide">ORDEM DE MANUTENÇÃO</div>
+                        <div className="text-center text-[9px] font-bold py-0.5 uppercase tracking-wide">Preencher de acordo com as especificações listadas</div>
+                    </div>
+
+                    {/* Ordem Box (Floating Right) */}
+                    <div className="w-32 shrink-0 text-center flex flex-col justify-center pt-2">
+                        <div className="font-bold underline text-[11px] mb-1">Ordem N.:</div>
+                        <div className="font-black text-xl text-red-600 tracking-wider">
+                            {os.numeroOS.toString().padStart(5, '0')}
+                        </div>
                     </div>
                 </div>
 
-                {/* Info Grid */}
-                <div className="grid grid-cols-12 gap-0 mb-2 items-start">
+                {/* Info Grid Container */}
+                <div className="flex gap-4 mb-4">
+                    {/* Main Details Box */}
+                    <div className="flex-1 flex border border-black border-collapse">
+                        {/* Left Column */}
+                        <div className="w-1/2 flex flex-col border-r border-black">
+                            <div className="flex border-b border-black h-7">
+                                <div className="w-32 p-1 border-r border-black font-bold text-[10px] flex items-center px-2">Data/H Abertura:</div>
+                                <div className="flex-1 p-1 font-bold text-[10px] text-center flex items-center justify-center">{formatDataHora(os.dataAbertura)}</div>
+                            </div>
+                            <div className="flex border-b border-black h-7">
+                                <div className="w-32 p-1 border-r border-black font-bold text-[10px] flex items-center px-2">Placa/Equipamento:</div>
+                                <div className="flex-1 p-1 font-bold text-[10px] text-center flex items-center justify-center">{os.veiculo?.placa || 'N/A'} / {os.veiculo?.codigoInterno}</div>
+                            </div>
+                            <div className="flex h-7">
+                                <div className="w-32 p-1 border-r border-black font-bold text-[10px] flex items-center px-2">Horimetro:</div>
+                                <div className="flex-1 p-1 font-bold text-[10px] text-center flex items-center justify-center">{os.veiculo?.horimetroAtual || ''}</div>
+                            </div>
+                        </div>
 
-                    {/* Left Panel */}
-                    <div className="col-span-4 border border-black border-r-0 flex flex-col">
-                        <div className="flex border-b border-black">
-                            <div className="w-32 p-1 border-r border-black font-bold text-[10px] bg-gray-100">Data/H Abertura:</div>
-                            <div className="flex-1 p-1 font-bold text-center text-[10px]">{formatDataHora(os.dataAbertura)}</div>
-                        </div>
-                        <div className="flex border-b border-black">
-                            <div className="w-32 p-1 border-r border-black font-bold text-[10px] bg-gray-100">Placa/Equipamento:</div>
-                            <div className="flex-1 p-1 font-bold text-center text-[10px]">{os.veiculo?.placa || 'N/A'} / {os.veiculo?.codigoInterno}</div>
-                        </div>
-                        <div className="flex">
-                            <div className="w-32 p-1 border-r border-black font-bold text-[10px] bg-gray-100">Horimetro:</div>
-                            <div className="flex-1 p-1 font-bold text-center text-[10px]">{os.veiculo?.horimetroAtual || ''}</div>
+                        {/* Right Column */}
+                        <div className="w-1/2 flex flex-col">
+                            <div className="flex border-b border-black h-7">
+                                <div className="w-32 p-1 border-r border-black font-bold text-[10px] flex items-center px-2">KM atual:</div>
+                                <div className="flex-1 p-1 font-bold text-[10px] px-2 flex items-center">{os.veiculo?.kmAtual || ''}</div>
+                            </div>
+                            <div className="flex border-b border-black h-7">
+                                <div className="w-32 p-1 border-r border-black font-bold text-[10px] flex items-center px-2">Modelo Equipto:</div>
+                                <div className="flex-1 p-1 font-bold text-[10px] px-2 flex items-center">{os.veiculo?.modelo || 'N/A'}</div>
+                            </div>
+                            <div className="flex border-b border-black h-7">
+                                <div className="w-32 p-1 border-r border-black font-bold text-[10px] flex items-center px-2">Modulo Origem:</div>
+                                <div className="flex-1 p-1 font-bold text-[10px] px-2 flex items-center">{os.sistema?.nome || ''}</div>
+                            </div>
+                            <div className="flex h-7">
+                                <div className="w-32 p-1 border-r border-black font-bold text-[10px] flex items-center px-2">Local da Reparação:</div>
+                                <div className="flex-1 p-1 font-bold text-[10px] px-2 flex items-center"></div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Middle Panel */}
-                    <div className="col-span-6 border border-black flex flex-col">
-                        <div className="flex border-b border-black">
-                            <div className="w-32 p-1 border-r border-black font-bold text-[10px] bg-gray-100">KM atual:</div>
-                            <div className="flex-1 p-1 font-bold text-[10px]">{os.veiculo?.kmAtual || ''}</div>
-                        </div>
-                        <div className="flex border-b border-black">
-                            <div className="w-32 p-1 border-r border-black font-bold text-[10px] bg-gray-100">Modelo Equipto:</div>
-                            <div className="flex-1 p-1 font-bold text-[10px]">{os.veiculo?.modelo || ''}</div>
-                        </div>
-                        <div className="flex border-b border-black">
-                            <div className="w-32 p-1 border-r border-black font-bold text-[10px] bg-gray-100">Modulo Origem:</div>
-                            <div className="flex-1 p-1 font-bold text-[10px]">{os.sistema?.nome || ''} {os.subSistema?.nome ? `/ ${os.subSistema.nome}` : ''}</div>
-                        </div>
-                        <div className="flex">
-                            <div className="w-32 p-1 border-r border-black font-bold text-[10px] bg-gray-100">Local da Reparação:</div>
-                            <div className="flex-1 p-1 font-bold text-[10px]"></div>
-                        </div>
-                    </div>
-
-                    {/* Right Panel */}
-                    <div className="col-span-2 flex flex-col items-center justify-center p-2">
-                        <div className="text-center">
-                            <div className="font-bold underline text-[11px] mb-1">Ordem N.:</div>
-                            <div className="font-black text-lg text-red-600">{os.numeroOS.toString().padStart(5, '0')}</div>
-                        </div>
-                    </div>
+                    {/* Placeholder to reserve space for the floating Ordem N. */}
+                    <div className="w-32 shrink-0"></div>
                 </div>
 
                 {/* Tipo Manutenção */}
-                <div className="flex gap-2 items-center mb-2 px-1">
-                    <span className="font-bold underline text-[10px]">Tipo Manutenção:</span>
-                    <span className="font-bold text-[10px] uppercase">{os.tipoOS} - {os.origem || 'MANUTENÇÃO'}</span>
-                    {os.descricao && <span className="font-medium text-[10px] ml-4 text-gray-700 italic">MOTIVO: {os.descricao}</span>}
+                <div className="flex gap-2 items-center mb-2 px-1 text-[11px]">
+                    <span className="font-bold underline">Tipo Manutenção:</span>
+                    <span className="font-bold uppercase">{os.tipoOS} {os.origem ? `- ${os.origem}` : ''}</span>
+                    {os.descricao && <span className="font-[450] text-gray-600 ml-6 italic">MOTIVO: {os.descricao}</span>}
                 </div>
 
                 {/* Legendas */}
-                <div className="border border-black mb-2">
-                    <div className="text-center border-b border-black font-bold text-[9px] bg-gray-100 p-1">
+                <div className="border border-black mb-2 flex flex-col">
+                    <div className="text-center font-bold text-[8px] p-0.5 border-b border-black uppercase tracking-wide">
                         CÓDIGOS DE LEGENDA PARA EXECUTOR DAS TAREFAS & STATUS/SITUAÇÃO
                     </div>
                     <div className="flex">
                         {/* Executores */}
-                        <div className="w-2/3 flex p-1 grid grid-cols-4 gap-1 text-[8px] font-bold content-start">
+                        <div className="flex-1 flex p-1 grid grid-cols-4 gap-x-2 gap-y-0 text-[8px] font-bold content-start">
                             <div>01 ALDY</div>
                             <div>05 IGOR</div>
                             <div>09 GEARLISON</div>
@@ -145,11 +151,11 @@ export default async function PrintOSPage(props: any) {
                             <div></div>
                         </div>
                         {/* Cores */}
-                        <div className="w-1/3 border-l border-black text-[8px] font-bold text-white flex flex-col">
-                            <div className="bg-[#10b981] p-1 border-b border-black">01 EXECUTADO</div>
-                            <div className="bg-[#eab308] p-1 border-b border-black text-black">02 LIBERADO COM PENDÊNCIAS</div>
-                            <div className="bg-[#ef4444] p-1 border-b border-black">03 NÃO EXECUTADO</div>
-                            <div className="bg-[#8b5cf6] p-1">04 NÃO SE APLICA</div>
+                        <div className="w-[30%] border-l border-black text-[8px] font-bold text-white flex flex-col justify-between">
+                            <div className="bg-[#10b981] p-1 border-b border-black h-1/4 flex items-center">01 EXECUTADO</div>
+                            <div className="bg-[#eab308] p-1 border-b border-black text-black h-1/4 flex items-center">02 LIBERADO COM PENDÊNCIAS</div>
+                            <div className="bg-[#ef4444] p-1 border-b border-black h-1/4 flex items-center">03 NÃO EXECUTADO</div>
+                            <div className="bg-[#8b5cf6] p-1 h-1/4 flex items-center">04 NÃO SE APLICA</div>
                         </div>
                     </div>
                 </div>
@@ -157,16 +163,16 @@ export default async function PrintOSPage(props: any) {
                 {/* Tabela de Tarefas */}
                 <table className="w-full border-collapse border border-black text-[9px]">
                     <thead>
-                        <tr className="bg-gray-100">
-                            <th className="border border-black p-1 w-10">TAREFA</th>
-                            <th className="border border-black p-1 w-16">EXECUTOR</th>
-                            <th className="border border-black p-1 text-left">DESCRIÇÃO DA TAREFA A REALIZAR</th>
-                            <th className="border border-black p-1 w-12">TIPO</th>
-                            <th className="border border-black p-1 w-20">DATA INICIO</th>
-                            <th className="border border-black p-1 w-16">HORA INICIO</th>
-                            <th className="border border-black p-1 w-20">DATA FINAL</th>
-                            <th className="border border-black p-1 w-16">HORA FINAL</th>
-                            <th className="border border-black p-1 w-16">SITUAÇÃO</th>
+                        <tr className="bg-white">
+                            <th className="border border-black p-1.5 w-10 text-center font-bold">TAREFA</th>
+                            <th className="border border-black p-1.5 w-16 text-center font-bold">EXECUTOR</th>
+                            <th className="border border-black p-1.5 text-left font-bold">DESCRIÇÃO DA TAREFA A REALIZAR</th>
+                            <th className="border border-black p-1.5 w-16 text-center font-bold">TIPO</th>
+                            <th className="border border-black p-1.5 w-20 text-center font-bold">DATA INICIO</th>
+                            <th className="border border-black p-1.5 w-16 text-center font-bold">HORA INICIO</th>
+                            <th className="border border-black p-1.5 w-20 text-center font-bold">DATA FINAL</th>
+                            <th className="border border-black p-1.5 w-16 text-center font-bold">HORA FINAL</th>
+                            <th className="border border-black p-1.5 w-16 text-center font-bold">SITUAÇÃO</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -195,25 +201,25 @@ export default async function PrintOSPage(props: any) {
                 </table>
 
                 {/* Observações */}
-                <div className="border border-black border-t-0 border-b-0 text-center font-bold text-[9px] bg-gray-100 p-1">
+                <div className="border border-black border-t-0 border-b-0 text-center font-bold text-[10px] bg-white p-1">
                     OBSERVAÇÕES / TAREFAS EXECUTADAS ALÉM DO INFORMADO NA ORDEM
                 </div>
                 <div className="border border-black h-8"></div>
                 <div className="border border-black border-t-0 h-8"></div>
 
                 {/* Assinaturas */}
-                <div className="mt-2 border border-black border-b-0 text-center font-bold text-[8px] bg-gray-100 p-0.5">
+                <div className="mt-2 border border-black border-b-0 text-center font-bold text-[9px] bg-white p-0.5">
                     VISTO DOS RESPONSÁVEIS
                 </div>
-                <table className="w-full border-collapse border border-black text-[9px] text-center">
+                <table className="w-full border-collapse border border-black text-[10px] text-center">
                     <thead>
                         <tr>
-                            <th className="border border-black p-1 w-1/6">EXECUTOR (s)</th>
-                            <th className="border border-black p-1 w-1/6">MANUTENÇÃO</th>
-                            <th className="border border-black p-1 w-1/6">PCM</th>
-                            <th className="border border-black p-1 w-1/6">SUZANO</th>
-                            <th className="border border-black p-1 w-1/6">MOTORISTA</th>
-                            <th className="border border-black p-1 w-1/6">DIVERSAS ASSINATURAS</th>
+                            <th className="border border-black p-1.5 w-1/6 font-bold">EXECUTOR (s)</th>
+                            <th className="border border-black p-1.5 w-1/6 font-bold">MANUTENÇÃO</th>
+                            <th className="border border-black p-1.5 w-1/6 font-bold">PCM</th>
+                            <th className="border border-black p-1.5 w-1/6 font-bold">SUZANO</th>
+                            <th className="border border-black p-1.5 w-1/6 font-bold">MOTORISTA</th>
+                            <th className="border border-black p-1.5 w-1/6 font-bold">DIVERSAS ASSINATURAS</th>
                         </tr>
                     </thead>
                     <tbody>

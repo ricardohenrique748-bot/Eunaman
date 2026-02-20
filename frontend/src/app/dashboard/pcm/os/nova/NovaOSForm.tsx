@@ -77,6 +77,62 @@ export default function NovaOSForm({ veiculos, osOptions }: {
         setIsFetchingBacklog(false)
     }
 
+    const handleDescricaoKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter') {
+            const cursorPosition = e.currentTarget.selectionStart;
+            const textBeforeCursor = descricao.slice(0, cursorPosition);
+            const textAfterCursor = descricao.slice(cursorPosition);
+
+            const lines = textBeforeCursor.split('\n');
+            const lastLine = lines[lines.length - 1];
+
+            // Match numbered line e.g., "1. ", "1- ", "1) "
+            const match = lastLine.match(/^(\d+)([.\-)]\s*)(.*)$/);
+
+            if (match) {
+                e.preventDefault();
+
+                // If it's an empty numbered line, pressing Enter removes the number to break the list
+                if (match[3].trim() === '') {
+                    const withoutNumber = textBeforeCursor.slice(0, cursorPosition - lastLine.length);
+                    const newText = withoutNumber + '\n' + textAfterCursor;
+                    setDescricao(newText);
+
+                    setTimeout(() => {
+                        const ta = document.getElementsByName('descricao')[0] as HTMLTextAreaElement;
+                        if (ta) ta.selectionStart = ta.selectionEnd = withoutNumber.length + 1;
+                    }, 0);
+                    return;
+                }
+
+                // Normal populated item, go to next number
+                const currentNumber = parseInt(match[1], 10);
+                const separator = match[2];
+                const insertText = `\n${currentNumber + 1}${separator}`;
+
+                const newText = textBeforeCursor + insertText + textAfterCursor;
+                setDescricao(newText);
+
+                setTimeout(() => {
+                    const ta = document.getElementsByName('descricao')[0] as HTMLTextAreaElement;
+                    if (ta) {
+                        const newPos = cursorPosition + insertText.length;
+                        ta.selectionStart = ta.selectionEnd = newPos;
+                    }
+                }, 0);
+            }
+        }
+    };
+
+    const handleDescricaoFocus = () => {
+        if (descricao.trim() === '') {
+            setDescricao('1. ');
+        } else if (!descricao.includes('1. ') && !descricao.includes('PENDÊNCIAS')) {
+            // Se já tem algum texto mas não tem número e não é backlog, a gente converte
+            setDescricao(`1. ${descricao}`);
+        }
+    };
+
     if (isSuccess) {
         return (
             <div className="max-w-2xl mx-auto py-20 text-center space-y-8 animate-in fade-in zoom-in-95 duration-500">
@@ -282,6 +338,8 @@ export default function NovaOSForm({ veiculos, osOptions }: {
                                 required
                                 value={descricao}
                                 onChange={(e) => setDescricao(e.target.value)}
+                                onKeyDown={handleDescricaoKeyDown}
+                                onFocus={handleDescricaoFocus}
                                 placeholder="Descreva os sintomas, falhas observadas ou serviços a serem realizados..."
                                 className="w-full bg-background border border-border-color rounded-xl px-4 py-4 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all resize-none shadow-inner"
                             />
