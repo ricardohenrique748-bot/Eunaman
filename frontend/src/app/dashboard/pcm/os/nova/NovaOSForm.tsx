@@ -150,13 +150,24 @@ export default function NovaOSForm({ veiculos, osOptions }: {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-8">
-                    <button
-                        onClick={() => window.print()}
-                        className="flex items-center justify-center gap-3 bg-surface border-2 border-border-color hover:border-primary/50 text-foreground px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:shadow-xl hover:-translate-y-1"
-                    >
-                        <Printer className="w-5 h-5 text-primary" />
-                        Imprimir O.S.
-                    </button>
+                    {lastCreatedOS ? (
+                        <Link
+                            href={`/print/os/${lastCreatedOS}`}
+                            target="_blank"
+                            className="flex items-center justify-center gap-3 bg-surface border-2 border-border-color hover:border-primary/50 text-foreground px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:shadow-xl hover:-translate-y-1"
+                        >
+                            <Printer className="w-5 h-5 text-primary" />
+                            Imprimir O.S.
+                        </Link>
+                    ) : (
+                        <button
+                            onClick={() => window.print()}
+                            className="flex items-center justify-center gap-3 bg-surface border-2 border-border-color hover:border-primary/50 text-foreground px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:shadow-xl hover:-translate-y-1"
+                        >
+                            <Printer className="w-5 h-5 text-primary" />
+                            Imprimir O.S.
+                        </button>
+                    )}
                     <Link href="/dashboard/pcm/os">
                         <button className="w-full flex items-center justify-center gap-3 bg-primary hover:bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-1">
                             <List className="w-5 h-5" />
@@ -193,10 +204,11 @@ export default function NovaOSForm({ veiculos, osOptions }: {
             <div className="dashboard-card p-8">
                 <form action={async (formData) => {
                     const res = await createOrdemServico(formData)
-                    if (res.success) {
+                    if (res.success && res.osId) {
+                        setLastCreatedOS(res.osId)
                         setIsSuccess(true)
                     } else {
-                        alert(res.error)
+                        alert(res.error || 'Erro ao criar a OS.')
                     }
                 }} className="space-y-10">
 

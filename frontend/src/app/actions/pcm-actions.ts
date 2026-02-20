@@ -86,7 +86,7 @@ export async function createOrdemServico(formData: FormData) {
             })
         }
 
-        await prisma.ordemServico.create({
+        const os = await prisma.ordemServico.create({
             data: {
                 veiculoId,
                 tipoOS,
@@ -103,7 +103,7 @@ export async function createOrdemServico(formData: FormData) {
 
         revalidatePath('/dashboard/pcm/os')
         revalidatePath('/dashboard')
-        return { success: true }
+        return { success: true, osId: os.id }
     } catch (error: any) {
         console.error('[PCM Action] Erro ao criar OS:', error)
         return { success: false, error: `Falha ao registrar O.S.: ${error.message}` }
