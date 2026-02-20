@@ -141,6 +141,64 @@ export default function LoginPage() {
         </div>
       )}
 
+      {/* Change Password Modal */}
+      {showChangePass && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-4 animate-in fade-in duration-300">
+          <div className="bg-white/90 backdrop-blur-2xl border border-white p-8 rounded-3xl w-full max-w-md relative shadow-[0_20px_50px_rgba(0,0,0,0.1)] animate-in zoom-in-95 duration-300">
+            <button
+              onClick={() => {
+                setShowChangePass(false)
+                setEmailForChange(null)
+              }}
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-900 transition-colors p-2 hover:bg-slate-100 rounded-full"
+            >
+              <span className="sr-only">Fechar</span>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary shadow-sm">
+                <Shield className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Definir Nova Senha</h3>
+              <p className="text-sm text-slate-500 mt-2 font-medium">Por segurança, você precisa criar uma nova senha para sua conta.</p>
+            </div>
+
+            <form onSubmit={handleChangePassword} className="space-y-6">
+              <input type="hidden" name="email" value={emailForChange || ''} />
+
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-[0.2em] font-black text-primary">Nova Senha</label>
+                <div className="relative group/input">
+                  <Lock className="absolute left-4 top-4 w-5 h-5 text-slate-400 group-focus-within/input:text-primary transition-colors" />
+                  <input
+                    type="password"
+                    name="newPassword"
+                    required
+                    placeholder="Sua nova senha segura"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <p className="text-xs text-red-500 text-center font-bold">
+                  {error}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-primary hover:bg-primary/90 text-white font-black py-4 rounded-2xl transition-all disabled:opacity-50 shadow-lg shadow-primary/20 uppercase tracking-widest text-sm"
+              >
+                {loading ? 'PROCESSANDO...' : 'CRIAR SENHA E ACESSAR'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Login Container */}
       <div className="w-full min-h-screen z-10 relative flex flex-col items-center justify-center px-4 py-12">
 
