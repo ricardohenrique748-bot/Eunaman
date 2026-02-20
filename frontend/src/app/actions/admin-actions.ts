@@ -55,6 +55,13 @@ export async function createUsuario(formData: FormData) {
         const area = formData.get('area') || 'GERAL'
 
         const unidadePadraoId = formData.get('unidadePadraoId') as string
+        const session = await getSession()
+
+        let finalUnidadeId = unidadePadraoId !== '' ? unidadePadraoId : null
+        // Se não for ADMIN, força a unidade do próprio gestor
+        if (session && session.perfil !== 'ADMIN') {
+            finalUnidadeId = session.unidadeId
+        }
 
         await prisma.usuario.create({
             data: {
@@ -64,7 +71,7 @@ export async function createUsuario(formData: FormData) {
                 perfil,
                 // @ts-ignore
                 area: area,
-                unidadePadraoId: unidadePadraoId !== '' ? unidadePadraoId : null,
+                unidadePadraoId: finalUnidadeId,
                 ativo: true
             }
         })
@@ -197,13 +204,22 @@ export async function updateUsuario(formData: FormData) {
         const area = formData.get('area')
         const senhaCandidate = formData.get('senha') as string
         const unidadePadraoId = formData.get('unidadePadraoId') as string
+        const session = await getSession()
+
+        let finalUnidadeId = unidadePadraoId !== '' ? unidadePadraoId : null
+
+        // Se não for ADMIN, não pode transformar um usuário em "Acesso Global"
+        // e sempre força ele para dentro da unidade do gestor
+        if (session && session.perfil !== 'ADMIN') {
+            finalUnidadeId = session.unidadeId
+        }
 
         const data: any = {
             nome,
             email,
             perfil,
             area,
-            unidadePadraoId: unidadePadraoId !== '' ? unidadePadraoId : null
+            unidadePadraoId: finalUnidadeId
         }
         if (senhaCandidate && senhaCandidate.trim() !== '') {
             data.senha = senhaCandidate
