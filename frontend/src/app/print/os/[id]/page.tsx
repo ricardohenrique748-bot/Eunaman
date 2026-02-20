@@ -170,19 +170,69 @@ export default async function PrintOSPage(props: any) {
                         </tr>
                     </thead>
                     <tbody>
-                        {[...Array(10)].map((_, i) => (
-                            <tr key={i} className="h-7 border border-black">
-                                <td className="border border-black p-1 text-center font-bold">{i + 1}º</td>
-                                <td className="border border-black p-1"></td>
-                                <td className="border border-black p-1"></td>
-                                <td className="border border-black p-1"></td>
-                                <td className="border border-black p-1"></td>
-                                <td className="border border-black p-1"></td>
-                                <td className="border border-black p-1"></td>
-                                <td className="border border-black p-1"></td>
-                                <td className="border border-black p-1"></td>
-                            </tr>
-                        ))}
+                        {[...Array(10)].map((_, i) => {
+                            const isFirst = i === 0;
+                            const dataInicioStr = isFirst && os.dataAbertura ? new Date(os.dataAbertura).toLocaleDateString('pt-BR') : '';
+                            const horaInicioStr = isFirst && os.dataAbertura ? new Date(os.dataAbertura).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '';
+                            const dataFinalStr = isFirst && os.dataConclusao ? new Date(os.dataConclusao).toLocaleDateString('pt-BR') : '';
+                            const horaFinalStr = isFirst && os.dataConclusao ? new Date(os.dataConclusao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '';
+
+                            return (
+                                <tr key={i} className="h-7 border border-black">
+                                    <td className="border border-black p-1 text-center font-bold">{i + 1}º</td>
+                                    <td className="border border-black p-1"></td>
+                                    <td className="border border-black p-1 font-bold text-[10px]">{isFirst ? os.descricao : ''}</td>
+                                    <td className="border border-black p-1 text-center font-bold text-[8px]">{isFirst ? os.tipoOS : ''}</td>
+                                    <td className="border border-black p-1 text-center">{dataInicioStr}</td>
+                                    <td className="border border-black p-1 text-center">{horaInicioStr}</td>
+                                    <td className="border border-black p-1 text-center">{dataFinalStr}</td>
+                                    <td className="border border-black p-1 text-center">{horaFinalStr}</td>
+                                    <td className="border border-black p-1"></td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                </table>
+
+                {/* Observações */}
+                <div className="border border-black border-t-0 border-b-0 text-center font-bold text-[9px] bg-gray-100 p-1">
+                    OBSERVAÇÕES / TAREFAS EXECUTADAS ALÉM DO INFORMADO NA ORDEM
+                </div>
+                <div className="border border-black h-8"></div>
+                <div className="border border-black border-t-0 h-8"></div>
+
+                {/* Assinaturas */}
+                <div className="mt-2 border border-black border-b-0 text-center font-bold text-[8px] bg-gray-100 p-0.5">
+                    VISTO DOS RESPONSÁVEIS
+                </div>
+                <table className="w-full border-collapse border border-black text-[9px] text-center">
+                    <thead>
+                        <tr>
+                            <th className="border border-black p-1 w-1/6">EXECUTOR (s)</th>
+                            <th className="border border-black p-1 w-1/6">MANUTENÇÃO</th>
+                            <th className="border border-black p-1 w-1/6">PCM</th>
+                            <th className="border border-black p-1 w-1/6">SUZANO</th>
+                            <th className="border border-black p-1 w-1/6">MOTORISTA</th>
+                            <th className="border border-black p-1 w-1/6">DIVERSAS ASSINATURAS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr className="h-10">
+                            <td className="border border-black p-1"></td>
+                            <td className="border border-black p-1"></td>
+                            <td className="border border-black p-1 font-bold">MARCOS</td>
+                            <td className="border border-black p-1"></td>
+                            <td className="border border-black p-1"></td>
+                            <td className="border border-black p-1"></td>
+                        </tr>
+                        <tr className="h-10">
+                            <td className="border border-black p-1"></td>
+                            <td className="border border-black p-1"></td>
+                            <td className="border border-black p-1"></td>
+                            <td className="border border-black p-1"></td>
+                            <td className="border border-black p-1"></td>
+                            <td className="border border-black p-1"></td>
+                        </tr>
                     </tbody>
                 </table>
 
