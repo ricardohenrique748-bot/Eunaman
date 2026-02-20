@@ -26,13 +26,20 @@ export default async function PrintOSPage(props: any) {
     }
 
     return (
-        <div className="w-full min-h-screen bg-white text-black print:bg-transparent font-sans text-xs">
+        <div className="w-full min-h-screen bg-white text-black print:bg-white font-sans text-xs">
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @media print {
-                  @page { size: A4 landscape; margin: 10mm; }
-                  body { background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                  @page { size: A4 landscape; margin: 4mm; }
+                  body { 
+                      background: white !important; 
+                      -webkit-print-color-adjust: exact !important; 
+                      print-color-adjust: exact !important;
+                      margin: 0;
+                      padding: 0;
+                  }
                   nav, aside, header, footer, .no-print { display: none !important; }
+                  .page-break { page-break-after: always; }
                 }
                 body { background: white; font-family: Arial, Helvetica, sans-serif !important; }
                 .border-black { border-color: #000 !important; border-width: 1px !important; }
@@ -41,7 +48,7 @@ export default async function PrintOSPage(props: any) {
                 th, td { padding: 4px; }
             `}} />
 
-            <div className="max-w-[1123px] mx-auto p-4 md:p-8 bg-white" style={{ maxWidth: '297mm', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div className="mx-auto bg-white print:w-[287mm] print:h-[195mm] print:p-0 p-4 md:p-8 overflow-hidden" style={{ maxWidth: '1123px', width: '100%', fontFamily: 'Arial, Helvetica, sans-serif' }}>
 
                 {/* Auto Print Script */}
                 <script dangerouslySetInnerHTML={{ __html: `window.onload = () => window.print();` }} />
