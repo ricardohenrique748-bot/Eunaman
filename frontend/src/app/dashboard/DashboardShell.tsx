@@ -58,7 +58,7 @@ export default function DashboardShell({ children, user }: { children: React.Rea
                                     <NavItem href="/dashboard/pcm/semanal" icon={CalendarClock} label="Prog. Semanal" active={isActive('/dashboard/pcm/semanal')} />
                                     <NavItem href="/dashboard/pcm/backlog" icon={ListTodo} label="Fila de Backlog" active={isActive('/dashboard/pcm/backlog')} />
                                     <NavItem href="/dashboard/pcm/preventivas" icon={Settings} label="Planos de Preventiva" active={isActive('/dashboard/pcm/preventivas')} />
-                                    <NavItem href="/dashboard/pcm/checklist" icon={Wrench} label="Checklist de Máquinas" active={isActive('/dashboard/pcm/checklist')} />
+                                    <NavItem href="/dashboard/pcm/checklist" icon={Wrench} label="Checklist" active={isActive('/dashboard/pcm/checklist')} />
                                 </>
                             )}
                             {checkAccess(['PCM', 'FROTA']) && <NavItem href="/dashboard/pcm/pneus" icon={Disc} label="Controle de Pneus" active={isActive('/dashboard/pcm/pneus')} />}
