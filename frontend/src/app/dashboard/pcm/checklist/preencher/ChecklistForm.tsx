@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronUp, ArrowLeft, ClipboardCheck, Send } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronUp, ArrowLeft, Send, Truck, User, Calendar, Clock } from 'lucide-react'
 import Link from 'next/link'
 
 type StatusType = 'OK' | 'NC' | 'NA' | null
@@ -20,10 +20,19 @@ interface Formulario {
     descricao: string | null
 }
 
+interface Veiculo {
+    id: string
+    codigoInterno: string
+    placa: string | null
+    modelo: string
+}
+
 interface Props {
     formulario: Formulario
     grouped: Record<string, ChecklistItem[]>
     tipoLabel: string
+    veiculos: Veiculo[]
+    usuarioNome: string
 }
 
 const STATUS_CONFIG = {
@@ -32,8 +41,17 @@ const STATUS_CONFIG = {
     NA: { label: 'N/A', color: 'bg-gray-400 text-white ring-gray-400', icon: MinusCircle, textColor: 'text-gray-500' },
 }
 
-export default function ChecklistForm({ formulario, grouped, tipoLabel }: Props) {
+export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos, usuarioNome }: Props) {
     const [respostas, setRespostas] = useState<Record<string, StatusType>>({})
+    const [veiculoId, setVeiculoId] = useState('')
+    const [responsavel, setResponsavel] = useState(usuarioNome)
+    const [dataHora, setDataHora] = useState(() => {
+        const now = new Date()
+        return {
+            data: now.toISOString().slice(0, 10),
+            hora: now.toTimeString().slice(0, 5)
+        }
+    })
     const [observacoes, setObservacoes] = useState<Record<string, string>>({})
     const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
     const [obsGerais, setObsGerais] = useState('')
@@ -55,6 +73,14 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel }: Props)
     }
 
     const handleSubmit = async () => {
+        if (!veiculoId) {
+            alert('Por favor, selecione o veículo/placa.')
+            return
+        }
+        if (!responsavel.trim()) {
+            alert('Por favor, informe o nome do responsável.')
+            return
+        }
         const unanswered = allItems.filter(i => !respostas[i.id] && i.obrigatorio)
         if (unanswered.length > 0) {
             alert(`Por favor, responda todos os itens obrigatórios. Faltam ${unanswered.length} item(ns).`)
@@ -100,6 +126,64 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel }: Props)
                 <div className="text-right">
                     <div className="text-2xl font-black text-primary">{progress}%</div>
                     <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{answered}/{totalItems}</div>
+                </div>
+            </div>
+
+            {/* Identification Card */}
+            <div className="dashboard-card p-5 space-y-4">
+                <h3 className="font-black text-xs text-gray-400 uppercase tracking-widest">Identificação</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Placa / Veículo */}
+                    <div className="sm:col-span-2 space-y-1.5">
+                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><Truck className="w-3 h-3" /> Placa / Equipamento *</label>
+                        <select
+                            value={veiculoId}
+                            onChange={e => setVeiculoId(e.target.value)}
+                            required
+                            className="w-full bg-surface-highlight border border-border-color rounded-xl px-4 py-3 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                        >
+                            <option value="">Selecione o veículo...</option>
+                            {veiculos.map(v => (
+                                <option key={v.id} value={v.id}>
+                                    {v.codigoInterno}{v.placa ? ` · ${v.placa}` : ''} — {v.modelo}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Data */}
+                    <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Data *</label>
+                        <input
+                            type="date"
+                            value={dataHora.data}
+                            onChange={e => setDataHora(p => ({ ...p, data: e.target.value }))}
+                            className="w-full bg-surface-highlight border border-border-color rounded-xl px-4 py-3 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                        />
+                    </div>
+
+                    {/* Hora */}
+                    <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><Clock className="w-3 h-3" /> Hora *</label>
+                        <input
+                            type="time"
+                            value={dataHora.hora}
+                            onChange={e => setDataHora(p => ({ ...p, hora: e.target.value }))}
+                            className="w-full bg-surface-highlight border border-border-color rounded-xl px-4 py-3 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                        />
+                    </div>
+
+                    {/* Responsável */}
+                    <div className="sm:col-span-2 space-y-1.5">
+                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><User className="w-3 h-3" /> Nome do Responsável *</label>
+                        <input
+                            type="text"
+                            value={responsavel}
+                            onChange={e => setResponsavel(e.target.value)}
+                            placeholder="Nome completo do motorista/operador"
+                            className="w-full bg-surface-highlight border border-border-color rounded-xl px-4 py-3 text-sm font-semibold text-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -179,8 +263,8 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel }: Props)
                                                                 key={s}
                                                                 onClick={() => setStatus(item.id, s)}
                                                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ring-2 ${isSelected
-                                                                        ? `${cfg.color} ring-opacity-50 scale-105 shadow-lg`
-                                                                        : 'bg-surface-highlight text-gray-500 ring-transparent hover:ring-1 hover:ring-border-color'
+                                                                    ? `${cfg.color} ring-opacity-50 scale-105 shadow-lg`
+                                                                    : 'bg-surface-highlight text-gray-500 ring-transparent hover:ring-1 hover:ring-border-color'
                                                                     }`}
                                                             >
                                                                 <Icon className="w-3.5 h-3.5" />

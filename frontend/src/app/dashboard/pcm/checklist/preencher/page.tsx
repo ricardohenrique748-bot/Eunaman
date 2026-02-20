@@ -1,9 +1,11 @@
 import prisma from '@/lib/prisma'
 import { notFound } from 'next/navigation'
+import { getSession } from '@/app/actions/auth-actions'
 import ChecklistForm from './ChecklistForm'
 
 export default async function PreencherChecklistPage(props: any) {
     const { tipo } = await props.searchParams
+    const session = await getSession()
 
     // Fetch form matching the tipo (e.g. "COMBOIO")
     const formulario = await prisma.checklistFormulario.findFirst({
@@ -28,7 +30,20 @@ export default async function PreencherChecklistPage(props: any) {
         return acc
     }, {})
 
+    // Fetch all active vehicles for the plate selector
+    const veiculos = await prisma.veiculo.findMany({
+        where: { status: { not: 'DESATIVADO' } },
+        select: { id: true, codigoInterno: true, placa: true, modelo: true },
+        orderBy: { codigoInterno: 'asc' }
+    })
+
     return (
-        <ChecklistForm formulario={formulario} grouped={grouped} tipoLabel={tipo} />
+        <ChecklistForm
+            formulario={formulario}
+            grouped={grouped}
+            tipoLabel={tipo}
+            veiculos={veiculos}
+            usuarioNome={session?.nome || ''}
+        />
     )
 }
