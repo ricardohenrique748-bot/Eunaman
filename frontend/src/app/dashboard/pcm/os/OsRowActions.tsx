@@ -4,6 +4,7 @@ import { Printer, Pencil, Trash2, MoreHorizontal } from 'lucide-react'
 import { useState } from 'react'
 import { deleteOrdemServico } from '@/app/actions/pcm-actions'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 interface OsRowActionsProps {
     osId: string
@@ -14,13 +15,6 @@ export default function OsRowActions({ osId, osNumero }: OsRowActionsProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
     const router = useRouter()
-
-    const handlePrint = () => {
-        // Encontra a linha da tabela e prepara para impressão ou abre uma nova aba formatada
-        // Por enquanto, vamos apenas acionar o print padrao, mas idealmente seria um layout de impressao
-        alert(`Gerando relatório para OS #${osNumero}... (Layout de impressão em desenvolvimento)`)
-        window.print()
-    }
 
     const handleDelete = async () => {
         if (!confirm(`Deseja realmente excluir a OS #${osNumero}?`)) return
@@ -38,13 +32,14 @@ export default function OsRowActions({ osId, osNumero }: OsRowActionsProps) {
 
     return (
         <div className="flex items-center justify-end gap-2">
-            <button
-                onClick={handlePrint}
+            <Link
+                href={`/print/os/${osId}`}
+                target="_blank"
                 title="Imprimir O.S."
                 className="w-8 h-8 rounded-xl bg-surface-highlight hover:bg-primary/10 text-gray-400 hover:text-primary transition-all flex items-center justify-center"
             >
                 <Printer className="w-4 h-4" />
-            </button>
+            </Link>
             <button
                 onClick={() => alert('Edição em desenvolvimento...')}
                 title="Editar O.S."
