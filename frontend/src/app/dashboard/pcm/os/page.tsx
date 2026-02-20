@@ -87,8 +87,7 @@ export default async function PcmPage(props: any) {
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-11 h-11 rounded-2xl bg-surface-highlight border border-border-color flex flex-col items-center justify-center group-hover:border-primary/40 transition-all shadow-inner">
-                                                    <span className="text-[9px] font-black text-gray-500 uppercase leading-none block mb-0.5">TAG</span>
+                                                <div className="min-w-[44px] h-11 px-2 rounded-2xl bg-surface-highlight border border-border-color flex items-center justify-center group-hover:border-primary/40 transition-all shadow-inner">
                                                     <span className="text-[11px] font-black text-foreground leading-none">
                                                         {os.veiculo?.codigoInterno || '---'}
                                                     </span>
