@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Lock, User, AlertCircle, Shield } from 'lucide-react'
 import Image from 'next/image'
@@ -18,6 +18,20 @@ export default function LoginPage() {
   const [showChangePass, setShowChangePass] = useState(false)
   const [emailForChange, setEmailForChange] = useState<string | null>(null)
 
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('eunaman_email')
+    const savedPassword = localStorage.getItem('eunaman_password')
+    if (savedEmail && savedPassword) {
+      setEmail(savedEmail)
+      setPassword(savedPassword)
+      setRememberMe(true)
+    }
+  }, [])
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
@@ -28,6 +42,13 @@ export default function LoginPage() {
     const res = await login(formData)
 
     if (res.success) {
+      if (rememberMe) {
+        localStorage.setItem('eunaman_email', formData.get('email') as string)
+        localStorage.setItem('eunaman_password', formData.get('password') as string)
+      } else {
+        localStorage.removeItem('eunaman_email')
+        localStorage.removeItem('eunaman_password')
+      }
       router.push('/dashboard')
     } else if (res.mustChangePassword) {
       setEmailForChange(res.email)
@@ -230,6 +251,8 @@ export default function LoginPage() {
                   <input
                     type="email"
                     name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="usuario@eunaman.com"
                     required
                     className="w-full bg-white border-2 border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-semibold shadow-sm"
@@ -240,6 +263,8 @@ export default function LoginPage() {
                   <input
                     type="password"
                     name="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     required
                     className="w-full bg-white border-2 border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-semibold shadow-sm"
@@ -253,6 +278,8 @@ export default function LoginPage() {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
                     className="hidden peer"
                   />
                   <div className="w-5 h-5 border-2 border-slate-300 rounded-md mr-3 peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center shadow-sm">
