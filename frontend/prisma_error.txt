@@ -1,0 +1,85 @@
+﻿node.exe : Environment 
+variables loaded from .env
+No linha:1 caractere:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Environ  
+  ment variables loaded fr   
+ om .env:String) [], Remo    
+teException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Prisma schema loaded from prisma\schema.prisma
+
+Error: Prisma schema 
+validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mError 
+validating field `veiculo` 
+in model 
+`ChecklistResposta`: The 
+relation field `veiculo` on 
+model `ChecklistResposta` is 
+missing an opposite relation 
+field on the model 
+`Veiculo`. Either run 
+`prisma format` or add it 
+manually.[0m
+  [1;94m-->[0m  [4mprisma\
+schema.prisma:392[0m
+[1;94m   | [0m
+[1;94m391 | [0m  
+formulario 
+ChecklistFormulario 
+@relation(fields: 
+[formularioId], references: 
+[id])
+[1;94m392 | [0m  
+[1;91mveiculo Veiculo 
+@relation(fields: 
+[veiculoId], references: 
+[id])
+[0m
+[1;94m393 | [0m  usuario 
+Usuario @relation(fields: 
+[usuarioId], references: 
+[id])
+[1;94m   | [0m
+[1;91merror[0m: [1mError 
+validating field `usuario` 
+in model 
+`ChecklistResposta`: The 
+relation field `usuario` on 
+model `ChecklistResposta` is 
+missing an opposite relation 
+field on the model 
+`Usuario`. Either run 
+`prisma format` or add it 
+manually.[0m
+  [1;94m-->[0m  [4mprisma\
+schema.prisma:393[0m
+[1;94m   | [0m
+[1;94m392 | [0m  veiculo 
+Veiculo @relation(fields: 
+[veiculoId], references: 
+[id])
+[1;94m393 | [0m  
+[1;91musuario Usuario 
+@relation(fields: 
+[usuarioId], references: 
+[id])
+[0m
+[1;94m394 | [0m
+[1;94m   | [0m
+
+Validation Error Count: 2
+[Context: validate]
+
+Prisma CLI Version : 6.19.2

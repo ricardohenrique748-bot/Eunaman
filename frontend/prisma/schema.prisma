@@ -19,10 +19,11 @@ model Usuario {
   unidadePadraoId String? @map("unidade_padrao_id")
   ativo           Boolean @default(true)
 
-  empresaPadrao Empresa? @relation(fields: [empresaPadraoId], references: [id])
-  unidadePadrao Unidade? @relation(fields: [unidadePadraoId], references: [id])
-  trocarSenha   Boolean  @default(true) @map("trocar_senha")
-  area          Area     @default(GERAL)
+  empresaPadrao      Empresa?            @relation(fields: [empresaPadraoId], references: [id])
+  unidadePadrao      Unidade?            @relation(fields: [unidadePadraoId], references: [id])
+  trocarSenha        Boolean             @default(true) @map("trocar_senha")
+  area               Area                @default(GERAL)
+  checklistRespostas ChecklistResposta[]
 
   @@map("usuarios")
 }
@@ -59,9 +60,9 @@ model Empresa {
   cnpj         String  @unique
   ativo        Boolean @default(true)
 
-  unidades  Unidade[]
-  veiculos  Veiculo[]
-  usuarios  Usuario[]
+  unidades Unidade[]
+  veiculos Veiculo[]
+  usuarios Usuario[]
 
   @@map("empresas")
 }
@@ -74,48 +75,49 @@ model Unidade {
   estado      String
   ativo       Boolean @default(true)
 
-  empresa   Empresa   @relation(fields: [empresaId], references: [id])
-  veiculos  Veiculo[]
-  usuarios  Usuario[]
+  empresa  Empresa   @relation(fields: [empresaId], references: [id])
+  veiculos Veiculo[]
+  usuarios Usuario[]
 
   @@map("unidades")
 }
 
 model Veiculo {
-  id              String            @id @default(uuid())
-  codigoInterno   String            @unique @map("codigo_interno")
-  placa           String?
-  tipoVeiculo     String            @map("tipo_veiculo")
-  fabricante      String
-  modelo          String
-  ano             Int
-  empresaId       String            @map("empresa_id")
-  unidadeId       String            @map("unidade_id")
-  status          StatusOperacional @map("status_operacional")
-  kmAtual         Int               @default(0) @map("km_atual")
-  horimetroAtual  Int               @default(0) @map("horimetro_atual")
-  critico         Boolean           @default(false)
-  observacoes     String?
-  categoria       String?
-  moduloSistema   String?           @map("modulo_sistema")
-  dataAtualizacaoHorimetro DateTime? @map("data_atualizacao_horimetro")
-  semanaPreventiva Int?             @map("semana_preventiva")
-  
+  id                       String            @id @default(uuid())
+  codigoInterno            String            @unique @map("codigo_interno")
+  placa                    String?
+  tipoVeiculo              String            @map("tipo_veiculo")
+  fabricante               String
+  modelo                   String
+  ano                      Int
+  empresaId                String            @map("empresa_id")
+  unidadeId                String            @map("unidade_id")
+  status                   StatusOperacional @map("status_operacional")
+  kmAtual                  Int               @default(0) @map("km_atual")
+  horimetroAtual           Int               @default(0) @map("horimetro_atual")
+  critico                  Boolean           @default(false)
+  observacoes              String?
+  categoria                String?
+  moduloSistema            String?           @map("modulo_sistema")
+  dataAtualizacaoHorimetro DateTime?         @map("data_atualizacao_horimetro")
+  semanaPreventiva         Int?              @map("semana_preventiva")
+
   // Dados da Programação Semanal
-  programacaoStatus    String?   @default("PENDENTE") @map("prog_status")
-  programacaoProgresso Int?      @default(0) @map("prog_progresso")
-  programacaoModulo    String?   @map("prog_modulo")
-  programacaoDescricao String?   @map("prog_descricao")
+  programacaoStatus     String?   @default("PENDENTE") @map("prog_status")
+  programacaoProgresso  Int?      @default(0) @map("prog_progresso")
+  programacaoModulo     String?   @map("prog_modulo")
+  programacaoDescricao  String?   @map("prog_descricao")
   programacaoDataInicio DateTime? @map("prog_data_inicio")
   programacaoDataFim    DateTime? @map("prog_data_fim")
 
-  empresa     Empresa     @relation(fields: [empresaId], references: [id])
-  unidade     Unidade     @relation(fields: [unidadeId], references: [id])
-  os          OrdemServico[]
-  planos      PlanoManutencao[]
-  pneus       Pneu[]
-  boletinsPneu BoletimPneu[]
-  documentos   DocumentoFrota[]
+  empresa            Empresa             @relation(fields: [empresaId], references: [id])
+  unidade            Unidade             @relation(fields: [unidadeId], references: [id])
+  os                 OrdemServico[]
+  planos             PlanoManutencao[]
+  pneus              Pneu[]
+  boletinsPneu       BoletimPneu[]
+  documentos         DocumentoFrota[]
+  checklistRespostas ChecklistResposta[]
 
   @@index([unidadeId])
   @@map("veiculos_frota")
@@ -146,13 +148,13 @@ model OrdemServico {
   responsavelPcm String?   @map("responsavel_pcm")
 
   // Parâmetros Mestre
-  motivoId      String?   @map("motivo_id")
-  sistemaId     String?   @map("sistema_id")
-  subSistemaId  String?   @map("sub_sistema_id")
+  motivoId     String? @map("motivo_id")
+  sistemaId    String? @map("sistema_id")
+  subSistemaId String? @map("sub_sistema_id")
 
-  veiculo    Veiculo    @relation(fields: [veiculoId], references: [id])
-  motivo     OsMotivo?  @relation(fields: [motivoId], references: [id])
-  sistema    OsSistema? @relation(fields: [sistemaId], references: [id])
+  veiculo    Veiculo       @relation(fields: [veiculoId], references: [id])
+  motivo     OsMotivo?     @relation(fields: [motivoId], references: [id])
+  sistema    OsSistema?    @relation(fields: [sistemaId], references: [id])
   subSistema OsSubSistema? @relation(fields: [subSistemaId], references: [id])
 
   @@index([status])
@@ -179,7 +181,7 @@ model PlanoManutencao {
   id              String           @id @default(uuid())
   veiculoId       String           @map("veiculo")
   tipo            String           @map("tipo_manutencao") // Ex: Motor, Hidraulico (No form: Tipo)
-  modulo          String?          // No form: Módulo
+  modulo          String? // No form: Módulo
   ultimoHorimetro Int              @default(0) @map("ultimo_horimetro") // No form: Último Horímetro
   intervalo       Int              @map("intervalo_horas") // No form: Intervalo
   dataAtualizacao DateTime         @default(now()) @map("data_atualizacao") // No form: Data da Atualização
@@ -212,7 +214,7 @@ model Pneu {
   posicao        String?
   sulcoAtualMm   Float   @map("sulco_atual_mm")
 
-  veiculo Veiculo? @relation(fields: [veiculoAtualId], references: [id])
+  veiculo           Veiculo?          @relation(fields: [veiculoAtualId], references: [id])
   historicoInspecao ItemBoletimPneu[]
 
   @@map("pneus_frota")
@@ -231,18 +233,18 @@ model SystemParameters {
 }
 
 model OsMotivo {
-  id    String @id @default(uuid())
-  nome  String @unique
-  ativo Boolean @default(true)
+  id    String         @id @default(uuid())
+  nome  String         @unique
+  ativo Boolean        @default(true)
   os    OrdemServico[]
 
   @@map("os_motivos")
 }
 
 model OsSistema {
-  id          String @id @default(uuid())
-  nome        String @unique
-  ativo       Boolean @default(true)
+  id          String         @id @default(uuid())
+  nome        String         @unique
+  ativo       Boolean        @default(true)
   subSistemas OsSubSistema[]
   os          OrdemServico[]
 
@@ -250,13 +252,13 @@ model OsSistema {
 }
 
 model OsSubSistema {
-  id        String @id @default(uuid())
+  id        String  @id @default(uuid())
   nome      String
-  sistemaId String @map("sistema_id")
+  sistemaId String  @map("sistema_id")
   ativo     Boolean @default(true)
 
-  sistema   OsSistema @relation(fields: [sistemaId], references: [id])
-  os        OrdemServico[]
+  sistema OsSistema      @relation(fields: [sistemaId], references: [id])
+  os      OrdemServico[]
 
   @@unique([nome, sistemaId])
   @@map("os_sub_sistemas")
@@ -271,21 +273,21 @@ model BoletimPneu {
   observacoes String?
   criadoEm    DateTime @default(now()) @map("criado_em")
 
-  itens       ItemBoletimPneu[]
-  veiculo     Veiculo @relation(fields: [veiculoId], references: [id])
+  itens   ItemBoletimPneu[]
+  veiculo Veiculo           @relation(fields: [veiculoId], references: [id])
 
   @@map("boletins_pneu")
 }
 
 model ItemBoletimPneu {
-  id        String @id @default(uuid())
-  boletimId String @map("boletim_id")
+  id        String  @id @default(uuid())
+  boletimId String  @map("boletim_id")
   posicao   String
-  sulcoMm   Float  @map("sulco_mm")
+  sulcoMm   Float   @map("sulco_mm")
   pneuId    String? @map("pneu_id")
 
-  boletim   BoletimPneu @relation(fields: [boletimId], references: [id])
-  pneu      Pneu?       @relation(fields: [pneuId], references: [id])
+  boletim BoletimPneu @relation(fields: [boletimId], references: [id])
+  pneu    Pneu?       @relation(fields: [pneuId], references: [id])
 
   @@map("itens_boletim_pneu")
 }
@@ -293,58 +295,120 @@ model ItemBoletimPneu {
 model DocumentoFrota {
   id           String    @id @default(uuid())
   veiculoId    String    @map("veiculo_id")
-  tipo         String    // LAUDO, CRLV, IMPLEMENTO, TACOGRAFO, CIV_CIPP
+  tipo         String // LAUDO, CRLV, IMPLEMENTO, TACOGRAFO, CIV_CIPP
   numero       String?
   dataEmissao  DateTime? @map("data_emissao")
   dataValidade DateTime? @map("data_validade")
-  
-  veiculo      Veiculo   @relation(fields: [veiculoId], references: [id])
-  
+
+  veiculo Veiculo @relation(fields: [veiculoId], references: [id])
+
   @@unique([veiculoId, tipo])
   @@map("documentos_frota")
 }
 
 model Backlog {
-  id String @id @default(uuid())
-  semana String?
-  mes String?
-  ano String?
-  dataEvidencia DateTime? @map("data_evidencia")
-  modulo String?
-  regiaoProgramacao String? @map("regiao_programacao")
-  diasPendenciaAberta Int? @map("dias_pendencia_aberta")
-  frota String?
-  tag String?
-  tipo String?
-  descricaoAtividade String? @map("descricao_atividade")
-  origem String?
-  criticidade String?
-  tempoExecucaoPrevisto String? @map("tempo_execucao_previsto")
-  campoBase String? @map("campo_base")
-  os String?
-  material String?
-  numeroRc String? @map("numero_rc")
-  numeroOrdem String? @map("numero_ordem")
-  fornecedor String?
-  dataRc DateTime? @map("data_rc")
-  detalhamentoPedido String? @map("detalhamento_pedido")
-  dataNecessidadeMaterial DateTime? @map("data_necessidade_material")
-  tipoPedido String? @map("tipo_pedido")
-  previsaoMaterial DateTime? @map("previsao_material")
-  situacaoRc String? @map("situacao_rc")
-  diasAberturaReqCompras Int? @map("dias_abertura_req_compras")
-  dataProgramacao DateTime? @map("data_programacao")
-  maoDeObra String? @map("mao_de_obra")
-  deltaEvidenciaProgramacao Int? @map("delta_evidencia_programacao")
-  statusProgramacao String? @map("status_programacao")
+  id                         String    @id @default(uuid())
+  semana                     String?
+  mes                        String?
+  ano                        String?
+  dataEvidencia              DateTime? @map("data_evidencia")
+  modulo                     String?
+  regiaoProgramacao          String?   @map("regiao_programacao")
+  diasPendenciaAberta        Int?      @map("dias_pendencia_aberta")
+  frota                      String?
+  tag                        String?
+  tipo                       String?
+  descricaoAtividade         String?   @map("descricao_atividade")
+  origem                     String?
+  criticidade                String?
+  tempoExecucaoPrevisto      String?   @map("tempo_execucao_previsto")
+  campoBase                  String?   @map("campo_base")
+  os                         String?
+  material                   String?
+  numeroRc                   String?   @map("numero_rc")
+  numeroOrdem                String?   @map("numero_ordem")
+  fornecedor                 String?
+  dataRc                     DateTime? @map("data_rc")
+  detalhamentoPedido         String?   @map("detalhamento_pedido")
+  dataNecessidadeMaterial    DateTime? @map("data_necessidade_material")
+  tipoPedido                 String?   @map("tipo_pedido")
+  previsaoMaterial           DateTime? @map("previsao_material")
+  situacaoRc                 String?   @map("situacao_rc")
+  diasAberturaReqCompras     Int?      @map("dias_abertura_req_compras")
+  dataProgramacao            DateTime? @map("data_programacao")
+  maoDeObra                  String?   @map("mao_de_obra")
+  deltaEvidenciaProgramacao  Int?      @map("delta_evidencia_programacao")
+  statusProgramacao          String?   @map("status_programacao")
   previsaoConclusaoPendencia DateTime? @map("previsao_conclusao_pendencia")
-  dataConclusaoPendencia DateTime? @map("data_conclusao_pendencia")
-  diasResolucaoPendencia Int? @map("dias_resolucao_pendencia")
-  status String?
-  observacao String?
-  
+  dataConclusaoPendencia     DateTime? @map("data_conclusao_pendencia")
+  diasResolucaoPendencia     Int?      @map("dias_resolucao_pendencia")
+  status                     String?
+  observacao                 String?
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("backlog_pcm")
+}
+
+// 5. CHECKLISTS PCM
+model ChecklistFormulario {
+  id        String   @id @default(uuid())
+  nome      String
+  descricao String?
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  itens     ChecklistItem[]
+  respostas ChecklistResposta[]
+
+  @@map("checklist_formularios")
+}
+
+model ChecklistItem {
+  id           String  @id @default(uuid())
+  formularioId String  @map("formulario_id")
+  texto        String
+  categoria    String?
+  obrigatorio  Boolean @default(true)
+  ordem        Int     @default(0)
+
+  formulario    ChecklistFormulario     @relation(fields: [formularioId], references: [id], onDelete: Cascade)
+  respostasItem ChecklistItemResposta[]
+
+  @@map("checklist_itens")
+}
+
+model ChecklistResposta {
+  id           String @id @default(uuid())
+  formularioId String @map("formulario_id")
+  veiculoId    String @map("veiculo_id")
+  usuarioId    String @map("usuario_id")
+
+  dataResposta      DateTime @default(now()) @map("data_resposta")
+  observacoesGerais String?  @map("observacoes_gerais")
+  assinatura        String?
+
+  formulario ChecklistFormulario @relation(fields: [formularioId], references: [id])
+  veiculo    Veiculo             @relation(fields: [veiculoId], references: [id])
+  usuario    Usuario             @relation(fields: [usuarioId], references: [id])
+
+  respostasItem ChecklistItemResposta[]
+
+  @@map("checklist_respostas")
+}
+
+model ChecklistItemResposta {
+  id         String @id @default(uuid())
+  respostaId String @map("resposta_id")
+  itemId     String @map("item_id")
+
+  status     String  @default("OK")
+  observacao String?
+
+  resposta ChecklistResposta @relation(fields: [respostaId], references: [id], onDelete: Cascade)
+  item     ChecklistItem     @relation(fields: [itemId], references: [id])
+
+  @@map("checklist_itens_respostas")
 }
