@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Lock, User, AlertCircle, Shield } from 'lucide-react'
 import Image from 'next/image'
+import LogoAnimation from '@/components/ui/LogoAnimation'
 import { login } from '@/app/actions/auth-actions'
 
 export default function LoginPage() {
@@ -180,12 +181,7 @@ export default function LoginPage() {
           <div className="mb-12 flex flex-col items-center">
             <div className="relative w-24 h-24 mb-10 group">
               <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors duration-1000 animate-pulse" />
-              <Image
-                src="/logo.png"
-                alt="Eunaman"
-                fill
-                className="object-contain drop-shadow-sm animate-logo-spin animate-logo-glow relative z-10 transition-transform duration-700 group-hover:scale-110"
-              />
+              <LogoAnimation fill className="drop-shadow-sm animate-logo-glow relative z-10 transition-transform duration-700 group-hover:scale-110" />
             </div>
             <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase text-center">Acesse sua conta</h2>
             <p className="text-slate-500 font-medium mt-2 text-center">Bem-vindo(a) de volta à Eunaman.</p>
