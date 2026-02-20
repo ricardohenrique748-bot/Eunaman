@@ -70,9 +70,14 @@ export async function createUsuario(formData: FormData) {
         })
         revalidatePath('/dashboard/admin')
         return { success: true }
-    } catch (e) {
+    } catch (e: any) {
         console.error("ERRO AO CRIAR USUARIO:", e)
-        return { success: false, error: 'Erro ao criar usuário' }
+        const errorMessage = e?.message || String(e)
+        // Check for common Prisma errors: Unique constraint failed
+        if (errorMessage.includes('Unique constraint failed')) {
+            return { success: false, error: 'Já existe um usuário cadastrado com este e-mail.' }
+        }
+        return { success: false, error: 'Erro ao criar usuário: ' + errorMessage }
     }
 }
 
@@ -210,8 +215,13 @@ export async function updateUsuario(formData: FormData) {
         })
         revalidatePath('/dashboard/admin')
         return { success: true }
-    } catch (_) {
-        return { success: false, error: 'Erro ao atualizar usuário' }
+    } catch (e: any) {
+        console.error("ERRO AO ATUALIZAR USUARIO:", e)
+        const errorMessage = e?.message || String(e)
+        if (errorMessage.includes('Unique constraint failed')) {
+            return { success: false, error: 'Já existe um usuário cadastrado com este e-mail.' }
+        }
+        return { success: false, error: 'Erro ao atualizar usuário: ' + errorMessage }
     }
 }
 
