@@ -24,7 +24,7 @@
     --border-color: #e2e8f0;    /* Slate 200 - Soft borders */
     --foreground: #0f172a;      /* Slate 900 - High contrast text */
     
-    --primary: #3b82f6;         /* Blue 500 - Vibrant but professional */
+    --primary: #16a34a;         /* Green 600 - Matches Eunaman logo */
     --primary-foreground: #ffffff;
     
     --status-ok: #10b981;
@@ -43,7 +43,7 @@
     --border-color: #2a344a;    /* Subtle Separators */
     --foreground: #f1f5f9;      /* Slate 100 */
     
-    --primary: #3b82f6;
+    --primary: #22c55e;         /* Green 500 for dark mode */
     --primary-foreground: #ffffff;
     
     --status-ok: #10b981;
@@ -92,8 +92,8 @@ body {
 }
 
 @keyframes logo-glow {
-  0%, 100% { filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.5)); }
-  50% { filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.8)); }
+  0%, 100% { filter: drop-shadow(0 0 2px rgba(22, 163, 74, 0.5)); }
+  50% { filter: drop-shadow(0 0 10px rgba(22, 163, 74, 0.8)); }
 }
 
 .animate-logo-spin {

@@ -20,7 +20,7 @@ export default function LogoAnimation({ className = '', fill = false, width, hei
     let imagesLoaded = 0;
     const images: HTMLImageElement[] = [];
     let isMounted = true;
-    
+
     for (let i = 0; i < TOTAL_FRAMES; i++) {
       const img = new window.Image();
       img.src = `${FRAME_PREFIX}${String(i).padStart(3, '0')}.jpg`;
@@ -42,9 +42,9 @@ export default function LogoAnimation({ className = '', fill = false, width, hei
 
   useEffect(() => {
     if (!loaded) return;
-    
+
     let lastTime = performance.now();
-    const interval = 1000 / 30; // ~30 fps
+    const interval = 1000 / 12; // ~12 fps (very smooth and slow)
     let reqId: number;
 
     const animate = (time: number) => {
@@ -66,7 +66,7 @@ export default function LogoAnimation({ className = '', fill = false, width, hei
     <img
       src={currentSrc}
       alt="Eunaman Logo Animation"
-      className={`object-contain ${className}`}
+      className={`object-contain mix-blend-multiply ${className}`}
       style={fill ? { width: '100%', height: '100%', position: 'absolute', inset: 0 } : { width, height }}
     />
   );

@@ -34,13 +34,10 @@ export default function DashboardShell({ children, user }: { children: React.Rea
         <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans">
             {/* Sidebar */}
             <aside className="w-68 bg-surface border-r border-border-color flex flex-col z-20 shadow-2xl">
-                <div className="h-20 flex items-center px-8 border-b border-border-color/50 group/logo">
-                    <div className="flex items-center gap-0">
-                        <div className="relative w-16 h-16 transform transition-transform duration-500 group-hover/logo:scale-110 flex items-center justify-center">
-                            <LogoAnimation fill className="animate-logo-glow scale-150 transform origin-center" />
-                        </div>
-                        <div className="overflow-hidden -ml-3">
-                            <span className="font-black text-xl tracking-tighter text-[#000000] dark:text-white block leading-none transition-all duration-500 group-hover/logo:translate-x-1 group-hover/logo:text-primary">UNAMAN</span>
+                <div className="h-28 flex items-center px-2 border-b border-border-color/50 overflow-hidden relative">
+                    <div className="flex items-center w-full h-full justify-center mix-blend-multiply">
+                        <div className="relative w-64 h-20 flex items-center justify-center mix-blend-multiply">
+                            <LogoAnimation fill className="scale-[2.4] origin-center translate-y-2 transition-transform duration-500 hover:scale-[2.5]" />
                         </div>
                     </div>
                 </div>

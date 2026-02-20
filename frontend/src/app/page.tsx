@@ -83,15 +83,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#f8fafc] selection:bg-primary/20">
-      {/* Premium Light Background Elements */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse [animation-delay:2s]" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)]" />
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-white selection:bg-primary/20">
       {/* Forgot Password Modal */}
       {showForgotPass && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-4 animate-in fade-in duration-300">
@@ -151,28 +143,29 @@ export default function LoginPage() {
 
       {/* Login Container */}
       <div className="w-full min-h-screen z-10 relative flex flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-xl relative flex flex-col justify-center">
-          <div className="mb-14 flex flex-col items-center">
-            <div className="relative w-full max-w-[400px] aspect-video mb-8 group pl-8">
-              <div className="absolute inset-0 bg-primary/5 rounded-3xl blur-3xl group-hover:bg-primary/10 transition-colors duration-1000 animate-pulse" />
-              <LogoAnimation fill className="drop-shadow-2xl relative z-10 transition-transform duration-700 hover:scale-105 scale-125" />
+
+        <div className="w-full max-w-2xl flex flex-col items-center justify-center">
+
+          <div className="mb-10 flex flex-col items-center w-full">
+            <div className="relative w-full max-w-[500px] aspect-[16/7] pr-6 mb-2">
+              <LogoAnimation fill className="relative z-10 transition-transform duration-1000 hover:scale-105 scale-125 origin-center" />
             </div>
-            <h2 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight uppercase text-center mt-6">Acesse sua conta</h2>
-            <p className="text-slate-500 font-medium mt-4 text-center text-lg">Bem-vindo(a) de volta à Eunaman.</p>
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase text-center mt-2">Acesse sua conta</h2>
+            <p className="text-slate-500 font-medium mt-1 text-center text-sm">Bem-vindo(a) de volta à Eunaman.</p>
           </div>
 
-          {error && (
-            <div className="mb-8 p-4 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
-              <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                <AlertCircle className="w-5 h-5 font-bold" />
-              </div>
-              <span className="font-bold">{error}</span>
-            </div>
-          )}
+          <div className="w-full max-w-[360px]">
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-3">
-              <label className="text-[10px] uppercase tracking-[0.2em] font-black text-primary">Credenciais de Acesso</label>
+            {error && (
+              <div className="mb-8 p-4 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                  <AlertCircle className="w-5 h-5 font-bold" />
+                </div>
+                <span className="font-bold">{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-4">
                 <div className="relative group/input">
                   <User className="absolute left-4 top-4 w-5 h-5 text-slate-400 group-focus-within/input:text-primary transition-colors" />
@@ -181,7 +174,7 @@ export default function LoginPage() {
                     name="email"
                     placeholder="usuario@eunaman.com"
                     required
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium"
+                    className="w-full bg-white border-2 border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-semibold shadow-sm"
                   />
                 </div>
                 <div className="relative group/input">
@@ -191,58 +184,58 @@ export default function LoginPage() {
                     name="password"
                     placeholder="••••••••"
                     required
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium"
+                    className="w-full bg-white border-2 border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-semibold shadow-sm"
                   />
                 </div>
               </div>
-            </div>
 
-            <div className="flex items-center justify-between mt-2 px-1">
-              <label className="flex items-center group cursor-pointer">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="hidden peer"
-                />
-                <div className="w-5 h-5 border-2 border-slate-200 rounded-md mr-3 peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}><path d="M5 13l4 4L19 7" /></svg>
-                </div>
-                <span className="text-xs text-slate-500 font-bold uppercase tracking-widest group-hover:text-slate-700 transition-colors">Lembrar-me</span>
-              </label>
+              <div className="flex items-center justify-between px-1">
+                <label className="flex items-center group cursor-pointer">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    className="hidden peer"
+                  />
+                  <div className="w-5 h-5 border-2 border-slate-300 rounded-md mr-3 peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center shadow-sm">
+                    <svg className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}><path d="M5 13l4 4L19 7" /></svg>
+                  </div>
+                  <span className="text-xs text-slate-500 font-bold uppercase tracking-widest group-hover:text-slate-800 transition-colors">Lembrar-me</span>
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPass(true)}
+                  className="text-xs font-black text-primary hover:text-primary/80 transition-colors outline-none uppercase tracking-widest"
+                >
+                  Esqueci a Senha
+                </button>
+              </div>
 
               <button
-                type="button"
-                onClick={() => setShowForgotPass(true)}
-                className="text-xs font-black text-primary hover:text-primary/80 transition-colors outline-none uppercase tracking-widest"
+                disabled={loading}
+                className="w-full relative group/btn overflow-hidden rounded-2xl bg-primary py-4 px-6 text-white font-black transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 shadow-[0_8px_30px_rgb(22,163,74,0.3)] ring-offset-2 focus:ring-4 focus:ring-primary/30"
               >
-                Esqueci a Senha
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+                <span className="relative z-10 flex items-center justify-center gap-2 uppercase tracking-[0.2em] text-sm">
+                  {loading ? 'AGUARDE...' : 'ENTRAR NO SISTEMA'}
+                </span>
               </button>
-            </div>
 
-            <button
-              disabled={loading}
-              className="w-full relative group/btn overflow-hidden rounded-2xl bg-primary py-4 px-6 text-white font-black transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 shadow-xl shadow-primary/20"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
-              <span className="relative z-10 flex items-center justify-center gap-2 uppercase tracking-[0.2em] text-sm">
-                {loading ? 'Aguarde...' : 'ENTRAR NO SISTEMA'}
-              </span>
-            </button>
-
-            {/* Security Info moved below button */}
-            <div className="pt-2 flex items-center justify-center gap-6 opacity-40 hover:opacity-80 transition-all duration-500">
-              <div className="flex items-center gap-2 text-[9px] font-black text-slate-900 uppercase tracking-widest">
-                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                SSL Secured
+              {/* Security Info moved below button */}
+              <div className="pt-4 flex items-center justify-center gap-6 opacity-30 hover:opacity-100 transition-opacity duration-300">
+                <div className="flex items-center gap-2 text-[9px] font-black text-slate-900 uppercase tracking-widest">
+                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]" />
+                  SSL Secured
+                </div>
+                <div className="w-1 h-1 rounded-full bg-slate-300" />
+                <div className="flex items-center gap-2 text-[9px] font-black text-slate-900 uppercase tracking-widest">
+                  <Shield className="w-3 h-3 text-primary" />
+                  Safe Login
+                </div>
               </div>
-              <div className="w-px h-3 bg-slate-200" />
-              <div className="flex items-center gap-2 text-[9px] font-black text-slate-900 uppercase tracking-widest">
-                <Shield className="w-3 h-3 text-primary" />
-                Safe Login
-              </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
 
@@ -250,7 +243,7 @@ export default function LoginPage() {
 
       <style jsx global>{`
         body {
-          background-color: #f8fafc;
+          background-color: #ffffff;
         }
       `}</style>
     </div>
