@@ -150,41 +150,15 @@ export default function LoginPage() {
       )}
 
       {/* Login Container */}
-      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-0 z-10 relative bg-white border border-slate-200 rounded-[40px] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] mx-4">
-
-        {/* Left Side: Branding/Visual - Full Bleed Photo */}
-        <div className="hidden lg:flex flex-col relative overflow-hidden bg-slate-100">
-          <Image
-            src="/unidade.jpg"
-            alt="Eunaman Unidade Operacional"
-            fill
-            className="object-cover transition-transform duration-[20s] hover:scale-110"
-            priority
-          />
-          {/* Subtle Overlay for Readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60" />
-
-          <div className="relative z-10 p-12 h-full flex flex-col justify-between">
-            <div />
-
-            <div className="space-y-4">
-              <span className="inline-flex px-4 py-2 rounded-full bg-primary/90 backdrop-blur-md text-[10px] font-black text-white uppercase tracking-widest shadow-2xl border border-white/20">
-                Unidade Operacional
-              </span>
-              <p className="text-[10px] text-white/60 uppercase tracking-[0.5em] font-black drop-shadow-sm">EUNAMAN CORP © 2026</p>
+      <div className="w-full min-h-screen z-10 relative flex flex-col items-center justify-center px-4 py-12">
+        <div className="w-full max-w-xl relative flex flex-col justify-center">
+          <div className="mb-14 flex flex-col items-center">
+            <div className="relative w-full max-w-[400px] aspect-video mb-8 group pl-8">
+              <div className="absolute inset-0 bg-primary/5 rounded-3xl blur-3xl group-hover:bg-primary/10 transition-colors duration-1000 animate-pulse" />
+              <LogoAnimation fill className="drop-shadow-2xl relative z-10 transition-transform duration-700 hover:scale-105 scale-125" />
             </div>
-          </div>
-        </div>
-
-        {/* Right Side: Login Form */}
-        <div className="p-8 lg:p-16 bg-white border-l border-slate-100 relative flex flex-col justify-center">
-          <div className="mb-12 flex flex-col items-center">
-            <div className="relative w-24 h-24 mb-10 group">
-              <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors duration-1000 animate-pulse" />
-              <LogoAnimation fill className="drop-shadow-sm animate-logo-glow relative z-10 transition-transform duration-700 group-hover:scale-110" />
-            </div>
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase text-center">Acesse sua conta</h2>
-            <p className="text-slate-500 font-medium mt-2 text-center">Bem-vindo(a) de volta à Eunaman.</p>
+            <h2 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight uppercase text-center mt-6">Acesse sua conta</h2>
+            <p className="text-slate-500 font-medium mt-4 text-center text-lg">Bem-vindo(a) de volta à Eunaman.</p>
           </div>
 
           {error && (
