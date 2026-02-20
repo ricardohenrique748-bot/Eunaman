@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronUp, ArrowLeft, Send, Truck, User, Calendar, Clock } from 'lucide-react'
+import { CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronUp, ArrowLeft, Send, Truck, User, Calendar, Clock, Camera, X, ImagePlus } from 'lucide-react'
 import Link from 'next/link'
 
 type StatusType = 'OK' | 'NC' | 'NA' | null
@@ -53,6 +53,7 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
         }
     })
     const [observacoes, setObservacoes] = useState<Record<string, string>>({})
+    const [fotos, setFotos] = useState<Record<string, string[]>>({})
     const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
     const [obsGerais, setObsGerais] = useState('')
     const [submitted, setSubmitted] = useState(false)
@@ -66,6 +67,21 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
 
     const setStatus = (itemId: string, status: StatusType) => {
         setRespostas(p => ({ ...p, [itemId]: p[itemId] === status ? null : status }))
+    }
+
+    const addFoto = (itemId: string, file: File) => {
+        const current = fotos[itemId] || []
+        if (current.length >= 4) return
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            const base64 = e.target?.result as string
+            setFotos(p => ({ ...p, [itemId]: [...(p[itemId] || []), base64] }))
+        }
+        reader.readAsDataURL(file)
+    }
+
+    const removeFoto = (itemId: string, idx: number) => {
+        setFotos(p => ({ ...p, [itemId]: (p[itemId] || []).filter((_, i) => i !== idx) }))
     }
 
     const toggleCollapse = (cat: string) => {
@@ -274,15 +290,60 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
                                                     })}
                                                 </div>
 
-                                                {/* Observation field – only if NC */}
+                                                {/* NC: Observation + Photos */}
                                                 {isNC && (
-                                                    <textarea
-                                                        value={observacoes[item.id] || ''}
-                                                        onChange={e => setObservacoes(p => ({ ...p, [item.id]: e.target.value }))}
-                                                        placeholder="Descreva o problema encontrado..."
-                                                        rows={2}
-                                                        className="mt-2 w-full text-sm bg-white dark:bg-surface border border-red-200 dark:border-red-900/30 rounded-xl px-3 py-2 text-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-300 dark:focus:ring-red-800 resize-none"
-                                                    />
+                                                    <div className="mt-3 space-y-3">
+                                                        <textarea
+                                                            value={observacoes[item.id] || ''}
+                                                            onChange={e => setObservacoes(p => ({ ...p, [item.id]: e.target.value }))}
+                                                            placeholder="Descreva o problema encontrado..."
+                                                            rows={2}
+                                                            className="w-full text-sm bg-white dark:bg-surface border border-red-200 dark:border-red-900/30 rounded-xl px-3 py-2 text-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-300 dark:focus:ring-red-800 resize-none"
+                                                        />
+
+                                                        {/* Photo upload section */}
+                                                        <div className="space-y-2">
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-[10px] font-black text-red-400 uppercase tracking-widest flex items-center gap-1">
+                                                                    <Camera className="w-3 h-3" /> Fotos ({(fotos[item.id] || []).length}/4)
+                                                                </span>
+                                                                {(fotos[item.id] || []).length < 4 && (
+                                                                    <label className="cursor-pointer flex items-center gap-1.5 text-[11px] font-black text-red-500 hover:text-red-700 transition-colors">
+                                                                        <ImagePlus className="w-4 h-4" />
+                                                                        Adicionar foto
+                                                                        <input
+                                                                            type="file"
+                                                                            accept="image/*"
+                                                                            capture="environment"
+                                                                            className="hidden"
+                                                                            onChange={e => {
+                                                                                const file = e.target.files?.[0]
+                                                                                if (file) addFoto(item.id, file)
+                                                                                e.target.value = ''
+                                                                            }}
+                                                                        />
+                                                                    </label>
+                                                                )}
+                                                            </div>
+
+                                                            {/* Thumbnails */}
+                                                            {(fotos[item.id] || []).length > 0 && (
+                                                                <div className="flex gap-2 flex-wrap">
+                                                                    {(fotos[item.id] || []).map((src, photoIdx) => (
+                                                                        <div key={photoIdx} className="relative w-20 h-20 rounded-xl overflow-hidden border-2 border-red-200 dark:border-red-900/40 shadow-md group/photo">
+                                                                            <img src={src} alt={`foto-${photoIdx + 1}`} className="w-full h-full object-cover" />
+                                                                            <button
+                                                                                onClick={() => removeFoto(item.id, photoIdx)}
+                                                                                className="absolute top-1 right-1 w-5 h-5 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity shadow-lg"
+                                                                            >
+                                                                                <X className="w-3 h-3 text-white stroke-[3px]" />
+                                                                            </button>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
