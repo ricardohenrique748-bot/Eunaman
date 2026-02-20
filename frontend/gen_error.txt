@@ -1,0 +1,238 @@
+﻿node.exe : prisma:cli:bin 
+Failed to initialize the 
+command state: Error: 
+ENOENT: no such file or 
+directory, open 'C:\Users\luc
+kh\AppData\Roaming\prisma-nod
+ejs\Config\commands.json' 
++920ms
+No linha:1 caractere:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (prisma:  
+  cli:bin ...ds.json' +920   
+ ms:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+prisma:config:loadConfigFromF
+ile Config file loaded in 
+67.83ms +851ms
+prisma:config:loadConfigFromF
+ile No config file found in 
+the current working 
+directory C:\Users\luckh\Desk
+top\Eunaman\frontend +0ms
+prisma:getSchema 
+prismaConfig null +72ms
+prisma:getSchema Checking 
+existence of C:\Users\luckh\D
+esktop\Eunaman\frontend\schem
+a.prisma +0ms
+prisma:getSchema Reading 
+schema from single file C:\Us
+ers\luckh\Desktop\Eunaman\fro
+ntend\schema.prisma +0ms
+prisma:getSchema Checking 
+existence of C:\Users\luckh\D
+esktop\Eunaman\frontend\prism
+a\schema.prisma +1ms
+prisma:getSchema Reading 
+schema from single file C:\Us
+ers\luckh\Desktop\Eunaman\fro
+ntend\prisma\schema.prisma 
++0ms
+prisma:getConfig Using 
+getConfig Wasm +1ms
+prisma:cli Failed to read 
+schema information. Using 
+default values: '{\n  
+"name": "GetConfigError"\n}' 
++17ms
+prisma:engines binaries to 
+download schema-engine, 
+libquery-engine +1006ms
+prisma:getSchema 
+prismaConfig null +15ms
+prisma:getSchema Checking 
+existence of C:\Users\luckh\D
+esktop\Eunaman\frontend\schem
+a.prisma +0ms
+prisma:getSchema Reading 
+schema from single file C:\Us
+ers\luckh\Desktop\Eunaman\fro
+ntend\schema.prisma +0ms
+prisma:getSchema 
+prismaConfig null +0ms
+prisma:getSchema Checking 
+existence of C:\Users\luckh\D
+esktop\Eunaman\frontend\schem
+a.prisma +0ms
+prisma:getSchema Reading 
+schema from single file C:\Us
+ers\luckh\Desktop\Eunaman\fro
+ntend\schema.prisma +0ms
+prisma:getSchema Checking 
+existence of C:\Users\luckh\D
+esktop\Eunaman\frontend\prism
+a\schema.prisma +0ms
+prisma:getSchema Reading 
+schema from single file C:\Us
+ers\luckh\Desktop\Eunaman\fro
+ntend\prisma\schema.prisma 
++1ms
+prisma:getSchema Checking 
+existence of C:\Users\luckh\D
+esktop\Eunaman\frontend\prism
+a\schema.prisma +1ms
+prisma:getSchema Reading 
+schema from single file C:\Us
+ers\luckh\Desktop\Eunaman\fro
+ntend\prisma\schema.prisma 
++0ms
+prisma:getConfig Using 
+getConfig Wasm +4ms
+prisma:getConfig config data 
+retrieved without errors in 
+getConfig Wasm +3ms
+prisma:cli:checkpoint 
+runCheckpointClientCheck(): 
+Execution time for getting 
+info: 23.61579999999981 ms 
++0ms
+prisma:cli:checkpoint 
+runCheckpointClientCheck(): 
+Execution time for "await 
+checkpoint.check(data)": 
+48.461900000000014 ms +49ms
+prisma:loadEnv project root 
+found at C:\Users\luckh\Deskt
+op\Eunaman\frontend\package.j
+son +55ms
+prisma:getSchema 
+prismaConfig null +1ms
+prisma:tryLoadEnv 
+Environment variables loaded 
+from C:\Users\luckh\Desktop\E
+unaman\frontend\.env +0ms
+Environment variables loaded 
+from .env
+prisma:getSchema 
+prismaConfig null +2ms
+prisma:getSchema Checking 
+existence of C:\Users\luckh\D
+esktop\Eunaman\frontend\schem
+a.prisma +0ms
+prisma:getSchema Reading 
+schema from single file C:\Us
+ers\luckh\Desktop\Eunaman\fro
+ntend\schema.prisma +0ms
+prisma:getSchema Checking 
+existence of C:\Users\luckh\D
+esktop\Eunaman\frontend\prism
+a\schema.prisma +0ms
+prisma:getSchema Reading 
+schema from single file C:\Us
+ers\luckh\Desktop\Eunaman\fro
+ntend\prisma\schema.prisma 
++0ms
+Prisma schema loaded from prisma\schema.prisma
+prisma:getConfig Using 
+getConfig Wasm +0ms
+prisma:getConfig config data 
+retrieved without errors in 
+getConfig Wasm +4ms
+prisma:getDMMF Using getDmmf 
+Wasm +1ms
+prisma:getDMMF dmmf data 
+retrieved without errors in 
+getDmmf Wasm +86ms
+prisma:client:generator 
+requiresEngines [
+  "libqueryEngine"
+] +1ms
+prisma:generator 
+prismaCliDir C:\Users\luckh\D
+esktop\Eunaman\frontend\node_
+modules\prisma +5ms
+prisma:generator 
+prismaClientDir C:\Users\luck
+h\Desktop\Eunaman\frontend\no
+de_modules\@prisma\client 
++0ms
+prisma:generator baseDir C:\U
+sers\luckh\Desktop\Eunaman\fr
+ontend\prisma +0ms
+prisma:mergeSchemas Using 
+mergeSchemas Wasm +0ms
+prisma:loadEnv project root 
+found at C:\Users\luckh\Deskt
+op\Eunaman\frontend\node_modu
+les\@prisma\client\package.js
+on +8ms
+prisma:getSchema 
+prismaConfig null +1ms
+prisma:getGenerators 
+neededVersions {
+  "c2990dca591cba766e3b7ef5d9
+e8a84796e47ab7": {
+    "engines": [
+      "libqueryEngine"
+    ],
+    "binaryTargets": [
+      {
+        "fromEnvVar": null,
+        "value": "windows",
+        "native": true
+      }
+    ]
+  }
+} +1ms
+prisma:getGenerators {
+  "generatorBinaryPaths": {
+    "libqueryEngine": {
+      "windows": "C:\\Users\\
+luckh\\Desktop\\Eunaman\\fron
+tend\\node_modules\\prisma\\q
+uery_engine-windows.dll.node"
+    }
+  }
+} +119ms
+prisma:tryLoadEnv 
+Environment variables not 
+found at null +8ms
+prisma:tryLoadEnv 
+Environment variables loaded 
+from C:\Users\luckh\Desktop\E
+unaman\frontend\.env +0ms
+Error: Error: 
+EPERM: operation not 
+permitted, rename 'C:\Users\l
+uckh\Desktop\Eunaman\frontend
+\node_modules\.prisma\client\
+query_engine-windows.dll.node
+.tmp9184' -> 'C:\Users\luckh\
+Desktop\Eunaman\frontend\node
+_modules\.prisma\client\query
+_engine-windows.dll.node'
+
+
+    at e.parse (C:\Users\luck
+h\Desktop\Eunaman\frontend\no
+de_modules\prisma\build\index
+.js:4352:71)
+    at async e.parse (C:\User
+s\luckh\Desktop\Eunaman\front
+end\node_modules\prisma\build
+\index.js:4084:1867)
+    at async D4t (C:\Users\lu
+ckh\Desktop\Eunaman\frontend\
+node_modules\prisma\build\ind
+ex.js:4910:132)
