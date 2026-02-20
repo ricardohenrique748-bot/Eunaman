@@ -1,0 +1,20 @@
+﻿node.exe : Environment 
+variables loaded from .env
+No linha:1 caractere:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Environ  
+  ment variables loaded fr   
+ om .env:String) [], Remo    
+teException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "postgres", schema "public" at "aws-0-us-west-2.pooler.supabase.com:6543"
