@@ -429,6 +429,19 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
                                     onDragStart={handleDragStart}
                                     weekId={week.id}
                                     isLoading={loadingId === veiculo.id}
+                                    onQuickAction={(status, moveNext) => {
+                                        const currentDetails: ProgrammingDetails = {
+                                            status: status || veiculo.programacaoStatus || 'PENDENTE',
+                                            progresso: status === 'CONCLUIDO' ? 100 : (status === 'EM_ANDAMENTO' ? 50 : (veiculo.programacaoProgresso || 0)),
+                                            modulo: veiculo.programacaoModulo || veiculo.moduloSistema || '',
+                                            descricao: veiculo.programacaoDescricao || '',
+                                            dataInicio: veiculo.programacaoDataInicio ? new Date(veiculo.programacaoDataInicio).toISOString().split('T')[0] : '',
+                                            dataFim: veiculo.programacaoDataFim ? new Date(veiculo.programacaoDataFim).toISOString().split('T')[0] : ''
+                                        }
+
+                                        const nextWeek = moveNext ? Math.min((week.id || 0) + 1, 4) : week.id
+                                        executeMove(veiculo.id, nextWeek, currentDetails)
+                                    }}
                                 />
                             ))}
                             {getColumnVehicles(week.id).length === 0 && (
@@ -545,7 +558,19 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
     )
 }
 
-function VehicleCard({ veiculo, onDragStart, weekId, isLoading }: { veiculo: Veiculo, onDragStart: (e: React.DragEvent, id: string) => void, weekId?: number, isLoading?: boolean }) {
+function VehicleCard({
+    veiculo,
+    onDragStart,
+    weekId,
+    isLoading,
+    onQuickAction
+}: {
+    veiculo: Veiculo,
+    onDragStart: (e: React.DragEvent, id: string) => void,
+    weekId?: number,
+    isLoading?: boolean,
+    onQuickAction?: (status?: string, moveNext?: boolean) => void
+}) {
     return (
         <div
             draggable
@@ -584,12 +609,40 @@ function VehicleCard({ veiculo, onDragStart, weekId, isLoading }: { veiculo: Vei
                 <GripVertical className="w-3 h-3 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
 
-            {/* Programming Badges */}
+            {/* Programming Badges and Quick Actions */}
             {weekId !== undefined && veiculo.programacaoDescricao && (
                 <div className="mt-2 pt-2 border-t border-border-color/50 space-y-1">
-                    <p className="text-[9px] font-bold text-foreground line-clamp-2 leading-tight">
-                        {veiculo.programacaoDescricao}
-                    </p>
+                    <div className="flex justify-between items-start gap-2">
+                        <p className="text-[9px] font-bold text-foreground line-clamp-2 leading-tight flex-1">
+                            {veiculo.programacaoDescricao}
+                        </p>
+
+                        {/* Quick Action Buttons (Show on Hover) */}
+                        <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-1 group-hover:translate-x-0">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onQuickAction?.('CONCLUIDO'); }}
+                                className="p-1 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded transition-all shadow-sm"
+                                title="Marcar como Concluído"
+                            >
+                                <CheckCircle2 className="w-3 h-3" />
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onQuickAction?.('EM_ANDAMENTO'); }}
+                                className="p-1 bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white rounded transition-all shadow-sm"
+                                title="Iniciar Manutenção"
+                            >
+                                <Loader2 className="w-3 h-3" />
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onQuickAction?.(undefined, true); }}
+                                className="p-1 bg-orange-500/10 text-orange-600 hover:bg-orange-500 hover:text-white rounded transition-all shadow-sm"
+                                title="Adiar para próxima semana"
+                            >
+                                <ChevronRight className="w-3 h-3" />
+                            </button>
+                        </div>
+                    </div>
+
                     <div className="flex items-center justify-between text-[8px] uppercase font-black text-gray-400">
                         <span>{veiculo.programacaoDataInicio ? new Date(veiculo.programacaoDataInicio).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '--/--'}</span>
                         <span className={`

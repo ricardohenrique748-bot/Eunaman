@@ -2,8 +2,10 @@
 
 import React from 'react'
 import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie
+    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie,
+    LineChart, Line, Legend
 } from 'recharts'
+import { X } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Veiculo } from './SemanalClient'
 
@@ -20,140 +22,183 @@ export default function SemanalDashboard({ veiculos, onBack }: SemanalDashboardP
     const completed = veiculos.filter(v => v.semanaPreventiva !== null && v.programacaoStatus === 'CONCLUIDO').length
     const adherence = programmed > 0 ? (completed / programmed) * 100 : 0
 
-    // Week distribution
-    const weekDistribution = [1, 2, 3, 4].map(week => ({
-        name: `Semana ${week}`,
-        count: veiculos.filter(v => v.semanaPreventiva === week).length
-    }))
+    // Acompanhamento de Programação Semanal
+    // Each week represents a meta of 25% (total 100% for the month)
+    const weeklyKPI = [1, 2, 3, 4].map(week => {
+        const weekVehicles = veiculos.filter(v => v.semanaPreventiva === week)
+        const weekCompleted = weekVehicles.filter(v => v.programacaoStatus === 'CONCLUIDO').length
 
-    // Status breakdown for programmed only
-    const statusCounts = {
-        'CONCLUIDO': 0,
-        'EM_ANDAMENTO': 0,
-        'PENDENTE': 0,
-        'CANCELADO': 0
-    }
+        // Calculate realized % within the 25% limit
+        // Formula: (Completed / Total in week) * 25
+        const weekTotal = weekVehicles.length
+        const realizedVal = weekTotal > 0 ? (weekCompleted / weekTotal) * 25 : 0
 
-    veiculos.filter(v => v.semanaPreventiva !== null).forEach(v => {
-        const s = v.programacaoStatus || 'PENDENTE'
-        if (statusCounts[s as keyof typeof statusCounts] !== undefined) {
-            statusCounts[s as keyof typeof statusCounts]++
+        return {
+            name: `S${week}`,
+            meta: 25,
+            realizado: parseFloat(realizedVal.toFixed(2))
         }
     })
 
-    const statusData = [
-        { name: 'Concluído', value: statusCounts.CONCLUIDO, color: '#10b981' }, // Emerald
-        { name: 'Em Andamento', value: statusCounts.EM_ANDAMENTO, color: '#3b82f6' }, // Blue
-        { name: 'Pendente', value: statusCounts.PENDENTE, color: '#f59e0b' }, // Amber
-        { name: 'Cancelado', value: statusCounts.CANCELADO, color: '#ef4444' }, // Red
-    ].filter(i => i.value > 0)
+    // Mock Monthly Data - Reset to zero/null as requested
+    const monthlyResults = [
+        { name: 'Jan', meta: 100, realizado: 0 },
+        { name: 'Fev', meta: 100, realizado: 0 },
+        { name: 'Mar', meta: 100, realizado: 0 },
+        { name: 'Abr', meta: 100, realizado: 0 },
+        { name: 'Mai', meta: 100, realizado: 0 },
+        { name: 'Jun', meta: 100, realizado: 0 },
+        { name: 'Jul', meta: 100, realizado: 0 },
+        { name: 'Ago', meta: 100, realizado: 0 },
+        { name: 'Set', meta: 100, realizado: 0 },
+        { name: 'Out', meta: 100, realizado: 0 },
+        { name: 'Nov', meta: 100, realizado: 0 },
+        { name: 'Dez', meta: 100, realizado: 0 },
+    ]
 
 
     return (
-        <div className="h-full flex flex-col space-y-6">
-            <div className="flex items-center gap-4">
-                {onBack && (
-                    <button
-                        onClick={onBack}
-                        className="px-4 py-2 bg-surface border border-border-color rounded-lg text-xs font-black uppercase tracking-widest hover:bg-surface-highlight transition-colors"
-                    >
-                        Voltar
-                    </button>
-                )}
-                <h2 className="text-xl font-black text-foreground">Dashboard de Aderência Semanal</h2>
+        <div className="h-full flex flex-col space-y-6 bg-gray-50/50 p-6 rounded-[2.5rem] overflow-hidden">
+            {/* Header / Brand Area */}
+            <div className="flex justify-between items-center px-4">
+                <div className="flex items-center gap-6">
+                    {onBack && (
+                        <button
+                            onClick={onBack}
+                            className="p-3 bg-white hover:bg-gray-100 rounded-2xl shadow-sm border border-border-color transition-all active:scale-95"
+                        >
+                            <X className="w-5 h-5 text-gray-500" />
+                        </button>
+                    )}
+                    <div>
+                        <h1 className="text-4xl font-black text-gray-800 tracking-tighter uppercase italic leading-none">KPI DE MANUTENÇÃO</h1>
+                        <div className="h-1.5 w-24 bg-primary rounded-full mt-2" />
+                    </div>
+                </div>
+                <div className="flex gap-4">
+                    <div className="bg-white border border-border-color rounded-2xl px-6 py-3 shadow-sm flex flex-col items-end justify-center">
+                        <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none mb-1">Calendário Operacional</span>
+                        <span className="text-sm font-black text-gray-700">Mês Operacional Junho</span>
+                    </div>
+                </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card className="bg-surface shadow-none border-border-color">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500 uppercase tracking-widest">Total Programado</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-black text-foreground">{programmed} <span className="text-xs text-gray-400 font-normal">veículos</span></div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-surface shadow-none border-border-color">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500 uppercase tracking-widest">Concluídos</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-black text-emerald-500">{completed}</div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-surface shadow-none border-border-color">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500 uppercase tracking-widest">Aderência</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-black text-primary">{Math.round(adherence)}%</div>
-                        <div className="w-full h-1 bg-gray-200 rounded-full mt-2 overflow-hidden">
-                            <div className="h-full bg-primary" style={{ width: `${adherence}%` }}></div>
+            <div className="flex-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+                {/* Top Chart: Resultado Mensal */}
+                <Card className="border-none shadow-xl shadow-gray-200/50 rounded-[2.5rem] overflow-hidden bg-white">
+                    <div className="bg-gray-900 px-8 py-4 flex justify-between items-center">
+                        <h3 className="text-white text-xs font-black uppercase tracking-[0.2em]">Resultado Mensal de Programação Preventiva</h3>
+                        <div className="flex gap-6 items-center">
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full bg-white border-2 border-white" />
+                                <span className="text-[10px] font-black text-white uppercase tracking-wider">Meta 100%</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full bg-red-500" />
+                                <span className="text-[10px] font-black text-white uppercase tracking-wider">Realizado</span>
+                            </div>
                         </div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-surface shadow-none border-border-color">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500 uppercase tracking-widest">Pendente</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-black text-orange-500">{statusCounts.PENDENTE}</div>
-                    </CardContent>
-                </Card>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[400px]">
-                <Card className="bg-surface border-border-color">
-                    <CardHeader>
-                        <CardTitle className="text-sm font-black uppercase tracking-widest">Distribuição por Semana</CardTitle>
-                    </CardHeader>
-                    <CardContent className="h-[320px]">
+                    </div>
+                    <CardContent className="h-[300px] p-8">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={weekDistribution}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.1} />
-                                <XAxis dataKey="name" stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#fff' }}
-                                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                            <LineChart data={monthlyResults} margin={{ top: 20, right: 40, left: 10, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.05} />
+                                <XAxis
+                                    dataKey="name"
+                                    fontSize={11}
+                                    fontWeight="900"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    dy={15}
+                                    tick={{ fill: '#94a3b8' }}
                                 />
-                                <Bar dataKey="count" fill="#ea580c" radius={[4, 4, 0, 0]} barSize={40} />
+                                <YAxis
+                                    domain={[0, 100]}
+                                    fontSize={11}
+                                    fontWeight="900"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tickFormatter={(val) => `${val}%`}
+                                    tick={{ fill: '#94a3b8' }}
+                                />
+                                <Tooltip
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', padding: '12px' }}
+                                    itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
+                                />
+                                <Line
+                                    name="Meta"
+                                    type="monotone"
+                                    dataKey="meta"
+                                    stroke="#1e293b"
+                                    strokeWidth={4}
+                                    dot={{ fill: '#1e293b', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                                    activeDot={{ r: 8 }}
+                                />
+                                <Line
+                                    name="Realizado"
+                                    type="monotone"
+                                    dataKey="realizado"
+                                    stroke="#ef4444"
+                                    strokeWidth={4}
+                                    dot={{ fill: '#ef4444', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                                    activeDot={{ r: 8 }}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
+
+                {/* Bottom Chart: Acompanhamento Semanal */}
+                <Card className="border-none shadow-xl shadow-gray-200/50 rounded-[2.5rem] overflow-hidden bg-white">
+                    <div className="bg-gray-100 px-8 py-4 flex justify-between items-center">
+                        <h3 className="text-gray-600 text-xs font-black uppercase tracking-[0.2em]">Acompanhamento de Programação Semanal</h3>
+                        <div className="flex gap-6 items-center">
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-lg bg-[#064e3b]" />
+                                <span className="text-[10px] font-black text-gray-600 uppercase tracking-wider">Meta (25%)</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-lg bg-[#2563eb]" />
+                                <span className="text-[10px] font-black text-gray-600 uppercase tracking-wider">Semanal</span>
+                            </div>
+                        </div>
+                    </div>
+                    <CardContent className="h-[320px] p-8">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={weeklyKPI} barGap={20}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.05} />
+                                <XAxis
+                                    dataKey="name"
+                                    fontSize={12}
+                                    fontWeight="900"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    dy={10}
+                                    tick={{ fill: '#64748b' }}
+                                />
+                                <YAxis domain={[0, 30]} hide />
+                                <Tooltip
+                                    cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
+                                />
+                                <Bar
+                                    name="META"
+                                    dataKey="meta"
+                                    fill="#064e3b"
+                                    radius={[8, 8, 0, 0]}
+                                    barSize={70}
+                                    label={{ position: 'top', fontSize: 12, fill: '#064e3b', fontWeight: '900', formatter: (v: any) => `${v.toFixed(2)}%`, offset: 10 }}
+                                />
+                                <Bar
+                                    name="SEMANAL"
+                                    dataKey="realizado"
+                                    fill="#2563eb"
+                                    radius={[8, 8, 0, 0]}
+                                    barSize={70}
+                                    label={{ position: 'top', fontSize: 12, fill: '#2563eb', fontWeight: '900', formatter: (v: any) => `${v.toFixed(2)}%`, offset: 10 }}
+                                />
                             </BarChart>
                         </ResponsiveContainer>
-                    </CardContent>
-                </Card>
-
-                <Card className="bg-surface border-border-color">
-                    <CardHeader>
-                        <CardTitle className="text-sm font-black uppercase tracking-widest">Status da Programação</CardTitle>
-                    </CardHeader>
-                    <CardContent className="h-[320px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={statusData}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={100}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                >
-                                    {statusData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                            </PieChart>
-                        </ResponsiveContainer>
-                        <div className="flex justify-center gap-4 mt-[-20px]">
-                            {statusData.map(s => (
-                                <div key={s.name} className="flex items-center gap-1">
-                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
-                                    <span className="text-[10px] font-bold text-gray-500 uppercase">{s.name}</span>
-                                </div>
-                            ))}
-                        </div>
                     </CardContent>
                 </Card>
             </div>
