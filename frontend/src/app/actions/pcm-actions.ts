@@ -14,7 +14,7 @@ export async function getOrdensServico(filters: { status?: string, q?: string, t
         const where: any = {}
 
         // Restricted to unit if not admin
-        if (session.perfil !== 'ADMIN') {
+        if (session.perfil !== 'ADMIN' && session.perfil !== 'GESTOR' && session.perfil !== 'PCM') {
             where.veiculo = { unidadeId: session.unidadeId }
         }
 
@@ -255,7 +255,7 @@ export async function getVeiculosSemanal(filters?: { startDate?: string, endDate
         console.error("Raw query failed, falling back to basic findMany (missing new field)", e)
         // Fallback: use normal prisma client but without the new field, so the page at least loads
         const where: any = { status: { not: 'DESATIVADO' } }
-        if (session.perfil !== 'ADMIN' && session.perfil !== 'PCM') {
+        if (session.perfil !== 'ADMIN' && session.perfil !== 'PCM' && session.perfil !== 'GESTOR') {
             where.unidadeId = session.unidadeId
         }
 
@@ -414,7 +414,7 @@ export async function getWeekDates() {
 export async function updateWeekDates(dates: Record<number, { start: string, end: string }>) {
     try {
         const session = await getSession()
-        if (!session || (session.perfil !== 'ADMIN' && session.perfil !== 'PCM')) {
+        if (!session || (session.perfil !== 'ADMIN' && session.perfil !== 'PCM' && session.perfil !== 'GESTOR')) {
             return { success: false, error: 'Sem permissão' }
         }
 
