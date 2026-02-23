@@ -40,13 +40,13 @@ export default function OsRowActions({ osId, osNumero }: OsRowActionsProps) {
             >
                 <Printer className="w-4 h-4" />
             </Link>
-            <button
-                onClick={() => alert('Edição em desenvolvimento...')}
+            <Link
+                href={`/dashboard/pcm/os/editar/${osId}`}
                 title="Editar O.S."
                 className="w-8 h-8 rounded-xl bg-surface-highlight hover:bg-emerald-500/10 text-gray-400 hover:text-emerald-500 transition-all flex items-center justify-center"
             >
                 <Pencil className="w-4 h-4" />
-            </button>
+            </Link>
             <button
                 onClick={handleDelete}
                 disabled={isDeleting}

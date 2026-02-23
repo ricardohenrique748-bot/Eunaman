@@ -53,6 +53,27 @@ export async function getOrdensServico(filters: { status?: string, q?: string, t
     }
 }
 
+export async function getOrdemServicoById(id: string) {
+    try {
+        const session = await getSession()
+        if (!session) return { success: false, error: 'Não autenticado' }
+
+        const os = await prisma.ordemServico.findUnique({
+            where: { id },
+            include: {
+                veiculo: true
+            }
+        })
+
+        if (!os) return { success: false, error: 'OS não encontrada' }
+
+        return { success: true, data: os }
+    } catch (error: any) {
+        console.error('[PCM] Error fetching OS by ID:', error)
+        return { success: false, error: 'Falha ao carregar OS' }
+    }
+}
+
 export async function createOrdemServico(formData: FormData) {
     const veiculoId = formData.get('veiculoId') as string
     const tipoOS = formData.get('tipoOS') as TipoOS
@@ -107,6 +128,63 @@ export async function createOrdemServico(formData: FormData) {
     } catch (error: any) {
         console.error('[PCM Action] Erro ao criar OS:', error)
         return { success: false, error: `Falha ao registrar O.S.: ${error.message}` }
+    }
+}
+
+export async function updateOrdemServico(id: string, formData: FormData) {
+    const veiculoId = formData.get('veiculoId') as string
+    const tipoOS = formData.get('tipoOS') as TipoOS
+    const descricao = formData.get('descricao') as string
+    const status = (formData.get('status') as any)
+    const dataAberturaStr = formData.get('dataAbertura') as string
+    const dataConclusaoStr = formData.get('dataConclusao') as string | null
+
+    const horimetro = Number(formData.get('horimetro')) || null
+    const motivoId = formData.get('motivoId') as string || null
+    const sistemaId = formData.get('sistemaId') as string || null
+    const subSistemaId = formData.get('subSistemaId') as string || null
+
+    if (!veiculoId || !descricao) {
+        return { success: false, error: 'O veículo e a descrição são obrigatórios.' }
+    }
+
+    try {
+        const dataAbertura = dataAberturaStr ? new Date(dataAberturaStr) : new Date()
+        let dataConclusao = null;
+
+        if (status === 'FECHADA' && dataConclusaoStr) {
+            dataConclusao = new Date(dataConclusaoStr);
+        }
+
+        // Sync horimetro if provided
+        if (horimetro) {
+            await prisma.veiculo.update({
+                where: { id: veiculoId },
+                data: { horimetroAtual: horimetro }
+            })
+        }
+
+        const os = await prisma.ordemServico.update({
+            where: { id },
+            data: {
+                veiculoId,
+                tipoOS,
+                status: status === 'FECHADA' ? 'CONCLUIDA' : (status as any),
+                descricao,
+                dataAbertura,
+                dataConclusao,
+                motivoId,
+                sistemaId,
+                subSistemaId
+            }
+        })
+
+        revalidatePath('/dashboard/pcm/os')
+        revalidatePath('/dashboard')
+        return { success: true, osId: os.id }
+    } catch (error: any) {
+        console.error('[PCM Action] Erro ao atualizar OS:', error)
+        return { success: false, error: `Falha ao atualizar O.S.: ${error.message}` }
     }
 }
 
