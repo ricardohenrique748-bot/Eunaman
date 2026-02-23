@@ -396,42 +396,44 @@ export async function updateAllVehiclesToPesado() {
         console.error('Error updating all vehicles:', error)
         return { success: false, error: error.message }
     }
-    export async function getWeekDates() {
-        try {
-            const param = await prisma.systemParameters.findUnique({
-                where: { key: 'PROGRAMACAO_SEMANAL_DATAS' }
-            })
-            if (!param) return null
-            return JSON.parse(param.value) as Record<number, { start: string, end: string }>
-        } catch (error) {
-            console.error('Error fetching week dates:', error)
-            return null
-        }
-    }
+}
 
-    export async function updateWeekDates(dates: Record<number, { start: string, end: string }>) {
-        try {
-            const session = await getSession()
-            if (!session || (session.perfil !== 'ADMIN' && session.perfil !== 'PCM')) {
-                return { success: false, error: 'Sem permissão' }
+export async function getWeekDates() {
+    try {
+        const param = await prisma.systemParameters.findUnique({
+            where: { key: 'PROGRAMACAO_SEMANAL_DATAS' }
+        })
+        if (!param) return null
+        return JSON.parse(param.value) as Record<number, { start: string, end: string }>
+    } catch (error) {
+        console.error('Error fetching week dates:', error)
+        return null
+    }
+}
+
+export async function updateWeekDates(dates: Record<number, { start: string, end: string }>) {
+    try {
+        const session = await getSession()
+        if (!session || (session.perfil !== 'ADMIN' && session.perfil !== 'PCM')) {
+            return { success: false, error: 'Sem permissão' }
+        }
+
+        await prisma.systemParameters.upsert({
+            where: { key: 'PROGRAMACAO_SEMANAL_DATAS' },
+            update: { value: JSON.stringify(dates) },
+            create: {
+                key: 'PROGRAMACAO_SEMANAL_DATAS',
+                value: JSON.stringify(dates),
+                group: 'PCM',
+                description: 'Datas de início e fim das 4 semanas da programação semanal'
             }
+        })
 
-            await prisma.systemParameters.upsert({
-                where: { key: 'PROGRAMACAO_SEMANAL_DATAS' },
-                update: { value: JSON.stringify(dates) },
-                create: {
-                    key: 'PROGRAMACAO_SEMANAL_DATAS',
-                    value: JSON.stringify(dates),
-                    group: 'PCM',
-                    description: 'Datas de início e fim das 4 semanas da programação semanal'
-                }
-            })
-
-            revalidatePath('/dashboard/pcm/semanal')
-            revalidatePath('/share/pcm/semanal')
-            return { success: true }
-        } catch (error) {
-            console.error('Error updating week dates:', error)
-            return { success: false, error: 'Falha ao salvar datas' }
-        }
+        revalidatePath('/dashboard/pcm/semanal')
+        revalidatePath('/share/pcm/semanal')
+        return { success: true }
+    } catch (error) {
+        console.error('Error updating week dates:', error)
+        return { success: false, error: 'Falha ao salvar datas' }
     }
+}
