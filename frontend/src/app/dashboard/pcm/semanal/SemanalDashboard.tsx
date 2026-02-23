@@ -11,11 +11,17 @@ import { Veiculo } from './SemanalClient'
 
 interface SemanalDashboardProps {
     veiculos: Veiculo[]
+    startDate: string
+    endDate: string
     onBack?: () => void
 }
 
-export default function SemanalDashboard({ veiculos, onBack }: SemanalDashboardProps) {
+export default function SemanalDashboard({ veiculos, startDate, endDate, onBack }: SemanalDashboardProps) {
     const totalVehicles = veiculos.filter(v => v.status !== 'DESATIVADO').length
+
+    // Calculate Dynamic Month Name from startDate
+    const monthName = new Date(startDate + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'long' })
+    const operationalMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1)
 
     // Calculate adherence for planned vs executed
     const programmed = veiculos.filter(v => v.semanaPreventiva !== null).length
@@ -78,7 +84,7 @@ export default function SemanalDashboard({ veiculos, onBack }: SemanalDashboardP
                 <div className="flex gap-4">
                     <div className="bg-white border border-border-color rounded-2xl px-6 py-3 shadow-sm flex flex-col items-end justify-center">
                         <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none mb-1">Calendário Operacional</span>
-                        <span className="text-sm font-black text-gray-700">Mês Operacional Junho</span>
+                        <span className="text-sm font-black text-gray-700">Mês Operacional {operationalMonth}</span>
                     </div>
                 </div>
             </div>

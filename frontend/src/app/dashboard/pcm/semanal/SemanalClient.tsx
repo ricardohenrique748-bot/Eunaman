@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { updateSemanaPreventiva, getVeiculosSemanal } from '@/app/actions/pcm-actions'
-import { Truck, AlertCircle, CalendarClock, ChevronRight, GripVertical, CheckCircle2, X, LayoutDashboard, Share2, Loader2, RefreshCw } from 'lucide-react'
+import { updateSemanaPreventiva, getVeiculosSemanal, getWeekDates, updateWeekDates } from '@/app/actions/pcm-actions'
+import { Truck, AlertCircle, CalendarClock, ChevronRight, GripVertical, CheckCircle2, X, LayoutDashboard, Share2, Loader2, RefreshCw, Save } from 'lucide-react'
 import SemanalDashboard from './SemanalDashboard'
 
 // --- Types ---
@@ -85,6 +85,34 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
         }
         return dates
     })
+    const [isSavingDates, setIsSavingDates] = useState(false)
+
+    // Load persisted dates on mount
+    useEffect(() => {
+        const loadDates = async () => {
+            const saved = await getWeekDates()
+            if (saved) {
+                setWeekDates(saved)
+            }
+        }
+        loadDates()
+    }, [])
+
+    const handleSaveWeekDates = async () => {
+        setIsSavingDates(true)
+        try {
+            const res = await updateWeekDates(weekDates)
+            if (res.success) {
+                alert("Ciclo de datas salvo com sucesso!")
+            } else {
+                alert(res.error || "Erro ao salvar datas")
+            }
+        } catch (e) {
+            alert("Erro ao conectar com o servidor")
+        } finally {
+            setIsSavingDates(false)
+        }
+    }
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -252,7 +280,7 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
     ]
 
     if (view === 'DASHBOARD') {
-        return <SemanalDashboard veiculos={veiculos} onBack={() => setView('BOARD')} />
+        return <SemanalDashboard veiculos={veiculos} startDate={startDate} endDate={endDate} onBack={() => setView('BOARD')} />
     }
 
     return (
@@ -299,6 +327,16 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
                             {isFetching ? <Loader2 className="w-4 h-4" /> : <RefreshCw className="w-4 h-4" />}
                         </button>
                     </div>
+
+                    <button
+                        onClick={handleSaveWeekDates}
+                        disabled={isSavingDates}
+                        className={`flex items-center gap-2 px-3 py-2 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-colors ${isSavingDates ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        title="Salvar Datas das Semanas"
+                    >
+                        {isSavingDates ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        Salvar Ciclo
+                    </button>
 
                     <button
                         onClick={() => setView('DASHBOARD')}
@@ -432,7 +470,7 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
                                     onQuickAction={(status, moveNext) => {
                                         const currentDetails: ProgrammingDetails = {
                                             status: status || veiculo.programacaoStatus || 'PENDENTE',
-                                            progresso: status === 'CONCLUIDO' ? 100 : (status === 'EM_ANDAMENTO' ? 50 : (veiculo.programacaoProgresso || 0)),
+                                            progresso: status === 'CONCLUIDO' ? 100 : (status === 'EM_ANDAMENTO' ? 50 : (status === 'PENDENTE' ? 0 : (veiculo.programacaoProgresso || 0))),
                                             modulo: veiculo.programacaoModulo || veiculo.moduloSistema || '',
                                             descricao: veiculo.programacaoDescricao || '',
                                             dataInicio: veiculo.programacaoDataInicio ? new Date(veiculo.programacaoDataInicio).toISOString().split('T')[0] : '',
@@ -616,47 +654,58 @@ function VehicleCard({
                         <p className="text-[9px] font-bold text-foreground line-clamp-2 leading-tight flex-1">
                             {veiculo.programacaoDescricao}
                         </p>
+                    </div>
 
-                        {/* Quick Action Buttons (Show on Hover) */}
-                        <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-1 group-hover:translate-x-0">
+                    <div className="flex items-center justify-between mt-1">
+                        <div className="flex items-center gap-1.5 text-[8px] uppercase font-black text-gray-400">
+                            <span>{veiculo.programacaoDataInicio ? new Date(veiculo.programacaoDataInicio).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '--/--'}</span>
+                            <span className={`
+                                px-1.5 py-0.5 rounded-md
+                                ${veiculo.programacaoStatus === 'CONCLUIDO' ? 'bg-emerald-500/10 text-emerald-500' :
+                                    veiculo.programacaoStatus === 'EM_ANDAMENTO' ? 'bg-blue-500/10 text-blue-600' :
+                                        veiculo.programacaoStatus === 'PENDENTE' ? 'bg-amber-500/10 text-amber-600' : 'bg-gray-500/10 text-gray-500'}
+                            `}>
+                                {veiculo.programacaoStatus}
+                            </span>
+                        </div>
+
+                        {/* Redesigned Quick Action Buttons (Horizontal & Elevated) */}
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0">
                             <button
                                 onClick={(e) => { e.stopPropagation(); onQuickAction?.('CONCLUIDO'); }}
-                                className="p-1 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded transition-all shadow-sm"
-                                title="Marcar como Concluído"
+                                className="p-1 px-1.5 bg-white dark:bg-gray-800 text-emerald-500 hover:bg-emerald-500 hover:text-white rounded-lg transition-all shadow-md active:scale-90 border border-emerald-500/20"
+                                title="Finalizar"
                             >
                                 <CheckCircle2 className="w-3 h-3" />
                             </button>
                             <button
                                 onClick={(e) => { e.stopPropagation(); onQuickAction?.('EM_ANDAMENTO'); }}
-                                className="p-1 bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white rounded transition-all shadow-sm"
-                                title="Iniciar Manutenção"
+                                className="p-1 px-1.5 bg-white dark:bg-gray-800 text-blue-500 hover:bg-blue-500 hover:text-white rounded-lg transition-all shadow-md active:scale-90 border border-blue-500/20"
+                                title="Iniciar"
                             >
                                 <Loader2 className="w-3 h-3" />
                             </button>
                             <button
+                                onClick={(e) => { e.stopPropagation(); onQuickAction?.('PENDENTE'); }}
+                                className="p-1 px-1.5 bg-white dark:bg-gray-800 text-amber-500 hover:bg-amber-500 hover:text-white rounded-lg transition-all shadow-md active:scale-90 border border-amber-500/20"
+                                title="Resetar Status"
+                            >
+                                <CalendarClock className="w-3 h-3" />
+                            </button>
+                            <button
                                 onClick={(e) => { e.stopPropagation(); onQuickAction?.(undefined, true); }}
-                                className="p-1 bg-orange-500/10 text-orange-600 hover:bg-orange-500 hover:text-white rounded transition-all shadow-sm"
-                                title="Adiar para próxima semana"
+                                className="p-1 px-1.5 bg-white dark:bg-gray-800 text-orange-500 hover:bg-orange-600 hover:text-white rounded-lg transition-all shadow-md active:scale-90 border border-orange-500/20"
+                                title="Adiar"
                             >
                                 <ChevronRight className="w-3 h-3" />
                             </button>
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-[8px] uppercase font-black text-gray-400">
-                        <span>{veiculo.programacaoDataInicio ? new Date(veiculo.programacaoDataInicio).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '--/--'}</span>
-                        <span className={`
-                             px-1.5 py-0.5 rounded
-                             ${veiculo.programacaoStatus === 'CONCLUIDO' ? 'bg-emerald-500/10 text-emerald-500' :
-                                veiculo.programacaoStatus === 'EM_ANDAMENTO' ? 'bg-blue-500/10 text-blue-500' : 'bg-gray-500/10 text-gray-500'}
-                         `}>
-                            {veiculo.programacaoStatus?.substring(0, 3)}
-                        </span>
-                    </div>
                     {veiculo.programacaoProgresso !== undefined && veiculo.programacaoProgresso > 0 && (
-                        <div className="w-full h-1 bg-gray-200 dark:bg-gray-700/50 rounded-full overflow-hidden mt-1">
+                        <div className="w-full h-1 bg-gray-200 dark:bg-gray-700/50 rounded-full overflow-hidden mt-2">
                             <div
-                                className="h-full bg-primary"
+                                className={`h-full transition-all duration-1000 ${veiculo.programacaoStatus === 'CONCLUIDO' ? 'bg-emerald-500' : 'bg-primary animate-pulse'}`}
                                 style={{ width: `${veiculo.programacaoProgresso}%` }}
                             />
                         </div>
