@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Wrench, Search, Filter, ArrowUpDown, Clock, AlertTriangle, CheckCircle2, Truck } from 'lucide-react'
-import Link from 'next/link'
+import { Wrench, Search, Filter, ArrowUpDown, Truck } from 'lucide-react'
 import PreventivaActions from './PreventivaActions'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 interface Plano {
     id: string
@@ -12,12 +13,15 @@ interface Plano {
     ultimoHorimetro: number
     intervalo: number
     status: string
+    dataAtualizacao: string | Date
     veiculo: {
         placa: string | null
         modelo: string
         codigoInterno: string
         horimetroAtual: number
         tipoVeiculo: string
+        categoria: string | null
+        moduloSistema: string | null
     }
 }
 
@@ -29,7 +33,7 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
     const [searchTerm, setSearchTerm] = useState('')
     const [typeFilter, setTypeFilter] = useState('TODOS')
     const [vehicleTypeFilter, setVehicleTypeFilter] = useState('TODOS')
-    const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc') // desc = maior para menor (urgência)
+    const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc')
 
     // Get unique maintenance types
     const maintenanceTypes = useMemo(() => {
@@ -39,9 +43,8 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
 
     const filteredAndSortedPlanos = useMemo(() => {
         let result = initialPlanos.filter(plano => {
-            const matchesSearch = (plano.veiculo.placa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                plano.veiculo.codigoInterno.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                plano.veiculo.modelo.toLowerCase().includes(searchTerm.toLowerCase()))
+            const searchStr = `${plano.veiculo.placa || ''} ${plano.veiculo.codigoInterno} ${plano.veiculo.modelo} ${plano.veiculo.tipoVeiculo}`.toLowerCase()
+            const matchesSearch = searchStr.includes(searchTerm.toLowerCase())
 
             const matchesType = typeFilter === 'TODOS' || plano.tipo === typeFilter
             const matchesVehicleType = vehicleTypeFilter === 'TODOS' || plano.veiculo.tipoVeiculo === vehicleTypeFilter
@@ -49,12 +52,12 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
             return matchesSearch && matchesType && matchesVehicleType
         })
 
-        // Sort by percentual (urgency)
+        // Sort by 'Falta' (urgency)
         result.sort((a, b) => {
-            const percA = ((a.veiculo.horimetroAtual - a.ultimoHorimetro) / a.intervalo) * 100
-            const percB = ((b.veiculo.horimetroAtual - b.ultimoHorimetro) / b.intervalo) * 100
+            const faltaA = (a.ultimoHorimetro + a.intervalo) - a.veiculo.horimetroAtual
+            const faltaB = (b.ultimoHorimetro + b.intervalo) - b.veiculo.horimetroAtual
 
-            return sortOrder === 'desc' ? percB - percA : percA - percB
+            return sortOrder === 'desc' ? faltaA - faltaB : faltaB - faltaA
         })
 
         return result
@@ -63,164 +66,182 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
     return (
         <div className="space-y-6">
             {/* Filters Bar */}
-            <div className="flex flex-col md:flex-row gap-4 bg-surface border border-border-color p-4 rounded-2xl shadow-sm">
+            <div className="flex flex-col md:flex-row gap-4 bg-white dark:bg-gray-900 border border-border-color p-4 rounded-2xl shadow-sm">
                 <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 font-bold" />
                     <input
                         type="text"
-                        placeholder="Buscar placa, código ou modelo..."
+                        placeholder="BUSCAR PLACA, CÓDIGO OU MODELO..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-surface-highlight border border-border-color rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-primary transition-all font-bold"
+                        className="w-full bg-surface-highlight border border-border-color rounded-xl py-2.5 pl-10 pr-4 text-xs focus:outline-none focus:border-primary transition-all font-black uppercase tracking-widest"
                     />
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                    <div className="flex items-center gap-2 bg-surface-highlight border border-border-color rounded-xl px-3 py-1">
+                    <div className="flex items-center gap-2 bg-surface-highlight border border-border-color rounded-xl px-4 py-2">
                         <Filter className="w-4 h-4 text-gray-400" />
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-r border-border-color pr-2 mr-1">Tipo Plano</span>
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-r border-border-color pr-3 mr-1">TIPO PLANO</span>
                         <select
                             value={typeFilter}
                             onChange={(e) => setTypeFilter(e.target.value)}
-                            className="bg-transparent text-xs font-black uppercase tracking-widest outline-none cursor-pointer pr-2"
+                            className="bg-transparent text-xs font-black uppercase tracking-widest outline-none cursor-pointer pr-2 text-foreground"
                         >
                             {maintenanceTypes.map(cat => (
-                                <option key={cat} value={cat} className="bg-surface text-foreground">{cat}</option>
+                                <option key={cat} value={cat} className="bg-white dark:bg-gray-800">{cat}</option>
                             ))}
                         </select>
                     </div>
 
-                    <div className="flex items-center gap-2 bg-surface-highlight border border-border-color rounded-xl px-3 py-1">
+                    <div className="flex items-center gap-2 bg-surface-highlight border border-border-color rounded-xl px-4 py-2">
                         <Truck className="w-4 h-4 text-gray-400" />
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-r border-border-color pr-2 mr-1">Frota</span>
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-r border-border-color pr-3 mr-1">FROTA</span>
                         <select
                             value={vehicleTypeFilter}
                             onChange={(e) => setVehicleTypeFilter(e.target.value)}
-                            className="bg-transparent text-xs font-black uppercase tracking-widest outline-none cursor-pointer pr-2"
+                            className="bg-transparent text-xs font-black uppercase tracking-widest outline-none cursor-pointer pr-2 text-foreground"
                         >
-                            <option value="TODOS" className="bg-surface">TODOS</option>
-                            <option value="LEVE" className="bg-surface">LEVE</option>
-                            <option value="PESADO" className="bg-surface">PESADO</option>
+                            <option value="TODOS" className="bg-white dark:bg-gray-800">TODOS</option>
+                            <option value="LEVE" className="bg-white dark:bg-gray-800">LEVE</option>
+                            <option value="PESADO" className="bg-white dark:bg-gray-800">PESADO</option>
                         </select>
                     </div>
 
                     <button
                         onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
-                        className="flex items-center gap-2 bg-surface-highlight border border-border-color rounded-xl px-4 py-2 hover:bg-surface transition-all text-xs font-black uppercase tracking-widest text-gray-600 active:scale-95 shadow-sm"
+                        className="flex items-center gap-2 bg-surface-highlight border border-border-color rounded-xl px-5 py-2.5 hover:bg-white dark:hover:bg-gray-800 transition-all text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-300 active:scale-95 shadow-sm border border-border-color"
                     >
                         <ArrowUpDown className="w-4 h-4 text-primary" />
-                        Urgência: {sortOrder === 'desc' ? 'Maior p/ Menor' : 'Menor p/ Maior'}
+                        URGÊNCIA: {sortOrder === 'desc' ? 'MAIOR P/ MENOR' : 'MENOR P/ MAIOR'}
                     </button>
                 </div>
             </div>
 
-            {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
-                {filteredAndSortedPlanos.length === 0 ? (
-                    <div className="col-span-full dashboard-card h-[40vh] flex items-center justify-center flex-col text-center p-8 bg-surface/30">
-                        <div className="p-6 bg-surface-highlight rounded-full mb-6 shadow-inner">
-                            <Wrench className="w-12 h-12 text-gray-600 opacity-20" />
-                        </div>
-                        <h2 className="text-xl font-black text-foreground mb-2">Nenhum plano encontrado</h2>
-                        <p className="text-sm text-gray-500 max-w-xs">Tente ajustar seus filtros ou busca.</p>
-                    </div>
-                ) : (
-                    filteredAndSortedPlanos.map((plano) => {
-                        const horimetroAtual = plano.veiculo.horimetroAtual
-                        const proximaRevisao = plano.ultimoHorimetro + plano.intervalo
-                        const horasRestantes = proximaRevisao - horimetroAtual
-                        const percentualRaw = ((horimetroAtual - plano.ultimoHorimetro) / plano.intervalo) * 100
-                        const percentual = Math.min(100, Math.max(0, percentualRaw))
+            {/* List View (Table) */}
+            <div className="bg-white dark:bg-gray-900 border border-border-color rounded-2xl shadow-sm overflow-hidden border border-border-color">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-border-color">
+                                <th className="px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Placa</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Tipo</th>
+                                <th className="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Categoria</th>
+                                <th className="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Módulo</th>
+                                <th className="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Último</th>
+                                <th className="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Atual</th>
+                                <th className="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Próxima</th>
+                                <th className="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Falta</th>
+                                <th className="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Última Atualização</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border-color">
+                            {filteredAndSortedPlanos.length === 0 ? (
+                                <tr>
+                                    <td colSpan={11} className="px-6 py-12 text-center text-gray-500">
+                                        <div className="flex flex-col items-center gap-3">
+                                            <Wrench className="w-8 h-8 opacity-20" />
+                                            <span className="text-sm font-black uppercase tracking-widest">Nenhum plano encontrado</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                filteredAndSortedPlanos.map((plano) => {
+                                    const horimetroAtual = plano.veiculo.horimetroAtual
+                                    const proximaRevisao = plano.ultimoHorimetro + plano.intervalo
+                                    const falta = proximaRevisao - horimetroAtual
 
-                        let statusColor = 'text-emerald-500'
-                        let statusBg = 'bg-emerald-500/10'
-                        let barColor = 'bg-emerald-500'
-                        let statusText = 'No Prazo'
+                                    const isAtrasado = plano.status === 'ATRASADO' || falta < 0
+                                    const isAtencao = plano.status === 'ATENCAO' || (falta < 50 && falta >= 0)
 
-                        if (plano.status === 'ATRASADO' || horasRestantes < 0) {
-                            statusColor = 'text-red-500'
-                            statusBg = 'bg-red-500/10'
-                            barColor = 'bg-red-500'
-                            statusText = 'Atrasado'
-                        } else if (plano.status === 'ATENCAO' || horasRestantes < 50) {
-                            statusColor = 'text-yellow-500'
-                            statusBg = 'bg-yellow-500/10'
-                            barColor = 'bg-yellow-500'
-                            statusText = 'Atenção'
-                        }
+                                    let statusColor = 'text-emerald-500'
+                                    let statusBg = 'bg-emerald-500/10'
+                                    let statusText = 'NO PRAZO'
 
-                        return (
-                            <div key={plano.id} className="dashboard-card p-6 group hover:translate-y-[-4px] hover:border-primary/40 transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[320px]">
-                                {/* Subtle Background Gradient Icon */}
-                                <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
-                                    <Wrench className="w-32 h-32 rotate-[-15deg] stroke-[3px]" />
-                                </div>
+                                    if (isAtrasado) {
+                                        statusColor = 'text-red-500'
+                                        statusBg = 'bg-red-500/10'
+                                        statusText = 'ATRASADO'
+                                    } else if (isAtencao) {
+                                        statusColor = 'text-amber-500'
+                                        statusBg = 'bg-amber-500/10'
+                                        statusText = 'ATENÇÃO'
+                                    }
 
-                                <div className="relative z-10 font-bold uppercase tracking-widest">
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-2xl bg-surface-highlight border border-border-color flex flex-col items-center justify-center shadow-inner group-hover:border-primary/30 transition-colors">
-                                                <span className="text-[10px] font-black text-gray-500">OS</span>
-                                                <span className="text-sm font-black text-foreground leading-none">PV</span>
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center gap-2 mb-0.5">
-                                                    <h3 className="text-lg font-black text-foreground tracking-tight">{plano.veiculo.placa || plano.veiculo.codigoInterno}</h3>
-                                                    <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-lg border border-current/10 ${statusBg} ${statusColor}`}>
-                                                        {statusText}
-                                                    </span>
+                                    const unidade = 'h' // Use 'h' or 'km' based on logic if needed
+
+                                    return (
+                                        <tr key={plano.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm font-black text-gray-700 dark:text-gray-200 uppercase tracking-tight">
+                                                    {plano.veiculo.placa || plano.veiculo.codigoInterno}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                    {plano.veiculo.modelo}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-4">
+                                                <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">
+                                                    {plano.veiculo.tipoVeiculo}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-4">
+                                                <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                                                    {plano.veiculo.moduloSistema || plano.modulo || '-'}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-4">
+                                                <span className="text-xs font-bold text-gray-600 dark:text-gray-300 tracking-tight">
+                                                    {plano.ultimoHorimetro}{unidade}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-4">
+                                                <span className="text-xs font-bold text-gray-600 dark:text-gray-300 tracking-tight">
+                                                    {horimetroAtual}{unidade}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-4">
+                                                <span className="text-xs font-bold text-gray-600 dark:text-gray-300 tracking-tight">
+                                                    {proximaRevisao}{unidade}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-4">
+                                                <span className={`text-xs font-black tracking-tight ${falta < 0 ? 'text-red-500' : 'text-gray-700 dark:text-gray-200'}`}>
+                                                    {falta}{unidade}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-4 text-xs font-bold text-gray-500">
+                                                {plano.dataAtualizacao ? format(new Date(plano.dataAtualizacao), 'dd/MM/yyyy', { locale: ptBR }) : '-'}
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className={`inline-block text-[9px] font-black px-3 py-1 rounded-lg border border-current/20 ${statusBg} ${statusColor} tracking-widest shadow-sm`}>
+                                                    {statusText}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-1 group-hover:translate-x-0">
+                                                    <PreventivaActions id={plano.id} />
                                                 </div>
-                                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{plano.veiculo.modelo}</p>
-                                            </div>
-                                        </div>
-                                        <PreventivaActions id={plano.id} />
-                                    </div>
+                                            </td>
+                                        </tr>
+                                    )
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                                    <div className="space-y-4 mb-8">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="bg-surface-highlight/40 p-3 rounded-xl border border-border-color/50">
-                                                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Tipo</p>
-                                                <p className="text-sm font-black text-foreground">{plano.tipo}</p>
-                                            </div>
-                                            <div className="bg-surface-highlight/40 p-3 rounded-xl border border-border-color/50 text-right">
-                                                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Intervalo</p>
-                                                <p className="text-sm font-black text-foreground">{plano.intervalo} h</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-col gap-1.5 p-3 bg-background rounded-xl border border-border-color/50">
-                                            <div className="flex justify-between items-center text-xs font-bold">
-                                                <span className="text-gray-500">Última: {plano.ultimoHorimetro}h</span>
-                                                <span className="text-foreground">Atual: {horimetroAtual}h</span>
-                                            </div>
-                                            <div className="h-2 w-full bg-surface-highlight rounded-full overflow-hidden shadow-inner">
-                                                <div
-                                                    className={`h-full rounded-full transition-all duration-700 ease-out ${barColor} shadow-[0_0_10px_rgba(0,0,0,0.2)]`}
-                                                    style={{ width: `${percentual}%` }}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="pt-4 border-t border-border-color/50 flex justify-between items-center relative z-10 mt-auto">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-0.5">Próxima Parada</span>
-                                        <span className={`text-sm font-black ${statusColor} tracking-tight`}>
-                                            {proximaRevisao} h
-                                        </span>
-                                    </div>
-                                    <div className="flex flex-col items-end">
-                                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-0.5">Status</span>
-                                        <span className={`text-xs font-bold ${statusColor} italic`}>
-                                            {horasRestantes < 0 ? `${Math.abs(horasRestantes)}h em atraso` : `${horasRestantes}h restantes`}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    })
-                )}
+            <div className="flex justify-between items-center px-2">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                    Pequenas variações podem ocorrer devido ao atraso na sincronia dos dados
+                </p>
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+                    Total de {filteredAndSortedPlanos.length} planos listados
+                </p>
             </div>
         </div>
     )
