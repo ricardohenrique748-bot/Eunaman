@@ -57,7 +57,7 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
         })
 
         return result
-    }, [initialPlanos, searchTerm, categoryFilter, sortOrder])
+    }, [initialPlanos, searchTerm, typeFilter, vehicleTypeFilter, sortOrder])
 
     return (
         <div className="space-y-6">
