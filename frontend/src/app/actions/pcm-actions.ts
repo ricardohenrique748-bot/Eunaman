@@ -372,3 +372,16 @@ export async function deleteOrdemServico(id: string) {
         return { success: false, error: `Falha ao excluir O.S.: ${error.message}` }
     }
 }
+export async function updateAllVehiclesToPesado() {
+    try {
+        await prisma.veiculo.updateMany({
+            data: { tipoVeiculo: 'PESADO' }
+        })
+        revalidatePath('/dashboard/admin')
+        revalidatePath('/dashboard/pcm/semanal')
+        return { success: true }
+    } catch (error: any) {
+        console.error('Error updating all vehicles:', error)
+        return { success: false, error: error.message }
+    }
+}

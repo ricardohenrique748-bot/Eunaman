@@ -1,7 +1,7 @@
 'use client'
 
 import { updateOrdemServico } from '@/app/actions/pcm-actions'
-import { ArrowLeft, Calendar, Clock, CheckCircle2, List } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, CheckCircle2, List, Search, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -57,6 +57,19 @@ export default function EditarOSForm({ veiculos, osOptions, initialData }: {
     const [descricao, setDescricao] = useState(initialData.descricao)
     const [isSuccess, setIsSuccess] = useState(false)
     const [statusOS, setStatusOS] = useState(initialData.status === 'CONCLUIDA' ? 'FECHADA' : initialData.status)
+
+    // Searchable Vehicle Selection
+    const [searchTerm, setSearchTerm] = useState('')
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const [selectedVeiculo, setSelectedVeiculo] = useState<VeiculoDropdown | undefined>(() =>
+        veiculos.find(v => v.id === initialData.veiculoId)
+    )
+
+    const filteredVeiculos = veiculos.filter(v =>
+        v.codigoInterno.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (v.placa && v.placa.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        v.modelo.toLowerCase().includes(searchTerm.toLowerCase())
+    )
 
     const filteredSubSistemas = osOptions.sistemas.find(s => s.id === selectedSistemaId)?.subSistemas || []
 
@@ -159,19 +172,87 @@ export default function EditarOSForm({ veiculos, osOptions, initialData }: {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="space-y-2">
+                            <div className="space-y-2 relative">
                                 <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Veículo / Placa *</label>
-                                <select
-                                    name="veiculoId"
-                                    required
-                                    defaultValue={initialData.veiculoId}
-                                    className="w-full bg-background border border-border-color rounded-xl px-4 py-3.5 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all appearance-none cursor-pointer"
-                                >
-                                    <option value="">Selecione o Veículo</option>
-                                    {veiculos.map((v) => (
-                                        <option key={v.id} value={v.id}>{v.codigoInterno} - {v.modelo} ({v.placa || 'Interno'})</option>
-                                    ))}
-                                </select>
+                                <div className="relative group">
+                                    <input
+                                        type="hidden"
+                                        name="veiculoId"
+                                        value={selectedVeiculo?.id || ''}
+                                        required
+                                    />
+                                    <div
+                                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                        className="w-full bg-background border border-border-color rounded-xl px-4 py-3.5 text-foreground font-bold flex items-center justify-between cursor-pointer hover:border-primary/50 transition-all shadow-sm"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            {selectedVeiculo ? (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-primary font-black">{selectedVeiculo.codigoInterno}</span>
+                                                    <span className="text-gray-400">|</span>
+                                                    <span>{selectedVeiculo.modelo} ({selectedVeiculo.placa || 'Interno'})</span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-gray-500 font-medium italic">Selecione o Veículo</span>
+                                            )}
+                                        </div>
+                                        <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                                    </div>
+
+                                    {isDropdownOpen && (
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-border-color rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                            <div className="p-3 border-b border-border-color bg-surface-highlight/30 flex items-center gap-3">
+                                                <Search className="w-4 h-4 text-primary shrink-0" />
+                                                <input
+                                                    type="text"
+                                                    autoFocus
+                                                    placeholder="Buscar por placa, código ou modelo..."
+                                                    value={searchTerm}
+                                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                                    className="w-full bg-transparent border-none outline-none text-xs font-bold text-foreground placeholder:text-gray-500"
+                                                />
+                                            </div>
+                                            <div className="max-h-64 overflow-y-auto custom-scrollbar">
+                                                {filteredVeiculos.length > 0 ? (
+                                                    filteredVeiculos.map((v) => (
+                                                        <div
+                                                            key={v.id}
+                                                            onClick={() => {
+                                                                setSelectedVeiculo(v)
+                                                                setIsDropdownOpen(false)
+                                                                setSearchTerm('')
+                                                            }}
+                                                            className={`px-4 py-3 hover:bg-primary/10 cursor-pointer transition-colors flex items-center gap-4 group ${selectedVeiculo?.id === v.id ? 'bg-primary/5' : ''}`}
+                                                        >
+                                                            <div className="w-12 py-1 rounded-lg bg-surface-highlight border border-border-color flex items-center justify-center group-hover:border-primary/40 transition-all bg-gray-500/5">
+                                                                <span className="text-[10px] font-black text-foreground">{v.codigoInterno}</span>
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[11px] font-black text-foreground uppercase">{v.placa || 'INTERNO'}</span>
+                                                                <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">{v.modelo}</span>
+                                                            </div>
+                                                            {selectedVeiculo?.id === v.id && (
+                                                                <div className="ml-auto">
+                                                                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div className="px-4 py-8 text-center text-gray-500 text-xs italic font-medium">
+                                                        Nenhum veículo localizado
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                {isDropdownOpen && (
+                                    <div
+                                        className="fixed inset-0 z-40 bg-transparent"
+                                        onClick={() => setIsDropdownOpen(false)}
+                                    />
+                                )}
                             </div>
 
                             <div className="space-y-2">
