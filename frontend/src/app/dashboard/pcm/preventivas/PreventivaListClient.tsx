@@ -17,6 +17,7 @@ interface Plano {
         modelo: string
         codigoInterno: string
         horimetroAtual: number
+        tipoVeiculo: string
     }
 }
 

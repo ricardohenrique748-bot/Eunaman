@@ -92,7 +92,8 @@ export async function getPlanosManutencao() {
                     placa: true,
                     modelo: true,
                     codigoInterno: true,
-                    horimetroAtual: true
+                    horimetroAtual: true,
+                    tipoVeiculo: true
                 }
             }
         },
