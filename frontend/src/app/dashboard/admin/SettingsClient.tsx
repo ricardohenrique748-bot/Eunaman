@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Building2, Users, Database, Settings, Plus, X, Check, Save, AlertTriangle, Edit, Trash2, FileSpreadsheet, FileText, Search, Filter } from 'lucide-react'
 import { createEmpresa, createUsuario, createUnidade, updateSystemParam, toggleUsuarioStatus, deleteUsuario, deleteVeiculo, deleteEmpresa, deleteUnidade, updateUsuario, updateVeiculo, updateEmpresa, updateUnidade, createOsMotivo, deleteOsMotivo, createOsSistema, deleteOsSistema, createOsSubSistema, deleteOsSubSistema } from '@/app/actions/admin-actions'
 import { importVeiculosExcel } from '@/app/actions/frota-actions'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 interface Veiculo {
@@ -515,6 +516,7 @@ export default function SettingsClient({ veiculos, usuarios, empresas, systemPar
 }
 
 function DatabaseSection({ veiculos, isAdmin, onDelete, onEdit }: { veiculos: Veiculo[], isAdmin: boolean, onDelete: (type: string, id: string) => void, onEdit: (type: 'vehicle', data: Veiculo) => void }) {
+    const router = useRouter()
     const [searchTerm, setSearchTerm] = useState('')
     const [filterMonth, setFilterMonth] = useState<string>('')
     const [filterYear, setFilterYear] = useState<string>('')

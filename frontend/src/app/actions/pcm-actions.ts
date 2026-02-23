@@ -214,11 +214,17 @@ export async function getVeiculosSemanal(filters?: { startDate?: string, endDate
         whereClause += ` AND "unidade_id" = '${session.unidadeId}'`
     }
 
+    let dateFilters = []
     if (filters?.startDate) {
-        whereClause += ` AND "prog_data_inicio" >= '${filters.startDate}'::timestamp`
+        dateFilters.push(`"prog_data_inicio" >= '${filters.startDate}'::timestamp`)
     }
     if (filters?.endDate) {
-        whereClause += ` AND "prog_data_fim" <= '${filters.endDate}'::timestamp`
+        dateFilters.push(`"prog_data_fim" <= '${filters.endDate}'::timestamp`)
+    }
+
+    if (dateFilters.length > 0) {
+        const dateClause = dateFilters.join(' AND ')
+        whereClause += ` AND (${dateClause} OR "semana_preventiva" IS NULL)`
     }
 
     const query = `
@@ -316,11 +322,17 @@ export async function getPublicVeiculosSemanal(unidadeId?: string, filters?: { s
         whereClause += ` AND "unidade_id" = '${unidadeId}'`
     }
 
+    let dateFilters = []
     if (filters?.startDate) {
-        whereClause += ` AND "prog_data_inicio" >= '${filters.startDate}'::timestamp`
+        dateFilters.push(`"prog_data_inicio" >= '${filters.startDate}'::timestamp`)
     }
     if (filters?.endDate) {
-        whereClause += ` AND "prog_data_fim" <= '${filters.endDate}'::timestamp`
+        dateFilters.push(`"prog_data_fim" <= '${filters.endDate}'::timestamp`)
+    }
+
+    if (dateFilters.length > 0) {
+        const dateClause = dateFilters.join(' AND ')
+        whereClause += ` AND (${dateClause} OR "semana_preventiva" IS NULL)`
     }
 
     const query = `

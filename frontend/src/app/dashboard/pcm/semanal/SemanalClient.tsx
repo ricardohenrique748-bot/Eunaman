@@ -60,6 +60,32 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
         return new Date(d.getFullYear(), d.getMonth() + 1, 0).toISOString().split('T')[0]
     })
 
+    // State for dates of each specific week
+    const [weekDates, setWeekDates] = useState<Record<number, { start: string, end: string }>>(() => {
+        const dates: Record<number, { start: string, end: string }> = {}
+        const today = new Date()
+
+        // Helper to get Monday of current week
+        const monday = new Date(today);
+        const day = today.getDay();
+        const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+        monday.setDate(diff);
+
+        for (let i = 1; i <= 4; i++) {
+            const start = new Date(monday);
+            start.setDate(monday.getDate() + (i - 1) * 7);
+
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6);
+
+            dates[i] = {
+                start: start.toISOString().split('T')[0],
+                end: end.toISOString().split('T')[0]
+            }
+        }
+        return dates
+    })
+
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [pendingDrop, setPendingDrop] = useState<{ veiculoId: string, week: number } | null>(null)
@@ -123,13 +149,18 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
         setPendingDrop({ veiculoId, week: targetWeek })
 
         // Pre-fill existing data if available, or defaults
+        const weekInfo = weekDates[targetWeek]
         setDetails({
             status: currentVeiculo?.programacaoStatus || 'PENDENTE',
             progresso: currentVeiculo?.programacaoProgresso || 0,
             modulo: currentVeiculo?.programacaoModulo || currentVeiculo?.moduloSistema || '',
             descricao: currentVeiculo?.programacaoDescricao || '',
-            dataInicio: currentVeiculo?.programacaoDataInicio ? new Date(currentVeiculo.programacaoDataInicio).toISOString().split('T')[0] : '',
-            dataFim: currentVeiculo?.programacaoDataFim ? new Date(currentVeiculo.programacaoDataFim).toISOString().split('T')[0] : ''
+            dataInicio: currentVeiculo?.programacaoDataInicio
+                ? new Date(currentVeiculo.programacaoDataInicio).toISOString().split('T')[0]
+                : (weekInfo?.start || ''),
+            dataFim: currentVeiculo?.programacaoDataFim
+                ? new Date(currentVeiculo.programacaoDataFim).toISOString().split('T')[0]
+                : (weekInfo?.end || '')
         })
 
         setIsModalOpen(true)
@@ -348,12 +379,43 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDrop(e, week.id)}
                     >
-                        <div className={`p-4 border-b border-border-color ${week.bg} sticky top-0 z-10 backdrop-blur-sm`}>
+                        <div className={`p-4 border-b border-border-color ${week.bg} sticky top-0 z-10 backdrop-blur-sm space-y-3`}>
                             <div className="flex justify-between items-center">
                                 <span className="text-xs font-black uppercase tracking-widest text-foreground">{week.label}</span>
                                 <span className="bg-surface text-foreground px-2 py-0.5 rounded-md text-[10px] font-black shadow-sm">
                                     {getColumnVehicles(week.id).length}
                                 </span>
+                            </div>
+
+                            {/* Per-week Date Range Picker */}
+                            <div className="flex flex-col gap-1.5 p-2 bg-white/40 dark:bg-black/10 rounded-xl border border-white/50 dark:border-white/5">
+                                <div className="flex items-center justify-between gap-2">
+                                    <div className="flex flex-col flex-1">
+                                        <span className="text-[8px] font-black uppercase text-gray-400">Início</span>
+                                        <input
+                                            type="date"
+                                            value={weekDates[week.id]?.start || ''}
+                                            onChange={(e) => setWeekDates(prev => ({
+                                                ...prev,
+                                                [week.id]: { ...prev[week.id], start: e.target.value }
+                                            }))}
+                                            className="bg-transparent text-[10px] font-bold text-foreground outline-none border-b border-transparent focus:border-primary transition-all p-0 h-4"
+                                        />
+                                    </div>
+                                    <div className="w-px h-4 bg-gray-300/30 self-end mb-1" />
+                                    <div className="flex flex-col flex-1">
+                                        <span className="text-[8px] font-black uppercase text-gray-400">Fim</span>
+                                        <input
+                                            type="date"
+                                            value={weekDates[week.id]?.end || ''}
+                                            onChange={(e) => setWeekDates(prev => ({
+                                                ...prev,
+                                                [week.id]: { ...prev[week.id], end: e.target.value }
+                                            }))}
+                                            className="bg-transparent text-[10px] font-bold text-foreground outline-none border-b border-transparent focus:border-primary transition-all p-0 h-4"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div className="p-3 flex-1 overflow-y-auto custom-scrollbar space-y-2 relative">

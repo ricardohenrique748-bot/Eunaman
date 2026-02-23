@@ -4,6 +4,7 @@ import { createOrdemServico } from '@/app/actions/pcm-actions'
 import { getBacklogByVehicle } from '@/app/actions/backlog-actions'
 import { ArrowLeft, Calendar, Clock, Loader2, CheckCircle2, Printer, List } from 'lucide-react'
 import Link from 'next/link'
+import { SearchableSelect } from '@/components/ui/SearchableSelect'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -45,6 +46,11 @@ export default function NovaOSForm({ veiculos, osOptions }: {
     const [statusOS, setStatusOS] = useState('ABERTA')
 
     const filteredSubSistemas = osOptions.sistemas.find(s => s.id === selectedSistemaId)?.subSistemas || []
+
+    const veiculoOptions = veiculos.map(v => ({
+        value: v.id,
+        label: `${v.codigoInterno} - ${v.modelo} (${v.placa || 'Interno'})`
+    }))
 
     const handleVeiculoChange = async (veiculoId: string) => {
         if (!veiculoId) return
@@ -224,17 +230,14 @@ export default function NovaOSForm({ veiculos, osOptions }: {
                                     Veículo / Placa *
                                     {isFetchingBacklog && <Loader2 className="w-3 h-3 animate-spin text-primary" />}
                                 </label>
-                                <select
+                                <SearchableSelect
                                     name="veiculoId"
+                                    options={veiculoOptions}
+                                    placeholder="Selecione o Veículo"
                                     required
-                                    className="w-full bg-background border border-border-color rounded-xl px-4 py-3.5 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all appearance-none cursor-pointer"
-                                    onChange={(e) => handleVeiculoChange(e.target.value)}
-                                >
-                                    <option value="">Selecione o Veículo</option>
-                                    {veiculos.map((v) => (
-                                        <option key={v.id} value={v.id}>{v.codigoInterno} - {v.modelo} ({v.placa || 'Interno'})</option>
-                                    ))}
-                                </select>
+                                    onSelect={(value) => handleVeiculoChange(value)}
+                                />
+
                             </div>
 
                             <div className="space-y-2">
@@ -385,12 +388,15 @@ export default function NovaOSForm({ veiculos, osOptions }: {
                                 {enviadoReserva && (
                                     <div className="space-y-2 animate-in fade-in zoom-in-95 duration-300">
                                         <label className="text-[10px] uppercase font-black text-primary tracking-widest ml-1">Veículo Reserva Enviado</label>
-                                        <select name="veiculoReservaId" className="w-full bg-background border border-primary/30 rounded-xl px-4 py-3.5 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all appearance-none cursor-pointer">
-                                            <option value="">Selecione o reserva...</option>
-                                            {veiculos.map((v) => (
-                                                <option key={v.id} value={v.id}>{v.codigoInterno} - {v.placa}</option>
-                                            ))}
-                                        </select>
+                                        <SearchableSelect
+                                            name="veiculoReservaId"
+                                            options={veiculos.map(v => ({
+                                                value: v.id,
+                                                label: `${v.codigoInterno} - ${v.placa || 'Sem Placa'}`
+                                            }))}
+                                            placeholder="Selecione o reserva..."
+                                            onSelect={() => { }}
+                                        />
                                     </div>
                                 )}
                             </div>
