@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Wrench, Search, Filter, ArrowUpDown, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Wrench, Search, Filter, ArrowUpDown, Clock, AlertTriangle, CheckCircle2, Truck } from 'lucide-react'
 import Link from 'next/link'
 import PreventivaActions from './PreventivaActions'
 
