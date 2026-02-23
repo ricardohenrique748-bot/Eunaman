@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { updateSemanaPreventiva } from '@/app/actions/pcm-actions'
-import { Truck, AlertCircle, CalendarClock, ChevronRight, GripVertical, CheckCircle2, X, LayoutDashboard, Share2 } from 'lucide-react'
+import { updateSemanaPreventiva, getVeiculosSemanal } from '@/app/actions/pcm-actions'
+import { Truck, AlertCircle, CalendarClock, ChevronRight, GripVertical, CheckCircle2, X, LayoutDashboard, Share2, Loader2, RefreshCw } from 'lucide-react'
 import SemanalDashboard from './SemanalDashboard'
 
 // --- Types ---
@@ -46,8 +46,19 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
     const [veiculos, setVeiculos] = useState<Veiculo[]>(initialData)
     const [draggedVeiculo, setDraggedVeiculo] = useState<string | null>(null)
     const [loadingId, setLoadingId] = useState<string | null>(null)
+    const [isFetching, setIsFetching] = useState(false)
     const [filter, setFilter] = useState<string>('TODOS')
     const [view, setView] = useState<'BOARD' | 'DASHBOARD'>('BOARD')
+
+    // Period Filter State (Default to current month)
+    const [startDate, setStartDate] = useState(() => {
+        const d = new Date()
+        return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0]
+    })
+    const [endDate, setEndDate] = useState(() => {
+        const d = new Date()
+        return new Date(d.getFullYear(), d.getMonth() + 1, 0).toISOString().split('T')[0]
+    })
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -174,6 +185,18 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
         }
     }
 
+    const handleRefresh = async () => {
+        setIsFetching(true)
+        try {
+            const data = await getVeiculosSemanal({ startDate, endDate })
+            setVeiculos(data)
+        } catch (error) {
+            console.error('Failed to fetch filtered data', error)
+        } finally {
+            setIsFetching(false)
+        }
+    }
+
     const getColumnVehicles = (week: number | null) => {
         return veiculos
             .filter(v => v.semanaPreventiva === week)
@@ -215,6 +238,37 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
+                    {/* Period Filter */}
+                    <div className="flex items-center gap-3 bg-surface-highlight/50 border border-border-color rounded-2xl px-4 py-2">
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Início</span>
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="bg-transparent text-xs font-bold text-foreground outline-none border-b border-transparent focus:border-primary transition-all cursor-pointer"
+                            />
+                        </div>
+                        <div className="w-px h-6 bg-border-color mx-1" />
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Fim</span>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="bg-transparent text-xs font-bold text-foreground outline-none border-b border-transparent focus:border-primary transition-all cursor-pointer"
+                            />
+                        </div>
+                        <button
+                            onClick={handleRefresh}
+                            disabled={isFetching}
+                            className={`ml-2 p-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all ${isFetching ? 'animate-spin' : ''}`}
+                            title="Filtrar Período"
+                        >
+                            {isFetching ? <Loader2 className="w-4 h-4" /> : <RefreshCw className="w-4 h-4" />}
+                        </button>
+                    </div>
+
                     <button
                         onClick={() => setView('DASHBOARD')}
                         className="flex items-center gap-2 px-3 py-2 bg-purple-500/10 text-purple-600 border border-purple-500/20 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-purple-500/20 transition-colors"

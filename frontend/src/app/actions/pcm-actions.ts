@@ -203,7 +203,7 @@ export async function getVeiculosDropdown() {
     })
 }
 
-export async function getVeiculosSemanal() {
+export async function getVeiculosSemanal(filters?: { startDate?: string, endDate?: string }) {
     const session = await getSession()
     if (!session) return []
 
@@ -212,6 +212,13 @@ export async function getVeiculosSemanal() {
 
     if (session.perfil !== 'ADMIN' && session.perfil !== 'PCM') {
         whereClause += ` AND "unidade_id" = '${session.unidadeId}'`
+    }
+
+    if (filters?.startDate) {
+        whereClause += ` AND "prog_data_inicio" >= '${filters.startDate}'::timestamp`
+    }
+    if (filters?.endDate) {
+        whereClause += ` AND "prog_data_fim" <= '${filters.endDate}'::timestamp`
     }
 
     const query = `
@@ -300,13 +307,20 @@ export async function updateSemanaPreventiva(
     }
 }
 
-export async function getPublicVeiculosSemanal(unidadeId?: string) {
+export async function getPublicVeiculosSemanal(unidadeId?: string, filters?: { startDate?: string, endDate?: string }) {
     // Public access - read only
     // Use raw query
     let whereClause = `WHERE "status_operacional" != 'DESATIVADO'`
 
     if (unidadeId) {
         whereClause += ` AND "unidade_id" = '${unidadeId}'`
+    }
+
+    if (filters?.startDate) {
+        whereClause += ` AND "prog_data_inicio" >= '${filters.startDate}'::timestamp`
+    }
+    if (filters?.endDate) {
+        whereClause += ` AND "prog_data_fim" <= '${filters.endDate}'::timestamp`
     }
 
     const query = `
