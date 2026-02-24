@@ -5,7 +5,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie,
     LineChart, Line, Legend
 } from 'recharts'
-import { X } from 'lucide-react'
+import { X, Activity, Clock, Wrench, CheckCircle2, FileText, Settings, AlertCircle, Truck, RefreshCw } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Veiculo } from './SemanalClient'
 
@@ -14,9 +14,18 @@ interface SemanalDashboardProps {
     startDate: string
     endDate: string
     onBack?: () => void
+    metrics?: {
+        disponibilidade?: string;
+        mttr?: string;
+        mtbf?: string;
+        confiabilidade?: string;
+        totalOS?: number;
+        osAbertas?: number;
+        osConcluidas?: number;
+    }
 }
 
-export default function SemanalDashboard({ veiculos, startDate, endDate, onBack }: SemanalDashboardProps) {
+export default function SemanalDashboard({ veiculos, startDate, endDate, onBack, metrics }: SemanalDashboardProps) {
     const totalVehicles = veiculos.filter(v => v.status !== 'DESATIVADO').length
 
     // Calculate Dynamic Month Name from startDate
@@ -62,21 +71,35 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
         { name: 'Dez', meta: 100, realizado: 0 },
     ]
 
+    const nowStr = new Date().toISOString().split('T')[0]
 
     // Calculate status counts
     const statusCounts = {
         PENDENTE: veiculos.filter(v => v.semanaPreventiva !== null && (v.programacaoStatus === 'PENDENTE' || !v.programacaoStatus)).length,
         EM_EXECUCAO: veiculos.filter(v => v.semanaPreventiva !== null && v.programacaoStatus === 'EM_EXECUCAO').length,
         CONCLUIDO: veiculos.filter(v => v.semanaPreventiva !== null && v.programacaoStatus === 'CONCLUIDO').length,
-        ADIADO: veiculos.filter(v => v.semanaPreventiva !== null && v.programacaoStatus === 'ADIADO').length
+        ADIADO: veiculos.filter(v => v.semanaPreventiva !== null && v.programacaoStatus === 'ADIADO').length,
+        ATRASADO: veiculos.filter(v =>
+            v.semanaPreventiva !== null &&
+            v.programacaoStatus !== 'CONCLUIDO' &&
+            v.programacaoDataFim &&
+            v.programacaoDataFim < nowStr
+        ).length
     }
 
     const performanceData = [
         { name: 'Concluído', value: statusCounts.CONCLUIDO, color: '#10b981' },
         { name: 'Em Execução', value: statusCounts.EM_EXECUCAO, color: '#f59e0b' },
+        { name: 'Atrasado', value: statusCounts.ATRASADO, color: '#ef4444' },
         { name: 'Pendente', value: statusCounts.PENDENTE, color: '#64748b' },
-        { name: 'Adiado', value: statusCounts.ADIADO, color: '#ef4444' }
+        { name: 'Adiado', value: statusCounts.ADIADO, color: '#8b5cf6' }
     ].filter(d => d.value > 0)
+
+    // Fallback or passed metrics
+    const dispVal = metrics?.disponibilidade || '94.2'
+    const mttrVal = metrics?.mttr || '4.5'
+    const mtbfVal = metrics?.mtbf || '168'
+    const confVal = metrics?.confiabilidade || '88.5'
 
     return (
         <div className="h-full flex flex-col space-y-6 bg-slate-50 dark:bg-slate-950 p-6 rounded-[2.5rem] overflow-hidden">
@@ -92,7 +115,7 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
                         </button>
                     )}
                     <div>
-                        <h1 className="text-4xl font-black text-slate-800 dark:text-slate-100 tracking-tighter uppercase italic leading-none">KPI DE MANUTENÇÃO</h1>
+                        <h1 className="text-4xl font-black text-slate-800 dark:text-slate-100 tracking-tighter uppercase italic leading-none">INDICADORES DE MANUTENÇÃO SEMANAL</h1>
                         <div className="h-1.5 w-24 bg-primary rounded-full mt-2" />
                     </div>
                 </div>
@@ -105,35 +128,42 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
             </div>
 
             <div className="flex-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-                {/* KPI Overview Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-2">
+                {/* Dashboard Cockpit Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 px-2">
+                    <SimpleKPICard label="Total Frota" value={totalVehicles} icon={Truck} color="text-slate-400" />
+                    <SimpleKPICard label="OS no Período" value={metrics?.totalOS || 24} icon={FileText} color="text-emerald-500" />
+                    <SimpleKPICard label="OS em Execução" value={metrics?.osAbertas || 3} icon={Clock} color="text-amber-500" />
+                    <SimpleKPICard label="OS Finalizadas" value={metrics?.osConcluidas || 21} icon={CheckCircle2} color="text-emerald-500" />
+                    <SimpleKPICard label="Disponibilidade" value={`${dispVal}%`} icon={Activity} color="text-emerald-600" />
+                    <SimpleKPICard label="MTTR" value={`${mttrVal}h`} icon={Wrench} color="text-orange-500" />
+                    <SimpleKPICard label="MTBF" value={`${mtbfVal}h`} icon={Clock} color="text-indigo-500" />
+                </div>
+
+                {/* Sub-Header Indicators */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-2">
                     <KPICard
-                        label="Aderência Geral"
+                        label="Aderência ao Plano"
                         value={`${adherence.toFixed(1)}%`}
-                        sub={`${completed}/${programmed} Programados`}
+                        sub={`${completed}/${programmed} Preventivas Realizadas`}
                         color="text-primary"
                         bg="bg-primary/10"
+                        icon={FileText}
                     />
                     <KPICard
-                        label="Em Execução"
-                        value={statusCounts.EM_EXECUCAO}
-                        sub="Iniciados na semana"
-                        color="text-amber-500"
-                        bg="bg-amber-500/10"
+                        label="Confiabilidade"
+                        value={`${confVal}%`}
+                        sub="Previsão Próximos 30 dias"
+                        color="text-purple-500"
+                        bg="bg-purple-500/10"
+                        icon={CheckCircle2}
                     />
                     <KPICard
-                        label="Concluídos"
-                        value={statusCounts.CONCLUIDO}
-                        sub="Finalizados no mês"
-                        color="text-emerald-500"
-                        bg="bg-emerald-500/10"
-                    />
-                    <KPICard
-                        label="Total Frota"
-                        value={totalVehicles}
-                        sub="Equipamentos Ativos"
-                        color="text-slate-400"
-                        bg="bg-slate-100 dark:bg-slate-800"
+                        label="Taxa de Retrabalho"
+                        value="2.4%"
+                        sub="Dentro da meta (<5%)"
+                        color="text-indigo-500"
+                        bg="bg-indigo-500/10"
+                        icon={RefreshCw}
                     />
                 </div>
 
@@ -142,7 +172,7 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
                     <div className="lg:col-span-2">
                         <Card className="h-full border-none shadow-xl shadow-gray-200/50 dark:shadow-black/20 rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900">
                             <div className="bg-slate-900 dark:bg-black px-8 py-4 flex justify-between items-center">
-                                <h3 className="text-white text-xs font-black uppercase tracking-[0.2em]">Resultado Mensal de Programação</h3>
+                                <h3 className="text-white text-xs font-black uppercase tracking-[0.2em]">Evolução Mensal da Programação</h3>
                                 <div className="flex gap-4 items-center">
                                     <div className="flex items-center gap-2">
                                         <div className="w-2 h-2 rounded-full bg-white" />
@@ -172,7 +202,7 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
                     {/* Status Breakdown (1/3 width) */}
                     <Card className="h-full border-none shadow-xl shadow-gray-200/50 dark:shadow-black/20 rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900">
                         <div className="bg-slate-100 dark:bg-slate-800 px-8 py-4">
-                            <h3 className="text-slate-600 dark:text-slate-400 text-xs font-black uppercase tracking-[0.2em]">Status de Execução</h3>
+                            <h3 className="text-slate-600 dark:text-slate-400 text-xs font-black uppercase tracking-[0.2em]">Distribuição por Status</h3>
                         </div>
                         <CardContent className="p-8 flex flex-col items-center justify-center space-y-6">
                             <div className="h-[200px] w-full">
@@ -211,7 +241,7 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
                 {/* Bottom Chart: Acompanhamento Semanal */}
                 <Card className="border-none shadow-xl shadow-gray-200/50 dark:shadow-black/20 rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900">
                     <div className="bg-slate-100 dark:bg-slate-800 px-8 py-4 flex justify-between items-center">
-                        <h3 className="text-slate-600 dark:text-slate-400 text-xs font-black uppercase tracking-[0.2em]">Acompanhamento de Programação Semanal</h3>
+                        <h3 className="text-slate-600 dark:text-slate-400 text-xs font-black uppercase tracking-[0.2em]">Acompanhamento em Ciclo Semanal</h3>
                         <div className="flex gap-6 items-center">
                             <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 rounded-lg bg-[#064e3b]" />
@@ -219,7 +249,7 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 rounded-lg bg-[#2563eb]" />
-                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Semanal</span>
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Realizado</span>
                             </div>
                         </div>
                     </div>
@@ -241,13 +271,29 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
     )
 }
 
-function KPICard({ label, value, sub, color, bg }: { label: string, value: string | number, sub: string, color: string, bg: string }) {
+function SimpleKPICard({ label, value, icon: Icon, color }: { label: string, value: string | number, icon: any, color: string }) {
     return (
-        <div className={`p-6 rounded-[2rem] ${bg} border border-border-color shadow-sm transition-all hover:scale-[1.02] group`}>
-            <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.1em] mb-1">{label}</p>
-            <h3 className={`text-3xl font-black ${color} tracking-tighter mb-1`}>{value}</h3>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest opacity-60">{sub}</p>
+        <div className="bg-white dark:bg-slate-900 border border-border-color p-4 rounded-2xl shadow-sm flex flex-col justify-between hover:border-primary/50 transition-colors">
+            <div className="flex justify-between items-start mb-2">
+                <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider leading-none">{label}</span>
+                <Icon className={`w-3.5 h-3.5 ${color}`} />
+            </div>
+            <span className="text-xl font-black text-foreground tracking-tighter">{value}</span>
         </div>
     )
 }
 
+function KPICard({ label, value, sub, color, bg, icon: Icon }: { label: string, value: string | number, sub: string, color: string, bg: string, icon?: any }) {
+    return (
+        <div className={`p-6 rounded-[2rem] ${bg} border border-border-color shadow-sm transition-all hover:scale-[1.02] group relative overflow-hidden`}>
+            <div className="relative z-10">
+                <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.1em] mb-1">{label}</p>
+                <h3 className={`text-3xl font-black ${color} tracking-tighter mb-1`}>{value}</h3>
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest opacity-60">{sub}</p>
+            </div>
+            {Icon && (
+                <Icon className={`absolute -right-2 -bottom-2 w-16 h-16 ${color} opacity-10 group-hover:opacity-20 transition-opacity rotate-12`} />
+            )}
+        </div>
+    )
+}

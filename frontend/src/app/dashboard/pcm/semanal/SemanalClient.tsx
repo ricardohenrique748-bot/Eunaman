@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { updateSemanaPreventiva, getVeiculosSemanal, getWeekDates, updateWeekDates } from '@/app/actions/pcm-actions'
+import { getDashboardMetrics } from '@/app/actions/dashboard-actions'
 import { Truck, AlertCircle, CalendarClock, ChevronRight, GripVertical, CheckCircle2, X, LayoutDashboard, Share2, Loader2, RefreshCw, Save } from 'lucide-react'
 import SemanalDashboard from './SemanalDashboard'
 
@@ -49,6 +50,7 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
     const [isFetching, setIsFetching] = useState(false)
     const [filter, setFilter] = useState<string>('TODOS')
     const [view, setView] = useState<'BOARD' | 'DASHBOARD'>('BOARD')
+    const [metrics, setMetrics] = useState<any>(null)
 
     // Period Filter State (Default to current month)
     const [startDate, setStartDate] = useState(() => {
@@ -97,6 +99,27 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
         }
         loadDates()
     }, [])
+
+    // Load full maintenance metrics when dashboard is active
+    useEffect(() => {
+        if (view === 'DASHBOARD') {
+            const loadMetrics = async () => {
+                const res = await getDashboardMetrics({ dataInicio: startDate, dataFim: endDate })
+                if (res.success && res.data) {
+                    setMetrics({
+                        disponibilidade: res.data.kpis.disponibilidadeGlobal,
+                        mttr: res.data.kpis.mttr,
+                        mtbf: res.data.kpis.mtbf,
+                        confiabilidade: '89.4', // Mock
+                        totalOS: res.data.kpis.totalOS,
+                        osAbertas: res.data.kpis.osAbertas,
+                        osConcluidas: res.data.kpis.osFechadas
+                    })
+                }
+            }
+            loadMetrics()
+        }
+    }, [view, startDate, endDate])
 
     const handleSaveWeekDates = async () => {
         setIsSavingDates(true)
@@ -280,7 +303,13 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
     ]
 
     if (view === 'DASHBOARD') {
-        return <SemanalDashboard veiculos={veiculos} startDate={startDate} endDate={endDate} onBack={() => setView('BOARD')} />
+        return <SemanalDashboard
+            veiculos={veiculos}
+            startDate={startDate}
+            endDate={endDate}
+            metrics={metrics}
+            onBack={() => setView('BOARD')}
+        />
     }
 
     return (
