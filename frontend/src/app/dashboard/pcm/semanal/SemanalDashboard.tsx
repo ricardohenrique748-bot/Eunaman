@@ -167,7 +167,7 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
                                 <Tooltip />
                                 <Bar dataKey="meta" fill="#064e3b" radius={[8, 8, 8, 8]} barSize={50} />
                                 <Bar dataKey="semanal" fill="#2563eb" radius={[8, 8, 8, 8]} barSize={50}>
-                                    <LabelList dataKey="semanal" position="top" style={{ fontSize: '12px', fontWeight: '900', fill: '#1e293b' }} formatter={(v: any) => `${(Number(v) || 0).toFixed(2)}%`} />
+                                    <LabelList dataKey="semanal" position="top" style={{ fontSize: '12px', fontWeight: '900', fill: '#1e293b' }} formatter={(val: string | number) => `${Number(val).toFixed(2)}%`} />
                                 </Bar>
                             </BarChart>
                         </ResponsiveContainer>
