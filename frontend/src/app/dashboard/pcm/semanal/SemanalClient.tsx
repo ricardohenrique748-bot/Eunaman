@@ -307,7 +307,6 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
             veiculos={veiculos}
             startDate={startDate}
             endDate={endDate}
-            metrics={metrics}
             onBack={() => setView('BOARD')}
         />
     }
