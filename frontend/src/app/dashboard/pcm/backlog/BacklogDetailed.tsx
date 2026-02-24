@@ -68,7 +68,9 @@ export default function BacklogDetailed({ data }: { data: BacklogItem[] }) {
                                 <td className="p-3 max-w-xs truncate" title={item.descricaoAtividade || ''}>{item.descricaoAtividade}</td>
                                 <td className="p-3">{item.origem}</td>
                                 <td className="p-3">
-                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${item.criticidade === 'CRITICO' ? 'bg-red-500 text-white' : ''}`}>
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold 
+                                        ${item.criticidade === 'A' ? 'bg-red-500 text-white' :
+                                            item.criticidade === 'B' ? 'bg-orange-500 text-white' : 'bg-gray-100'}`}>
                                         {item.criticidade}
                                     </span>
                                 </td>

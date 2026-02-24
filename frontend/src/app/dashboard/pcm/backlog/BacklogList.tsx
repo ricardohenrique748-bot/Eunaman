@@ -45,6 +45,7 @@ export default function BacklogList({ data, onEdit, onDelete }: BacklogListProps
                     <thead className="bg-surface-highlight/50 sticky top-0 z-10 backdrop-blur-sm border-b border-border-color">
                         <tr>
                             <th className="p-3 text-[10px] font-black uppercase text-gray-500 tracking-wider">Data Evidência</th>
+                            <th className="p-3 text-[10px] font-black uppercase text-gray-500 tracking-wider">Unidade</th>
                             <th className="p-3 text-[10px] font-black uppercase text-gray-500 tracking-wider">Frota</th>
                             <th className="p-3 text-[10px] font-black uppercase text-gray-500 tracking-wider w-1/3">Descrição</th>
                             <th className="p-3 text-[10px] font-black uppercase text-gray-500 tracking-wider">Origem</th>
@@ -60,6 +61,9 @@ export default function BacklogList({ data, onEdit, onDelete }: BacklogListProps
                             <tr key={item.id} className="hover:bg-surface-highlight/50 transition-colors group">
                                 <td className="p-3 text-xs font-medium text-gray-500">
                                     {item.dataEvidencia ? new Date(item.dataEvidencia).toLocaleDateString('pt-BR') : '-'}
+                                </td>
+                                <td className="p-3 text-xs font-medium text-gray-500 uppercase">
+                                    {item.unidade || '-'}
                                 </td>
                                 <td className="p-3 text-xs font-bold text-foreground">
                                     <span className="px-2 py-1 bg-surface-highlight rounded-md border border-border-color">
@@ -95,11 +99,11 @@ export default function BacklogList({ data, onEdit, onDelete }: BacklogListProps
                                 </td>
                                 <td className="p-3 text-xs">
                                     <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider
-                                        ${item.criticidade === 'CRITICO' ? 'bg-red-500 text-white shadow-red-500/20 shadow-lg' :
-                                            item.criticidade === 'ALTA' ? 'bg-orange-500 text-white' :
-                                                'bg-green-500/10 text-green-600'}
+                                        ${item.criticidade === 'A' ? 'bg-red-500 text-white shadow-red-500/20 shadow-lg' :
+                                            item.criticidade === 'B' ? 'bg-orange-500 text-white' :
+                                                'bg-gray-500/10 text-gray-600'}
                                      `}>
-                                        {item.criticidade || 'NORMAL'}
+                                        {item.criticidade || '-'}
                                     </span>
                                 </td>
                                 <td className="p-3 text-xs font-mono text-gray-500">

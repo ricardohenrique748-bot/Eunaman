@@ -43,6 +43,7 @@ export interface BacklogItem {
     diasResolucaoPendencia: number | null
     status: string | null
     observacao: string | null
+    unidade: string | null
     createdAt: Date
     updatedAt: Date
 }
@@ -87,6 +88,7 @@ function mapRawToBacklog(row: any): BacklogItem {
         diasResolucaoPendencia: row.dias_resolucao_pendencia,
         status: row.status,
         observacao: row.observacao,
+        unidade: row.unidade,
         createdAt: new Date(row.created_at),
         updatedAt: new Date(row.updated_at)
     }
@@ -171,7 +173,7 @@ export async function createBacklogItem(data: Omit<BacklogItem, 'id' | 'createdA
             'numero_ordem', 'fornecedor', 'detalhamento_pedido', 'tipo_pedido',
             'situacao_rc', 'dias_abertura_req_compras', 'mao_de_obra',
             'delta_evidencia_programacao', 'status_programacao', 'dias_resolucao_pendencia',
-            'status', 'observacao'
+            'status', 'observacao', 'unidade'
         ]
 
         // Date fields need special handling for NULL
@@ -185,7 +187,6 @@ export async function createBacklogItem(data: Omit<BacklogItem, 'id' | 'createdA
         const values = [
             ...fields.map(f => {
                 // Map camelBack to snake_case for access
-                const camelKey = f.replace(/_([a-z])/g, (g) => g[1].toUpperCase()) as keyof typeof data
                 // Special mapping for keys that dont follow simple rule if any
                 // Mapping back logic
                 let val: any
@@ -204,7 +205,8 @@ export async function createBacklogItem(data: Omit<BacklogItem, 'id' | 'createdA
                 else if (f === 'delta_evidencia_programacao') val = data.deltaEvidenciaProgramacao
                 else if (f === 'status_programacao') val = data.statusProgramacao
                 else if (f === 'dias_resolucao_pendencia') val = data.diasResolucaoPendencia
-                else val = data[f as keyof typeof data]
+                else if (f === 'unidade') val = data.unidade
+                else val = (data as any)[f]
 
                 if (val === undefined || val === null || val === '') return 'NULL'
                 if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'` // Escape quotes
@@ -286,6 +288,7 @@ export async function updateBacklogItem(id: string, data: Partial<BacklogItem>) 
         add('dias_resolucao_pendencia', data.diasResolucaoPendencia)
         add('status', data.status)
         add('observacao', data.observacao)
+        add('unidade', data.unidade)
 
         // Dates
         add('data_evidencia', data.dataEvidencia, true)
@@ -382,25 +385,24 @@ export async function importBacklogItems(items: Omit<BacklogItem, 'id' | 'create
 
         const valuesList: string[] = []
 
+        const fields = [
+            'semana', 'mes', 'ano', 'modulo', 'regiao_programacao', 'dias_pendencia_aberta',
+            'frota', 'tag', 'tipo', 'descricao_atividade', 'origem', 'criticidade',
+            'tempo_execucao_previsto', 'campo_base', 'os', 'material', 'numero_rc',
+            'numero_ordem', 'fornecedor', 'detalhamento_pedido', 'tipo_pedido',
+            'situacao_rc', 'dias_abertura_req_compras', 'mao_de_obra',
+            'delta_evidencia_programacao', 'status_programacao', 'dias_resolucao_pendencia',
+            'status', 'observacao', 'unidade'
+        ]
+
+        const dateFields = [
+            'data_evidencia', 'data_rc', 'data_necessidade_material', 'previsao_material',
+            'data_programacao', 'previsao_conclusao_pendencia', 'data_conclusao_pendencia'
+        ]
+
         for (const data of uniqueItems) {
-            const fields = [
-                'semana', 'mes', 'ano', 'modulo', 'regiao_programacao', 'dias_pendencia_aberta',
-                'frota', 'tag', 'tipo', 'descricao_atividade', 'origem', 'criticidade',
-                'tempo_execucao_previsto', 'campo_base', 'os', 'material', 'numero_rc',
-                'numero_ordem', 'fornecedor', 'detalhamento_pedido', 'tipo_pedido',
-                'situacao_rc', 'dias_abertura_req_compras', 'mao_de_obra',
-                'delta_evidencia_programacao', 'status_programacao', 'dias_resolucao_pendencia',
-                'status', 'observacao'
-            ]
-
-            const dateFields = [
-                'data_evidencia', 'data_rc', 'data_necessidade_material', 'previsao_material',
-                'data_programacao', 'previsao_conclusao_pendencia', 'data_conclusao_pendencia'
-            ]
-
             const values = [
                 ...fields.map(f => {
-                    const camelKey = f.replace(/_([a-z])/g, (g) => g[1].toUpperCase()) as keyof typeof data
                     let val: any
                     if (f === 'descricao_atividade') val = data.descricaoAtividade
                     else if (f === 'regiao_programacao') val = data.regiaoProgramacao
@@ -417,7 +419,8 @@ export async function importBacklogItems(items: Omit<BacklogItem, 'id' | 'create
                     else if (f === 'delta_evidencia_programacao') val = data.deltaEvidenciaProgramacao
                     else if (f === 'status_programacao') val = data.statusProgramacao
                     else if (f === 'dias_resolucao_pendencia') val = data.diasResolucaoPendencia
-                    else val = data[f as keyof typeof data]
+                    else if (f === 'unidade') val = data.unidade
+                    else val = (data as any)[f]
 
                     if (val === undefined || val === null || val === '') return 'NULL'
                     if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`
@@ -449,19 +452,6 @@ export async function importBacklogItems(items: Omit<BacklogItem, 'id' | 'create
             valuesList.push(`(gen_random_uuid(), NOW(), NOW(), ${values})`)
         }
 
-        const fields = [
-            'semana', 'mes', 'ano', 'modulo', 'regiao_programacao', 'dias_pendencia_aberta',
-            'frota', 'tag', 'tipo', 'descricao_atividade', 'origem', 'criticidade',
-            'tempo_execucao_previsto', 'campo_base', 'os', 'material', 'numero_rc',
-            'numero_ordem', 'fornecedor', 'detalhamento_pedido', 'tipo_pedido',
-            'situacao_rc', 'dias_abertura_req_compras', 'mao_de_obra',
-            'delta_evidencia_programacao', 'status_programacao', 'dias_resolucao_pendencia',
-            'status', 'observacao'
-        ]
-        const dateFields = [
-            'data_evidencia', 'data_rc', 'data_necessidade_material', 'previsao_material',
-            'data_programacao', 'previsao_conclusao_pendencia', 'data_conclusao_pendencia'
-        ]
         const columns = [...fields, ...dateFields].map(f => `"${f}"`).join(', ')
 
         // Batch insert in chunks of 50

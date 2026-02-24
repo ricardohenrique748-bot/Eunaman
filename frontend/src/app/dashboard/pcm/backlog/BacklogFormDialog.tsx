@@ -16,7 +16,7 @@ export default function BacklogFormDialog({ isOpen, onClose, onSuccess, initialD
     const [activeTab, setActiveTab] = useState('EQUIPAMENTO')
     const [formData, setFormData] = useState<Partial<BacklogItem>>(initialData || {
         status: 'ABERTO',
-        criticidade: 'NORMAL',
+        criticidade: 'A',
         origem: 'PREVENTIVA',
         diasPendenciaAberta: 0
     })
@@ -143,6 +143,7 @@ export default function BacklogFormDialog({ isOpen, onClose, onSuccess, initialD
                         {activeTab === 'EQUIPAMENTO' && (
                             <div className="grid grid-cols-2 gap-4">
                                 <Input label="Frota" value={formData.frota} onChange={v => handleChange('frota', v)} placeholder="Ex: CAM-01" />
+                                <Input label="Unidade" value={formData.unidade} onChange={v => handleChange('unidade', v)} placeholder="Ex: FEROZ" />
                                 <Input label="TAG" value={formData.tag} onChange={v => handleChange('tag', v)} />
                                 <Input label="Tipo" value={formData.tipo} onChange={v => handleChange('tipo', v)} />
                                 <Input label="Módulo" value={formData.modulo} onChange={v => handleChange('modulo', v)} />
@@ -155,7 +156,7 @@ export default function BacklogFormDialog({ isOpen, onClose, onSuccess, initialD
                             <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <Select label="Origem" value={formData.origem} onChange={v => handleChange('origem', v)} options={['PREVENTIVA', 'CORRETIVA', 'INSPECAO', 'MELHORIA']} />
-                                    <Select label="Criticidade" value={formData.criticidade} onChange={v => handleChange('criticidade', v)} options={['NORMAL', 'ALTA', 'CRITICO']} />
+                                    <Select label="Criticidade" value={formData.criticidade} onChange={v => handleChange('criticidade', v)} options={['A', 'B']} />
                                     <Select label="Status" value={formData.status} onChange={v => handleChange('status', v)} options={['ABERTO', 'EM_ANDAMENTO', 'CONCLUIDO', 'CANCELADO']} />
                                 </div>
                                 <div className="space-y-1">

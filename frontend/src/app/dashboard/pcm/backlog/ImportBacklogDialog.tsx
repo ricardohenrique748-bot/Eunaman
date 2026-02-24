@@ -63,14 +63,14 @@ export default function ImportBacklogDialog({ isOpen, onClose, onSuccess, onImpo
                 mes: get('mes')?.toString(),
                 ano: get('ano')?.toString(),
                 // Image: DATA DA EVIDENCIA
-                dataEvidencia: get('datadaevidencia'),
+                dataEvidencia: get('datadaevidencia') || get('data') || get('datadeabertura'),
                 // Image: MÓDULO
                 modulo: get('modulo')?.toString(),
                 regiaoProgramacao: get('regiaoprogramacao'),
                 // Image: Dias de pendência aberta
                 diasPendenciaAberta: Number(get('diasdependenciaaberta') || 0),
                 // Image: Placa
-                frota: get('placa')?.toString(),
+                frota: get('placa')?.toString() || get('frota')?.toString() || get('equipamento')?.toString(),
                 tag: get('tag')?.toString(),
                 // Image: TIPO
                 tipo: get('tipo')?.toString(),
@@ -79,7 +79,7 @@ export default function ImportBacklogDialog({ isOpen, onClose, onSuccess, onImpo
                 // Image: ORIGEM
                 origem: get('origem')?.toString(),
                 // Image: CRITICIDADE
-                criticidade: get('criticidade')?.toString(),
+                criticidade: get('criticidade')?.toString() || get('grau')?.toString(),
                 // Image: TEMPO DE EXECUÇÃO PREVISTO
                 tempoExecucaoPrevisto: get('tempodeexecucaoprevisto'),
                 // Image: CAMPO / BASE
@@ -89,9 +89,9 @@ export default function ImportBacklogDialog({ isOpen, onClose, onSuccess, onImpo
                 // Image: MATERIAL
                 material: get('material')?.toString(),
                 // Image: N° RC
-                numeroRc: get('nrc') || get('numerorc'),
+                numeroRc: get('nrc') || get('numerorc') || get('reqcompras'),
                 // Image: N° PEDIDO (Assuming this maps to Numero Ordem based on context, or could be ignored if irrelevant)
-                numeroOrdem: get('npedido') || get('numeropedido') || get('numeroordem'),
+                numeroOrdem: get('npedido') || get('numeropedido') || get('numeroordem') || get('descrevaasolicitacao'),
                 // Image: FORNECEDOR
                 fornecedor: get('fornecedor')?.toString(),
                 // Image: DATA RC
@@ -112,9 +112,8 @@ export default function ImportBacklogDialog({ isOpen, onClose, onSuccess, onImpo
                 dataProgramacao: get('datadeprogramacao'),
                 // Image: MÃO DE OBRA
                 maoDeObra: get('maodeobra'),
-                // Image: DELTA EVIDÊNCIA V.S DATA PROGRAMAÇÃO
-                deltaEvidenciaProgramacao: Number(get('deltaevidenciavsdataprogramacao') || 0),
-                statusProgramacao: get('statusprogramacao'),
+                deltaEvidenciaProgramacao: Number(get('deltaevidenciavsdataprogramacao') || get('deltaevidencia') || 0),
+                statusProgramacao: get('statusprogramacao') || get('situacaoprogramacao'),
                 // Image: PREVISÃO DE CONCLUSÃO PENDÊNCIA
                 previsaoConclusaoPendencia: get('previsaodeconclusaopendencia'),
                 // Image: DATA CONCLUSÃO DA PENDÊNCIA
@@ -123,6 +122,8 @@ export default function ImportBacklogDialog({ isOpen, onClose, onSuccess, onImpo
                 diasResolucaoPendencia: Number(get('diasderesolucaodapendencia') || 0),
                 // Image: STATUS
                 status: get('status')?.toString(),
+                // Image: UNIDADE
+                unidade: get('unidade')?.toString() || get('projeto')?.toString(),
                 // Image: OBESERVAÇÃO (Typo in header)
                 observacao: get('obeservacao') || get('observacao')
             }
