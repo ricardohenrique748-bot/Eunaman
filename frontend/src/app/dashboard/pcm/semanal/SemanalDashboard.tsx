@@ -1,5 +1,6 @@
 'use client'
 
+// Dashboard sem formatadores para evitar erros na Vercel v2
 import React from 'react'
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie,
@@ -17,10 +18,8 @@ interface SemanalDashboardProps {
 }
 
 export default function SemanalDashboard({ veiculos, startDate, endDate, onBack }: SemanalDashboardProps) {
-    // 1. Data Processing
     const programmedVehicles = veiculos.filter(v => v.semanaPreventiva !== null)
 
-    // Monthly Evolution Logic
     const monthlyResults = [
         { name: 'Jan', meta: 100, realizado: 0 },
         { name: 'Fev', meta: 100, realizado: programmedVehicles.length > 0 ? Math.round((programmedVehicles.filter(v => v.programacaoStatus === 'CONCLUIDO').length / programmedVehicles.length) * 100) : 0 },
@@ -36,7 +35,6 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
         { name: 'Dez', meta: 100, realizado: 0 },
     ]
 
-    // Weekly Cycle Follow-up (Meta 25% cumulative/slot)
     const weeklyKPI = [1, 2, 3, 4].map(week => {
         const weekVehicles = veiculos.filter(v => v.semanaPreventiva === week)
         const weekCompleted = weekVehicles.filter(v => v.programacaoStatus === 'CONCLUIDO').length
@@ -50,13 +48,11 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
         }
     })
 
-    // Prepare Date Labels
     const monthBase = new Date(startDate + 'T00:00:00')
     const monthName = monthBase.toLocaleDateString('pt-BR', { month: 'long' })
     const monthNameUpper = monthName.charAt(0).toUpperCase() + monthName.slice(1)
     const monthLabelFull = `${monthBase.getMonth() + 1}º ${monthName.toUpperCase()}`
 
-    // Status Preparation
     const statusMap: Record<string, string> = {
         'CONCLUIDO': 'CONCLUIDO',
         'EM_EXECUCAO': 'EM ANDAMENTO',
@@ -86,7 +82,6 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
         'PENDENTE': '#64748b'
     }
 
-    // Category Preparation
     const categoryCounts = programmedVehicles.reduce((acc, v) => {
         const cat = v.tipoVeiculo || 'N/A'
         acc[cat] = (acc[cat] || 0) + 1
@@ -96,7 +91,6 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
 
     return (
         <div className="h-full flex flex-col space-y-6 bg-[#f8fafc] p-6 rounded-[2rem] overflow-hidden text-slate-800">
-            {/* Header / Title Section */}
             <div className="flex justify-between items-start">
                 <div className="flex items-center gap-6">
                     {onBack && (
@@ -120,7 +114,6 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
 
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-6">
 
-                {/* 1. Monthly Results Chart */}
                 <Card className="border border-slate-100 shadow-lg rounded-[2.5rem] overflow-hidden bg-white">
                     <div className="px-8 py-5 bg-[#111827] flex justify-between items-center text-white">
                         <h3 className="text-xs font-black uppercase tracking-wider">Resultado Mensal de Programação Preventiva</h3>
@@ -149,7 +142,6 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
                     </CardContent>
                 </Card>
 
-                {/* 2. Weekly Results Chart */}
                 <Card className="border border-slate-100 shadow-md rounded-[2.5rem] overflow-hidden bg-white">
                     <div className="px-8 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/20">
                         <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">Acompanhamento de Programação Semanal</h3>
@@ -179,7 +171,6 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
                     </CardContent>
                 </Card>
 
-                {/* 3. Small Support Charts Row */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
                     <Card className="md:col-span-3 border border-slate-100 shadow-sm rounded-2xl overflow-hidden bg-white">
                         <div className="px-6 py-3 border-b border-slate-50 flex flex-col items-center">
@@ -229,8 +220,8 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
                                         fontSize={12}
                                         fontWeight="900"
                                     >
-                                        {statusData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={pieColors[entry.name] || '#64748b'} />
+                                        {statusData.map((e, i) => (
+                                            <Cell key={`c-${i}`} fill={pieColors[e.name] || '#64748b'} />
                                         ))}
                                     </Pie>
                                     <Tooltip />
@@ -240,7 +231,6 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
                     </Card>
                 </div>
 
-                {/* 4. Category and Table Row */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pb-6">
                     <Card className="md:col-span-4 border border-slate-100 shadow-sm rounded-2xl overflow-hidden bg-white">
                         <div className="px-6 py-3 border-b border-slate-50 flex flex-col items-center">
