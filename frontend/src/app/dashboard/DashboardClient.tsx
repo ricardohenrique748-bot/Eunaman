@@ -335,107 +335,122 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
                 </div>
             </div>
 
-            {/* Secondary Grid: Preventives & Recent Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Preventive Maintenance Progress */}
-                <div className="dashboard-card p-6">
-                    <div className="flex justify-between items-start mb-8">
-                        <div>
-                            <h3 className="text-foreground text-lg font-black tracking-tight">Status de Preventivas</h3>
-                            <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-0.5">Horas restantes para serviços</p>
+            {/* Preventive Maintenance Status - Full Width */}
+            <div className="dashboard-card p-6">
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
+                    <div>
+                        <h3 className="text-foreground text-xl font-black tracking-tight">Status de Preventivas</h3>
+                        <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">Horas restantes para serviços</p>
+                    </div>
+                    <div className="flex gap-4 text-[10px] font-black uppercase tracking-widest">
+                        <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                            <span className="text-gray-500">No Prazo</span>
                         </div>
-                        <div className="flex gap-1">
-                            <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                            <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                            <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                        <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
+                            <span className="text-gray-500">Atenção</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></span>
+                            <span className="text-gray-500">Crítico</span>
                         </div>
                     </div>
+                </div>
 
-                    <div className="w-full">
+                <div className="w-full overflow-x-auto pb-4 custom-scrollbar">
+                    <div className="h-[400px]" style={{ minWidth: `${Math.max(1000, preventiveData.length * 60)}px` }}>
                         {preventiveData.length > 0 ? (
-                            <div className="h-[350px] w-full mt-4">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart
-                                        data={preventiveData}
-                                        margin={{ top: 20, right: 10, left: -20, bottom: 20 }}
-                                    >
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.1)" />
-                                        <XAxis
-                                            dataKey="placa"
-                                            tick={{ fontSize: 9, fill: '#6B7280', fontWeight: 800 }}
-                                            axisLine={false}
-                                            tickLine={false}
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                    data={preventiveData}
+                                    margin={{ top: 30, right: 30, left: 10, bottom: 60 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.1)" />
+                                    <XAxis
+                                        dataKey="placa"
+                                        angle={-45}
+                                        textAnchor="end"
+                                        interval={0}
+                                        tick={{ fontSize: 10, fill: '#6B7280', fontWeight: 800 }}
+                                        height={70}
+                                        tickMargin={10}
+                                    />
+                                    <YAxis
+                                        tick={{ fontSize: 10, fill: '#6B7280', fontWeight: 800 }}
+                                        tickFormatter={(val) => `${val}h`}
+                                        stroke="transparent"
+                                    />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: 'var(--surface)', borderRadius: '12px', border: '1px solid var(--border-color)', fontSize: '13px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                                        cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                                        itemStyle={{ fontWeight: 'bold' }}
+                                        formatter={(val: any) => [`${val}h`, 'Horas Restantes']}
+                                    />
+                                    <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={35}>
+                                        <LabelList
+                                            dataKey="value"
+                                            position="top"
+                                            formatter={(val: any) => `${val}h`}
+                                            style={{ fill: '#6B7280', fontWeight: '800', fontSize: '11px' }}
                                         />
-                                        <YAxis hide />
-                                        <Tooltip
-                                            contentStyle={{ backgroundColor: 'var(--surface)', borderRadius: '12px', border: '1px solid var(--border-color)', fontSize: '12px' }}
-                                            cursor={{ fill: 'rgba(0,0,0,0.02)' }}
-                                            formatter={(val: any) => [`${val}h`, 'Horas Restantes']}
-                                        />
-                                        <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={32}>
-                                            <LabelList
-                                                dataKey="value"
-                                                position="top"
-                                                formatter={(val: any) => `${val}h`}
-                                                style={{ fill: '#6B7280', fontWeight: '800', fontSize: '10px' }}
-                                            />
-                                            {preventiveData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.fill} />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
+                                        {preventiveData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
                         ) : (
-                            <div className="flex flex-col items-center justify-center h-[200px] text-gray-500 bg-surface-highlight/10 rounded-2xl border-2 border-dashed border-border-color">
-                                <Settings className="w-10 h-10 mb-3 opacity-10" />
-                                <p className="text-xs font-black uppercase tracking-widest opacity-40">Tudo em dia por aqui</p>
+                            <div className="flex flex-col items-center justify-center h-full text-gray-500 bg-surface-highlight/10 rounded-2xl border-2 border-dashed border-border-color">
+                                <Settings className="w-12 h-12 mb-3 opacity-10" />
+                                <p className="text-sm font-black uppercase tracking-widest opacity-40">Tudo em dia por aqui</p>
                             </div>
                         )}
                     </div>
                 </div>
+            </div>
 
-                {/* Recent Activity / OS Feed */}
-                <div className="dashboard-card p-6 flex flex-col">
-                    <div className="flex justify-between items-start mb-8">
-                        <div>
-                            <h3 className="text-foreground text-lg font-black tracking-tight">Atividades Recentes</h3>
-                            <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-0.5">Últimas Ordens de Serviço abertas</p>
-                        </div>
-                        <Link href="/dashboard/pcm/os" className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">Ver Todas</Link>
+            {/* Recent Activity Section */}
+            <div className="dashboard-card p-6 flex flex-col">
+                <div className="flex justify-between items-start mb-8">
+                    <div>
+                        <h3 className="text-foreground text-xl font-black tracking-tight">Atividades Recentes</h3>
+                        <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">Últimas Ordens de Serviço abertas</p>
                     </div>
+                    <Link href="/dashboard/pcm/os" className="bg-surface-highlight hover:bg-border-color px-4 py-2 rounded-xl text-[10px] font-black text-primary transition-all uppercase tracking-widest shadow-sm border border-border-color">Ver Todas</Link>
+                </div>
 
-                    <div className="flex-1 space-y-4">
-                        {recentActivity.length > 0 ? (
-                            recentActivity.map((os, i) => (
-                                <div key={os.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-highlight/20 transition-all border border-transparent hover:border-border-color group">
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shadow-inner ${os.status === 'CONCLUIDA' ? 'bg-emerald-500/10 text-emerald-500' :
-                                        os.status === 'EM_EXECUCAO' ? 'bg-orange-500/10 text-orange-500' : 'bg-gray-500/10 text-gray-500'
-                                        }`}>
-                                        {os.veiculo?.codigoInterno || 'N/A'}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {recentActivity.length > 0 ? (
+                        recentActivity.map((os, i) => (
+                            <div key={os.id} className="flex items-center gap-4 p-4 rounded-2xl bg-surface-highlight/30 hover:bg-surface-highlight/60 transition-all border border-border-color/50 group">
+                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xs shadow-inner flex-shrink-0 ${os.status === 'CONCLUIDA' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
+                                    os.status === 'EM_EXECUCAO' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 'bg-gray-500/10 text-gray-500 border border-gray-500/20'
+                                    }`}>
+                                    {os.veiculo?.codigoInterno || 'N/A'}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex justify-between items-baseline mb-1">
+                                        <h4 className="text-sm font-black text-foreground truncate">{os.veiculo?.placa || '---'}</h4>
+                                        <span className="text-[9px] font-black text-gray-500 uppercase">{new Date(os.dataAbertura).toLocaleDateString('pt-BR')}</span>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex justify-between items-baseline mb-0.5">
-                                            <h4 className="text-sm font-black text-foreground truncate max-w-[140px]">{os.veiculo?.placa || '---'}</h4>
-                                            <span className="text-[9px] font-black text-gray-500 uppercase">{new Date(os.dataAbertura).toLocaleDateString('pt-BR')}</span>
-                                        </div>
-                                        <p className="text-[11px] text-gray-500 line-clamp-1 italic">&ldquo;{os.descricao}&rdquo;</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter border ${os.tipoOS === 'CORRETIVA' ? 'border-red-500/20 text-red-500 bg-red-500/5' : 'border-blue-500/20 text-blue-500 bg-blue-500/5'
+                                    <p className="text-[11px] text-gray-500 line-clamp-1 italic font-medium">&ldquo;{os.descricao}&rdquo;</p>
+                                    <div className="mt-2 flex items-center gap-2">
+                                        <span className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest border ${os.tipoOS === 'CORRETIVA' ? 'border-red-500/20 text-red-500 bg-red-500/5' : 'border-blue-500/20 text-blue-500 bg-blue-500/5'
                                             }`}>
                                             {os.tipoOS}
                                         </span>
+                                        <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">{os.status}</span>
                                     </div>
                                 </div>
-                            ))
-                        ) : (
-                            <div className="h-full flex flex-col items-center justify-center text-gray-500 opacity-20 py-10">
-                                <FileText className="w-12 h-12 mb-2" />
-                                <p className="text-xs font-black uppercase tracking-widest">Sem atividades registros</p>
                             </div>
-                        )}
-                    </div>
+                        ))
+                    ) : (
+                        <div className="col-span-full py-16 flex flex-col items-center justify-center text-gray-500 opacity-20">
+                            <FileText className="w-16 h-16 mb-2" />
+                            <p className="text-sm font-black uppercase tracking-widest">Sem atividades registradas</p>
+                        </div>
+                    )}
                 </div>
             </div>
 
