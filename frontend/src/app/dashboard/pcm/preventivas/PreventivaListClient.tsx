@@ -66,7 +66,7 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
     return (
         <div className="space-y-6">
             {/* Filters Bar */}
-            <div className="flex flex-col md:flex-row gap-4 bg-white dark:bg-gray-900 border border-border-color p-4 rounded-2xl shadow-sm">
+            <div className="flex flex-col md:flex-row gap-4 bg-surface border border-border-color p-4 rounded-2xl shadow-sm">
                 <div className="flex-1 relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 font-bold" />
                     <input
@@ -88,7 +88,7 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
                             className="bg-transparent text-xs font-black uppercase tracking-widest outline-none cursor-pointer pr-2 text-foreground"
                         >
                             {maintenanceTypes.map(cat => (
-                                <option key={cat} value={cat} className="bg-white dark:bg-gray-800">{cat}</option>
+                                <option key={cat} value={cat} className="bg-surface">{cat}</option>
                             ))}
                         </select>
                     </div>
@@ -101,15 +101,15 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
                             onChange={(e) => setVehicleTypeFilter(e.target.value)}
                             className="bg-transparent text-xs font-black uppercase tracking-widest outline-none cursor-pointer pr-2 text-foreground"
                         >
-                            <option value="TODOS" className="bg-white dark:bg-gray-800">TODOS</option>
-                            <option value="LEVE" className="bg-white dark:bg-gray-800">LEVE</option>
-                            <option value="PESADO" className="bg-white dark:bg-gray-800">PESADO</option>
+                            <option value="TODOS" className="bg-surface">TODOS</option>
+                            <option value="LEVE" className="bg-surface">LEVE</option>
+                            <option value="PESADO" className="bg-surface">PESADO</option>
                         </select>
                     </div>
 
                     <button
                         onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
-                        className="flex items-center gap-2 bg-surface-highlight border border-border-color rounded-xl px-5 py-2.5 hover:bg-white dark:hover:bg-gray-800 transition-all text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-300 active:scale-95 shadow-sm border border-border-color"
+                        className="flex items-center gap-2 bg-surface-highlight border border-border-color rounded-xl px-5 py-2.5 hover:bg-surface transition-all text-[10px] font-black uppercase tracking-widest text-foreground active:scale-95 shadow-sm"
                     >
                         <ArrowUpDown className="w-4 h-4 text-primary" />
                         URGÊNCIA: {sortOrder === 'desc' ? 'MAIOR P/ MENOR' : 'MENOR P/ MAIOR'}
@@ -118,11 +118,11 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
             </div>
 
             {/* List View (Table) */}
-            <div className="bg-white dark:bg-gray-900 border border-border-color rounded-2xl shadow-sm overflow-hidden border border-border-color">
+            <div className="bg-surface border border-border-color rounded-2xl shadow-sm overflow-hidden border border-border-color">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-border-color">
+                            <tr className="bg-surface-highlight/50 border-b border-border-color">
                                 <th className="px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Placa</th>
                                 <th className="px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Tipo</th>
                                 <th className="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Categoria</th>
@@ -172,9 +172,9 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
                                     const unidade = 'h' // Use 'h' or 'km' based on logic if needed
 
                                     return (
-                                        <tr key={plano.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
+                                        <tr key={plano.id} className="hover:bg-surface-highlight transition-colors group">
                                             <td className="px-6 py-4">
-                                                <span className="text-sm font-black text-gray-700 dark:text-gray-200 uppercase tracking-tight">
+                                                <span className="text-sm font-black text-foreground uppercase tracking-tight">
                                                     {plano.veiculo.placa || plano.veiculo.codigoInterno}
                                                 </span>
                                             </td>
@@ -209,7 +209,7 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
                                                 </span>
                                             </td>
                                             <td className="px-4 py-4">
-                                                <span className={`text-xs font-black tracking-tight ${falta < 0 ? 'text-red-500' : 'text-gray-700 dark:text-gray-200'}`}>
+                                                <span className={`text-xs font-black tracking-tight ${falta < 0 ? 'text-red-500' : 'text-foreground'}`}>
                                                     {falta}{unidade}
                                                 </span>
                                             </td>
@@ -239,7 +239,7 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                     Pequenas variações podem ocorrer devido ao atraso na sincronia dos dados
                 </p>
-                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest bg-surface-highlight px-3 py-1 rounded-full">
                     Total de {filteredAndSortedPlanos.length} planos listados
                 </p>
             </div>
