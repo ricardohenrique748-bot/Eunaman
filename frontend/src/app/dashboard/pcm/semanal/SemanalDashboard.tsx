@@ -1,6 +1,6 @@
 'use client'
 
-// Dashboard sem formatadores para evitar erros na Vercel v2
+// BUILD_VERSION: 1.0.3
 import React from 'react'
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie,
