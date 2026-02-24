@@ -3,7 +3,7 @@
 import React from 'react'
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie,
-    LabelList, LineChart, Line, YAxis as ReYAxis
+    LabelList, LineChart, Line
 } from 'recharts'
 import { X } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -115,7 +115,7 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
 
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-6">
 
-                {/* 1. Monthly Results Chart (The big one from image) */}
+                {/* 1. Monthly Results Chart */}
                 <Card className="border border-slate-100 shadow-lg rounded-[2.5rem] overflow-hidden bg-white">
                     <div className="px-8 py-5 bg-[#111827] flex justify-between items-center text-white">
                         <h3 className="text-xs font-black uppercase tracking-wider">Resultado Mensal de Programação Preventiva</h3>
@@ -139,17 +139,12 @@ export default function SemanalDashboard({ veiculos, startDate, endDate, onBack 
                                 <Tooltip />
                                 <Line type="monotone" dataKey="meta" stroke="#334155" strokeWidth={3} dot={{ r: 4, fill: '#334155' }} activeDot={{ r: 6 }} />
                                 <Line type="monotone" dataKey="realizado" stroke="#ef4444" strokeWidth={4} dot={{ r: 5, fill: '#ef4444' }} activeDot={{ r: 8 }} />
-                                <text x="0" y="20" fill="#94a3b8" fontSize="10" fontWeight="bold">100%</text>
-                                <text x="0" y="90" fill="#94a3b8" fontSize="10" fontWeight="bold">75%</text>
-                                <text x="0" y="160" fill="#94a3b8" fontSize="10" fontWeight="bold">50%</text>
-                                <text x="0" y="230" fill="#94a3b8" fontSize="10" fontWeight="bold">25%</text>
-                                <text x="0" y="300" fill="#94a3b8" fontSize="10" fontWeight="bold">0%</text>
                             </LineChart>
                         </ResponsiveContainer>
                     </CardContent>
                 </Card>
 
-                {/* 2. Weekly Results Chart (The second big one) */}
+                {/* 2. Weekly Results Chart */}
                 <Card className="border border-slate-100 shadow-md rounded-[2.5rem] overflow-hidden bg-white">
                     <div className="px-8 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/20">
                         <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">Acompanhamento de Programação Semanal</h3>
