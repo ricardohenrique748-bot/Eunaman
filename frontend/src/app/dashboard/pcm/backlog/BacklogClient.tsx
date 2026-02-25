@@ -254,8 +254,9 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
                 isCreateOpen && (
                     <BacklogFormDialog
                         isOpen={isCreateOpen}
-                        onClose={() => setIsCreateOpen(false)}
+                        onClose={closeDialog}
                         onSuccess={() => window.location.reload()} // For simplicity, full reload or re-fetch via action
+                        initialData={editingItem}
                     />
                 )
             }
