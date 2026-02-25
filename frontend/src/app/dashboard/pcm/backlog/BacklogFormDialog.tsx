@@ -102,22 +102,22 @@ export default function BacklogFormDialog({ isOpen, onClose, onSuccess, initialD
                     <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
                         {activeTab === 'EQUIPAMENTO' && (
                             <div className="grid grid-cols-2 gap-4">
-                                <Input label="Frota" value={formData.frota} onChange={v => handleChange('frota', v)} placeholder="Ex: CAM-01" />
-                                <Input label="Unidade" value={formData.unidade} onChange={v => handleChange('unidade', v)} placeholder="Ex: FEROZ" />
-                                <Input label="TAG" value={formData.tag} onChange={v => handleChange('tag', v)} />
-                                <Input label="Tipo" value={formData.tipo} onChange={v => handleChange('tipo', v)} />
-                                <Input label="Módulo" value={formData.modulo} onChange={v => handleChange('modulo', v)} />
-                                <Input label="Campo / Base" value={formData.campoBase} onChange={v => handleChange('campoBase', v)} />
-                                <Select label="Região" value={formData.regiaoProgramacao} onChange={v => handleChange('regiaoProgramacao', v)} options={['Norte', 'Sul', 'Leste', 'Oeste']} />
+                                <Input label="Frota" value={formData.frota} onChange={(v: string) => handleChange('frota', v)} placeholder="Ex: CAM-01" />
+                                <Input label="Unidade" value={formData.unidade} onChange={(v: string) => handleChange('unidade', v)} placeholder="Ex: FEROZ" />
+                                <Input label="TAG" value={formData.tag} onChange={(v: string) => handleChange('tag', v)} />
+                                <Input label="Tipo" value={formData.tipo} onChange={(v: string) => handleChange('tipo', v)} />
+                                <Input label="Módulo" value={formData.modulo} onChange={(v: string) => handleChange('modulo', v)} />
+                                <Input label="Campo / Base" value={formData.campoBase} onChange={(v: string) => handleChange('campoBase', v)} />
+                                <Select label="Região" value={formData.regiaoProgramacao} onChange={(v: string) => handleChange('regiaoProgramacao', v)} options={['Norte', 'Sul', 'Leste', 'Oeste']} />
                             </div>
                         )}
 
                         {activeTab === 'ATIVIDADE' && (
                             <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Select label="Origem" value={formData.origem} onChange={v => handleChange('origem', v)} options={['PREVENTIVA', 'CORRETIVA', 'INSPECAO', 'MELHORIA']} />
-                                    <Select label="Criticidade" value={formData.criticidade} onChange={v => handleChange('criticidade', v)} options={['A', 'B']} />
-                                    <Select label="Status" value={formData.status} onChange={v => handleChange('status', v)} options={['ABERTO', 'EM_ANDAMENTO', 'CONCLUIDO', 'CANCELADO']} />
+                                    <Select label="Origem" value={formData.origem} onChange={(v: string) => handleChange('origem', v)} options={['PREVENTIVA', 'CORRETIVA', 'INSPECAO', 'MELHORIA']} />
+                                    <Select label="Criticidade" value={formData.criticidade} onChange={(v: string) => handleChange('criticidade', v)} options={['A', 'B']} />
+                                    <Select label="Status" value={formData.status} onChange={(v: string) => handleChange('status', v)} options={['ABERTO', 'EM_ANDAMENTO', 'CONCLUIDO', 'CANCELADO']} />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Descrição da Atividade</label>
@@ -127,32 +127,32 @@ export default function BacklogFormDialog({ isOpen, onClose, onSuccess, initialD
                                         onChange={e => handleChange('descricaoAtividade', e.target.value)}
                                     />
                                 </div>
-                                <Input label="Observação" value={formData.observacao} onChange={v => handleChange('observacao', v)} />
+                                <Input label="Observação" value={formData.observacao} onChange={(v: string) => handleChange('observacao', v)} />
                             </div>
                         )}
 
                         {activeTab === 'MATERIAL' && (
                             <div className="grid grid-cols-2 gap-4">
-                                <Input label="Número RC" value={formData.numeroRc} onChange={v => handleChange('numeroRc', v)} />
-                                <Input label="Número Ordem" value={formData.numeroOrdem} onChange={v => handleChange('numeroOrdem', v)} />
-                                <Input label="OS" value={formData.os} onChange={v => handleChange('os', v)} />
-                                <Input label="Fornecedor" value={formData.fornecedor} onChange={v => handleChange('fornecedor', v)} />
-                                <Input label="Material" value={formData.material} onChange={v => handleChange('material', v)} />
-                                <Input label="Situação RC" value={formData.situacaoRc} onChange={v => handleChange('situacaoRc', v)} />
+                                <Input label="Número RC" value={formData.numeroRc} onChange={(v: string) => handleChange('numeroRc', v)} />
+                                <Input label="Número Ordem" value={formData.numeroOrdem} onChange={(v: string) => handleChange('numeroOrdem', v)} />
+                                <Input label="OS" value={formData.os} onChange={(v: string) => handleChange('os', v)} />
+                                <Input label="Fornecedor" value={formData.fornecedor} onChange={(v: string) => handleChange('fornecedor', v)} />
+                                <Input label="Material" value={formData.material} onChange={(v: string) => handleChange('material', v)} />
+                                <Input label="Situação RC" value={formData.situacaoRc} onChange={(v: string) => handleChange('situacaoRc', v)} />
                                 <div className="col-span-2">
-                                    <Input label="Detalhamento Pedido" value={formData.detalhamentoPedido} onChange={v => handleChange('detalhamentoPedido', v)} />
+                                    <Input label="Detalhamento Pedido" value={formData.detalhamentoPedido} onChange={(v: string) => handleChange('detalhamentoPedido', v)} />
                                 </div>
                             </div>
                         )}
 
                         {activeTab === 'TEMPORAL' && (
                             <div className="grid grid-cols-2 gap-4">
-                                <Input label="Data Evidência" type="date" value={formData.dataEvidencia} onChange={v => handleChange('dataEvidencia', v)} />
-                                <Input label="Previsão Material" type="date" value={formData.previsaoMaterial} onChange={v => handleChange('previsaoMaterial', v)} />
-                                <Input label="Data Programação" type="date" value={formData.dataProgramacao} onChange={v => handleChange('dataProgramacao', v)} />
-                                <Input label="Mão de Obra" value={formData.maoDeObra} onChange={v => handleChange('maoDeObra', v)} />
-                                <Input label="Tempo Exec. Previsto" value={formData.tempoExecucaoPrevisto} onChange={v => handleChange('tempoExecucaoPrevisto', v)} />
-                                <Input label="Semana" value={formData.semana} onChange={v => handleChange('semana', v)} />
+                                <Input label="Data Evidência" type="date" value={formData.dataEvidencia} onChange={(v: string) => handleChange('dataEvidencia', v)} />
+                                <Input label="Previsão Material" type="date" value={formData.previsaoMaterial} onChange={(v: string) => handleChange('previsaoMaterial', v)} />
+                                <Input label="Data Programação" type="date" value={formData.dataProgramacao} onChange={(v: string) => handleChange('dataProgramacao', v)} />
+                                <Input label="Mão de Obra" value={formData.maoDeObra} onChange={(v: string) => handleChange('maoDeObra', v)} />
+                                <Input label="Tempo Exec. Previsto" value={formData.tempoExecucaoPrevisto} onChange={(v: string) => handleChange('tempoExecucaoPrevisto', v)} />
+                                <Input label="Semana" value={formData.semana} onChange={(v: string) => handleChange('semana', v)} />
                             </div>
                         )}
                     </div>

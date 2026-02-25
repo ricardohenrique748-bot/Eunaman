@@ -42,6 +42,38 @@ export default function ImportBacklogDialog({ isOpen, onClose, onSuccess, onImpo
     }
 
     const mapDataToBacklogItems = (data: any[]) => {
+        // Safe date parse helper to handle string dates from Excel, e.g. "DD/MM/YYYY" or valid Date instances
+        const parseDate = (val: any) => {
+            if (!val) return undefined;
+            if (val instanceof Date) {
+                if (!isNaN(val.getTime())) return val;
+                return undefined;
+            }
+            if (typeof val === 'number') {
+                const date = new Date(Math.round((val - 25569) * 86400 * 1000));
+                if (!isNaN(date.getTime())) return date;
+                return undefined;
+            }
+            if (typeof val === 'string') {
+                const parts = val.trim().split(/[\/\-]/);
+                if (parts.length === 3) {
+                    // Assuming DD/MM/YYYY
+                    if (parts[0].length <= 2 && parts[2].length === 4) {
+                        const d = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}T12:00:00Z`);
+                        if (!isNaN(d.getTime())) return d;
+                    }
+                    // Assuming YYYY/MM/DD
+                    else if (parts[0].length === 4) {
+                        const d = new Date(`${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}T12:00:00Z`);
+                        if (!isNaN(d.getTime())) return d;
+                    }
+                }
+                const d = new Date(val);
+                if (!isNaN(d.getTime())) return d;
+            }
+            return undefined;
+        }
+
         return data.map(row => {
             // Helper to find key case-insensitively and handle variations
             // We create a map of normalized keys to values for faster lookup
@@ -62,14 +94,14 @@ export default function ImportBacklogDialog({ isOpen, onClose, onSuccess, onImpo
                 semana: get('semana')?.toString(),
                 mes: get('mes')?.toString(),
                 ano: get('ano')?.toString(),
-                dataEvidencia: get('dataevidencia') || get('datadaevidencia') || get('data') || get('datadeabertura'),
+                dataEvidencia: parseDate(get('dataevidencia') || get('datadaevidencia') || get('data') || get('datadeabertura') || get('dataabertura') || get('dataevidenc')),
                 modulo: get('modulo')?.toString(),
                 regiaoProgramacao: get('regiaoxprogramacao') || get('regiaoprogramacao'),
                 diasPendenciaAberta: Number(get('diaspendencia') || get('diasdependenciaaberta') || 0),
                 frota: get('frota')?.toString() || get('placa')?.toString() || get('equipamento')?.toString(),
                 tag: get('tag')?.toString(),
                 tipo: get('tipo')?.toString(),
-                descricaoAtividade: get('descricao') || get('descricaodaatividade'),
+                descricaoAtividade: (get('descricao') || get('descricaodaatividade') || get('descricaodoproblema') || get('atividade') || get('sintoma') || get('problema') || get('falha') || get('historico') || get('descricaofalha'))?.toString(),
                 origem: get('origem')?.toString(),
                 criticidade: get('criticidade')?.toString() || get('grau')?.toString(),
                 tempoExecucaoPrevisto: get('tempoexecucao')?.toString() || get('tempodeexecucaoprevisto')?.toString(),
@@ -79,19 +111,19 @@ export default function ImportBacklogDialog({ isOpen, onClose, onSuccess, onImpo
                 numeroRc: get('nrc')?.toString() || get('numerorc')?.toString() || get('reqcompras')?.toString(),
                 numeroOrdem: get('nordem')?.toString() || get('numeroordem')?.toString() || get('npedido')?.toString() || get('numeropedido')?.toString() || get('descrevaasolicitacao')?.toString(),
                 fornecedor: get('fornecedor')?.toString(),
-                dataRc: get('datarc'),
+                dataRc: parseDate(get('datarc')),
                 detalhamentoPedido: get('detalhamento') || get('detalhamentodopedido'),
-                dataNecessidadeMaterial: get('datanecmaterial') || get('datanecessidadematerial') || get('datanecessidadedomaterial'),
+                dataNecessidadeMaterial: parseDate(get('datanecmaterial') || get('datanecessidadematerial') || get('datanecessidadedomaterial')),
                 tipoPedido: get('tipopedido')?.toString(),
-                previsaoMaterial: get('previsaomaterial') || get('previsaodomaterial'),
+                previsaoMaterial: parseDate(get('previsaomaterial') || get('previsaodomaterial')),
                 situacaoRc: get('situacaorc')?.toString(),
                 diasAberturaReqCompras: Number(get('diasabertura') || get('diasaberturapendenciareqcompras') || 0),
-                dataProgramacao: get('dataprogramacao') || get('datadeprogramacao'),
+                dataProgramacao: parseDate(get('dataprogramacao') || get('datadeprogramacao')),
                 maoDeObra: get('maodeobra')?.toString(),
                 deltaEvidenciaProgramacao: Number(get('delta') || get('deltaevidenciavsdataprogramacao') || get('deltaevidencia') || 0),
                 statusProgramacao: get('statusprogramacao') || get('situacaoprogramacao'),
-                previsaoConclusaoPendencia: get('previsaoconclusao') || get('previsaodeconclusaopendencia'),
-                dataConclusaoPendencia: get('dataconclusao') || get('dataconclusaodapendencia'),
+                previsaoConclusaoPendencia: parseDate(get('previsaoconclusao') || get('previsaodeconclusaopendencia')),
+                dataConclusaoPendencia: parseDate(get('dataconclusao') || get('dataconclusaodapendencia')),
                 diasResolucaoPendencia: Number(get('diasresolucao') || get('diasderesolucaodapendencia') || 0),
                 status: get('status')?.toString(),
                 unidade: get('unidade')?.toString() || get('projeto')?.toString(),
