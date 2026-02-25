@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { LayoutDashboard, ListTodo, TableProperties, RefreshCw, FileSpreadsheet, Plus, FileUp, List, Search, Filter, X } from 'lucide-react'
+import { LayoutDashboard, ListTodo, TableProperties, RefreshCw, FileSpreadsheet, Plus, FileUp, List, Search, Filter, X, Share2 } from 'lucide-react'
 import BacklogList from './BacklogList'
 import BacklogDashboard from './BacklogDashboard'
 import BacklogDetailed from './BacklogDetailed'
@@ -105,6 +105,27 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => {
+                            const params = new URLSearchParams()
+                            if (searchTerm) params.set('search', searchTerm)
+                            if (filterMonth) params.set('month', filterMonth)
+                            if (filterYear) params.set('year', filterYear)
+                            if (filterStatus) params.set('status', filterStatus)
+                            if (filterCriticidade) params.set('criticidade', filterCriticidade)
+                            params.set('view', view)
+                            params.set('visitor', 'true')
+
+                            const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+                            navigator.clipboard.writeText(url)
+                            alert('Link compartilhado de visitante copiado para a área de transferência!')
+                        }}
+                        className="flex items-center gap-2 px-3 py-2 bg-surface hover:bg-surface-highlight text-primary border border-primary/20 rounded-lg text-xs font-bold transition-all"
+                        title="Copiar link de visitante"
+                    >
+                        <Share2 className="w-4 h-4" />
+                        Compartilhar
+                    </button>
                     <button
                         onClick={() => setIsImportOpen(true)}
                         className="flex items-center gap-2 px-3 py-2 bg-surface border border-border-color rounded-lg text-xs font-bold hover:bg-surface-highlight transition-colors"
