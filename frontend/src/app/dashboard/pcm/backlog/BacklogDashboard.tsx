@@ -256,7 +256,7 @@ export default function BacklogDashboard({ data }: { data: BacklogItem[] }) {
                                     contentStyle={{ background: 'var(--surface)', borderColor: 'var(--border-color)', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}
                                     itemStyle={{ color: 'var(--foreground)' }}
                                 />
-                                <Bar dataKey="value" fill="currentColor" radius={[6, 6, 6, 6]} barSize={40} className="fill-blue-500/80 hover:fill-blue-500 transition-colors">
+                                <Bar dataKey="value" fill="currentColor" radius={[6, 6, 6, 6]} barSize={40} className="fill-emerald-500/80 hover:fill-emerald-500 transition-colors">
                                     <LabelList dataKey="value" position="top" className="fill-foreground text-[10px] font-black" offset={8} />
                                 </Bar>
                             </BarChart>
