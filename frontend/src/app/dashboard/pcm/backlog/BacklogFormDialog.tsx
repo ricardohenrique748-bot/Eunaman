@@ -124,7 +124,7 @@ export default function BacklogFormDialog({ isOpen, onClose, onSuccess, initialD
                                     <textarea
                                         className="w-full h-32 bg-surface border border-border-color rounded-xl p-3 text-xs font-bold outline-none focus:border-primary resize-none"
                                         value={formData.descricaoAtividade || ''}
-                                        onChange={e => handleChange('descricaoAtividade', e.target.value)}
+                                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleChange('descricaoAtividade', e.target.value)}
                                     />
                                 </div>
                                 <Input label="Observação" value={formData.observacao} onChange={(v: string) => handleChange('observacao', v)} />
@@ -196,7 +196,7 @@ function Input({ label, value, onChange, placeholder, type = 'text' }: any) {
             <input
                 type={type}
                 value={displayValue}
-                onChange={e => onChange(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
                 placeholder={placeholder}
                 className="w-full bg-surface border border-border-color rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-primary transition-colors"
             />
@@ -210,7 +210,7 @@ function Select({ label, value, onChange, options }: any) {
             <label className="text-[10px] font-black uppercase text-gray-500 ml-1">{label}</label>
             <select
                 value={value || ''}
-                onChange={e => onChange(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value)}
                 className="w-full bg-surface border border-border-color rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-primary transition-colors"
             >
                 <option value="">Selecione...</option>
