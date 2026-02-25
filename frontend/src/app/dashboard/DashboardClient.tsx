@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowUpRight, ArrowDownRight, Activity, Wrench, AlertTriangle, CheckCircle2, Clock, FileText, Settings, AlertCircle, Filter, Search, Calendar } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, Activity, Wrench, AlertTriangle, CheckCircle2, Clock, FileText, Settings, AlertCircle, Filter, Search, Calendar, Share2 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -161,13 +161,35 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
                     </select>
                 </div>
 
-                <button
-                    onClick={applyFilters}
-                    className="bg-primary hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl font-black text-sm shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
-                >
-                    <Filter className="w-4 h-4" />
-                    Filtrar
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={applyFilters}
+                        className="bg-primary hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl font-black text-sm shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
+                    >
+                        <Filter className="w-4 h-4" />
+                        Filtrar
+                    </button>
+                    <button
+                        onClick={() => {
+                            const params = new URLSearchParams()
+                            if (localFilters.dataInicio) params.set('dataInicio', localFilters.dataInicio)
+                            if (localFilters.dataFim) params.set('dataFim', localFilters.dataFim)
+                            if (localFilters.placa) params.set('placa', localFilters.placa)
+                            if (localFilters.status) params.set('status', localFilters.status)
+                            if (localFilters.os) params.set('os', localFilters.os)
+                            if (localFilters.tipo) params.set('tipo', localFilters.tipo)
+                            params.set('visitor', 'true')
+                            const url = `${window.location.origin}/dashboard?${params.toString()}`
+                            navigator.clipboard.writeText(url)
+                            alert('Link de visitante copiado para a área de transferência!')
+                        }}
+                        className="bg-surface hover:bg-surface-highlight text-primary border border-primary/20 px-4 py-2.5 rounded-xl font-black text-sm transition-all flex items-center gap-2"
+                        title="Copiar link de visitante"
+                    >
+                        <Share2 className="w-4 h-4" />
+                        Compartilhar
+                    </button>
+                </div>
             </div>
 
             {/* KPI Grid (already updated) */}
