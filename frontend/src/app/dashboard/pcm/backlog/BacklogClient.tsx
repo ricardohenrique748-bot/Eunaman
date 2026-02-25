@@ -233,7 +233,7 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
             <div className="flex-1 min-h-0 bg-surface border border-border-color rounded-2xl overflow-hidden shadow-sm">
                 {view === 'LIST' && <BacklogList data={filteredData} onEdit={handleEdit} onDelete={handleDelete} />}
                 {view === 'DASHBOARD' && <BacklogDashboard data={filteredData} />}
-                {view === 'DETAILED' && <BacklogDetailed data={filteredData} />}
+                {view === 'DETAILED' && <BacklogDetailed data={filteredData} onEdit={handleEdit} onDelete={handleDelete} />}
             </div>
 
             {/* Dialogs */}

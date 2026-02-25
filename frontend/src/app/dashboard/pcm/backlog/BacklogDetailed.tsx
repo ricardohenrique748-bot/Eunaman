@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react'
 import { BacklogItem } from '@/app/actions/backlog-actions'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, Edit2, Trash2 } from 'lucide-react'
 
-export default function BacklogDetailed({ data }: { data: BacklogItem[] }) {
+export default function BacklogDetailed({ data, onEdit, onDelete }: { data: BacklogItem[], onEdit: (item: BacklogItem) => void, onDelete: (id: string) => void }) {
     const [search, setSearch] = useState('')
 
     const filtered = data.filter(item => {
@@ -33,7 +33,7 @@ export default function BacklogDetailed({ data }: { data: BacklogItem[] }) {
                     <thead className="bg-surface-highlight/50 sticky top-0 z-10 backdrop-blur-sm border-b border-border-color">
                         <tr>
                             {[
-                                'Semana', 'Mês', 'Ano', 'Data Evidência', 'Módulo', 'Reg. Prog.', 'Dias Pend.', 'Frota', 'TAG', 'Tipo',
+                                'Ações', 'Semana', 'Mês', 'Ano', 'Data Evidência', 'Módulo', 'Reg. Prog.', 'Dias Pend.', 'Frota', 'TAG', 'Tipo',
                                 'Descrição', 'Origem', 'Criticidade', 'Tempo Est.', 'Campo Base', 'OS', 'Material', 'RC', 'Ordem',
                                 'Fornecedor', 'Data RC', 'Detalhe Pedido', 'Nec. Material', 'Tipo Pedido', 'Prev. Material',
                                 'Sit. RC', 'Dias Req.', 'Prog.', 'Mão de Obra', 'Delta', 'Status Prog.', 'Prev. Conclusão',
@@ -48,6 +48,24 @@ export default function BacklogDetailed({ data }: { data: BacklogItem[] }) {
                     <tbody className="divide-y divide-border-color/50">
                         {filtered.map((item) => (
                             <tr key={item.id} className="hover:bg-surface-highlight/50 transition-colors text-xs text-foreground">
+                                <td className="p-3">
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onEdit(item) }}
+                                            className="p-1.5 hover:bg-blue-50 text-blue-600 rounded-md transition-colors"
+                                            title="Editar"
+                                        >
+                                            <Edit2 className="w-3 h-3" />
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onDelete(item.id) }}
+                                            className="p-1.5 hover:bg-red-50 text-red-600 rounded-md transition-colors"
+                                            title="Excluir"
+                                        >
+                                            <Trash2 className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                </td>
                                 <td className="p-3">{item.semana}</td>
                                 <td className="p-3">{item.mes}</td>
                                 <td className="p-3">{item.ano}</td>
