@@ -55,47 +55,7 @@ export default function BacklogFormDialog({ isOpen, onClose, onSuccess, initialD
 
     // ... (rest of render code)
 
-    // Components
-    function Input({ label, value, onChange, placeholder, type = 'text' }: { label: string, value: any, onChange: (v: any) => void, placeholder?: string, type?: string }) {
-        let displayValue = value || ''
-        if (type === 'date' && value) {
-            try {
-                if (value instanceof Date) displayValue = value.toISOString().split('T')[0]
-                else if (typeof value === 'string' && value.includes('T')) displayValue = value.split('T')[0]
-            } catch (e) { }
-        }
-
-        return (
-            <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-gray-500 ml-1">{label}</label>
-                <input
-                    type={type}
-                    value={displayValue}
-                    onChange={e => onChange(e.target.value)}
-                    placeholder={placeholder}
-                    className="w-full bg-surface border border-border-color rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-primary transition-colors"
-                />
-            </div>
-        )
-    }
-
-    function Select({ label, value, onChange, options }: { label: string, value: any, onChange: (v: any) => void, options: string[] }) {
-        return (
-            <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-gray-500 ml-1">{label}</label>
-                <select
-                    value={value || ''}
-                    onChange={e => onChange(e.target.value)}
-                    className="w-full bg-surface border border-border-color rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-primary transition-colors"
-                >
-                    <option value="">Selecione...</option>
-                    {options.map((o: string) => (
-                        <option key={o} value={o}>{o}</option>
-                    ))}
-                </select>
-            </div>
-        )
-    }
+    // ... (rest of render code)
 
     if (!isOpen) return null
 
