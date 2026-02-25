@@ -28,7 +28,7 @@ export default function BacklogDetailed({ data }: { data: BacklogItem[] }) {
                 />
             </div>
 
-            <div className="flex-1 w-full overflow-auto relative pb-2">
+            <div className="flex-1 w-full overflow-auto relative pb-2 max-h-[calc(100vh-280px)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full">
                 <table className="w-max min-w-full text-left border-collapse whitespace-nowrap">
                     <thead className="bg-surface-highlight/50 sticky top-0 z-10 backdrop-blur-sm border-b border-border-color">
                         <tr>
