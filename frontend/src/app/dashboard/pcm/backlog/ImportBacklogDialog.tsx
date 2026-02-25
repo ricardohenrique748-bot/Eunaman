@@ -62,70 +62,40 @@ export default function ImportBacklogDialog({ isOpen, onClose, onSuccess, onImpo
                 semana: get('semana')?.toString(),
                 mes: get('mes')?.toString(),
                 ano: get('ano')?.toString(),
-                // Image: DATA DA EVIDENCIA
-                dataEvidencia: get('datadaevidencia') || get('data') || get('datadeabertura'),
-                // Image: MÓDULO
+                dataEvidencia: get('dataevidencia') || get('datadaevidencia') || get('data') || get('datadeabertura'),
                 modulo: get('modulo')?.toString(),
-                regiaoProgramacao: get('regiaoprogramacao'),
-                // Image: Dias de pendência aberta
-                diasPendenciaAberta: Number(get('diasdependenciaaberta') || 0),
-                // Image: Placa
-                frota: get('placa')?.toString() || get('frota')?.toString() || get('equipamento')?.toString(),
+                regiaoProgramacao: get('regiaoxprogramacao') || get('regiaoprogramacao'),
+                diasPendenciaAberta: Number(get('diaspendencia') || get('diasdependenciaaberta') || 0),
+                frota: get('frota')?.toString() || get('placa')?.toString() || get('equipamento')?.toString(),
                 tag: get('tag')?.toString(),
-                // Image: TIPO
                 tipo: get('tipo')?.toString(),
-                // Image: DESCRIÇÃO DA ATIVIDADE
-                descricaoAtividade: get('descricaodaatividade'),
-                // Image: ORIGEM
+                descricaoAtividade: get('descricao') || get('descricaodaatividade'),
                 origem: get('origem')?.toString(),
-                // Image: CRITICIDADE
                 criticidade: get('criticidade')?.toString() || get('grau')?.toString(),
-                // Image: TEMPO DE EXECUÇÃO PREVISTO
-                tempoExecucaoPrevisto: get('tempodeexecucaoprevisto'),
-                // Image: CAMPO / BASE
+                tempoExecucaoPrevisto: get('tempoexecucao')?.toString() || get('tempodeexecucaoprevisto')?.toString(),
                 campoBase: get('campobase')?.toString(),
-                // Image: O.S
                 os: get('os')?.toString(),
-                // Image: MATERIAL
                 material: get('material')?.toString(),
-                // Image: N° RC
-                numeroRc: get('nrc') || get('numerorc') || get('reqcompras'),
-                // Image: N° PEDIDO (Assuming this maps to Numero Ordem based on context, or could be ignored if irrelevant)
-                numeroOrdem: get('npedido') || get('numeropedido') || get('numeroordem') || get('descrevaasolicitacao'),
-                // Image: FORNECEDOR
+                numeroRc: get('nrc')?.toString() || get('numerorc')?.toString() || get('reqcompras')?.toString(),
+                numeroOrdem: get('nordem')?.toString() || get('numeroordem')?.toString() || get('npedido')?.toString() || get('numeropedido')?.toString() || get('descrevaasolicitacao')?.toString(),
                 fornecedor: get('fornecedor')?.toString(),
-                // Image: DATA RC
                 dataRc: get('datarc'),
-                // Image: DETALHAMENTO DO PEDIDO
-                detalhamentoPedido: get('detalhamentodopedido'),
-                // Image: DATA NECESSIDADE DO MATERIAL
-                dataNecessidadeMaterial: get('datanecessidadedomaterial'),
-                // Image: TIPO DE PEDIDO
-                tipoPedido: get('tipodepedido'),
-                // Image: PREVISÃO DO MATERIAL
-                previsaoMaterial: get('previsaodomaterial'),
-                // Image: SITUAÇÃO RC
-                situacaoRc: get('situacaorc'),
-                // Image: DIAS (ABERTURA PENDÊNCIA/REQ. COMPRAS)
-                diasAberturaReqCompras: Number(get('diasaberturapendenciareqcompras') || 0),
-                // Image: DATA DE PROGRAMAÇÃO
-                dataProgramacao: get('datadeprogramacao'),
-                // Image: MÃO DE OBRA
-                maoDeObra: get('maodeobra'),
-                deltaEvidenciaProgramacao: Number(get('deltaevidenciavsdataprogramacao') || get('deltaevidencia') || 0),
+                detalhamentoPedido: get('detalhamento') || get('detalhamentodopedido'),
+                dataNecessidadeMaterial: get('datanecmaterial') || get('datanecessidadematerial') || get('datanecessidadedomaterial'),
+                tipoPedido: get('tipopedido')?.toString(),
+                previsaoMaterial: get('previsaomaterial') || get('previsaodomaterial'),
+                situacaoRc: get('situacaorc')?.toString(),
+                diasAberturaReqCompras: Number(get('diasabertura') || get('diasaberturapendenciareqcompras') || 0),
+                dataProgramacao: get('dataprogramacao') || get('datadeprogramacao'),
+                maoDeObra: get('maodeobra')?.toString(),
+                deltaEvidenciaProgramacao: Number(get('delta') || get('deltaevidenciavsdataprogramacao') || get('deltaevidencia') || 0),
                 statusProgramacao: get('statusprogramacao') || get('situacaoprogramacao'),
-                // Image: PREVISÃO DE CONCLUSÃO PENDÊNCIA
-                previsaoConclusaoPendencia: get('previsaodeconclusaopendencia'),
-                // Image: DATA CONCLUSÃO DA PENDÊNCIA
-                dataConclusaoPendencia: get('dataconclusaodapendencia'),
-                // Image: DIAS DE RESOLUÇÃO DA PENDÊNCIA
-                diasResolucaoPendencia: Number(get('diasderesolucaodapendencia') || 0),
-                // Image: STATUS
+                previsaoConclusaoPendencia: get('previsaoconclusao') || get('previsaodeconclusaopendencia'),
+                dataConclusaoPendencia: get('dataconclusao') || get('dataconclusaodapendencia'),
+                diasResolucaoPendencia: Number(get('diasresolucao') || get('diasderesolucaodapendencia') || 0),
                 status: get('status')?.toString(),
-                // Image: UNIDADE
                 unidade: get('unidade')?.toString() || get('projeto')?.toString(),
-                // Image: OBESERVAÇÃO (Typo in header)
-                observacao: get('obeservacao') || get('observacao')
+                observacao: get('observacao') || get('obeservacao')
             }
         })
     }
