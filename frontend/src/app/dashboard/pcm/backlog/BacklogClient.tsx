@@ -20,11 +20,11 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
 
     const [editingItem, setEditingItem] = useState<BacklogItem | undefined>(undefined)
 
-    // Filter State
     const [searchTerm, setSearchTerm] = useState('')
     const [filterMonth, setFilterMonth] = useState('')
     const [filterYear, setFilterYear] = useState('')
     const [filterStatus, setFilterStatus] = useState('')
+    const [filterCriticidade, setFilterCriticidade] = useState('')
 
     // Derived Data
     const filteredData = data.filter(item => {
@@ -35,9 +35,6 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
             (item.os?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false)
 
         // Filter by Month
-        // Normalize item.mes to handle various formats if necessary, assuming exact match for now or index
-        // If stored as "Janeiro", we match string. If number, we match number.
-        // Let's assume text match for flexibility or try both.
         const matchesMonth = filterMonth === '' ||
             (item.mes?.toString().toLowerCase() === filterMonth.toLowerCase())
 
@@ -49,17 +46,22 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
         const matchesStatus = filterStatus === '' ||
             (item.status === filterStatus)
 
-        return matchesSearch && matchesMonth && matchesYear && matchesStatus
+        // Filter by Criticidade
+        const matchesCriticidade = filterCriticidade === '' ||
+            (item.criticidade === filterCriticidade)
+
+        return matchesSearch && matchesMonth && matchesYear && matchesStatus && matchesCriticidade
     })
 
     const months = [
         "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
         "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ]
-    const years = ["2023", "2024", "2025", "2026"]
+    const years = ["2023", "2024", "2025", "2026", "2027"]
 
     // Get unique statuses from data for the dropdown
     const statuses = Array.from(new Set(data.map(i => i.status).filter(Boolean) as string[])).sort()
+    const criticidades = Array.from(new Set(data.map(i => i.criticidade).filter(Boolean) as string[])).sort()
 
     // Export to Excel
     const handleExport = () => {
@@ -81,8 +83,6 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
             // Server action (needs import)
             const { deleteBacklogItem } = await import('@/app/actions/backlog-actions')
             await deleteBacklogItem(id)
-            // Revalidate happens on server, but we kept local state inconsistent if failed. 
-            // Ideally we re-fetch or use router.refresh(), but for now optimistic is fine.
         }
     }
 
@@ -132,7 +132,7 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
             {/* Filters Bar */}
             <div className="bg-surface border border-border-color p-4 rounded-2xl shadow-sm flex flex-wrap gap-4 items-end">
                 <div className="space-y-1.5 flex-1 min-w-[200px]">
-                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Buscar Placa / OS</label>
+                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Placa / OS / Tag</label>
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                         <input
@@ -152,8 +152,8 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
                     </div>
                 </div>
 
-                <div className="space-y-1.5 min-w-[140px]">
-                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Mês</label>
+                <div className="space-y-1.5 min-w-[120px]">
+                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Mês (Data)</label>
                     <select
                         value={filterMonth}
                         onChange={e => setFilterMonth(e.target.value)}
@@ -194,6 +194,19 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
                     </select>
                 </div>
 
+                <div className="space-y-1.5 min-w-[140px]">
+                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Criticidade</label>
+                    <select
+                        value={filterCriticidade}
+                        onChange={e => setFilterCriticidade(e.target.value)}
+                        className="w-full bg-surface-highlight border border-border-color rounded-xl px-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all"
+                    >
+                        <option value="">Todas</option>
+                        {criticidades.map(c => (
+                            <option key={c} value={c}>{c}</option>
+                        ))}
+                    </select>
+                </div>
 
                 <div className="border-l border-border-color h-10 mx-2 hidden md:block"></div>
 

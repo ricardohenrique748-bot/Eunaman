@@ -39,6 +39,21 @@ export default function BacklogDashboard({ data }: { data: BacklogItem[] }) {
         { name: 'Concluído', value: completed, color: '#10b981' },
     ]
 
+    // Chart 3: By Semana (Week)
+    const weekCount = data.reduce((acc, item) => {
+        const week = (item.semana || 'Não Info').trim()
+        acc[week] = (acc[week] || 0) + 1
+        return acc
+    }, {} as Record<string, number>)
+
+    const weekData = Object.entries(weekCount)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => {
+            if (a.name === 'Não Info') return 1
+            if (b.name === 'Não Info') return -1
+            return a.name.localeCompare(b.name, undefined, { numeric: true })
+        })
+
     return (
         <div className="p-4 md:p-8 space-y-8 overflow-y-auto h-full [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full">
             {/* Header / Intro */}
@@ -205,6 +220,47 @@ export default function BacklogDashboard({ data }: { data: BacklogItem[] }) {
                             <span className="text-4xl font-black text-foreground">{total}</span>
                             <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Total</span>
                         </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Segunda Linha de Gráficos */}
+            <div className="grid grid-cols-1 gap-6 h-[380px] mt-6">
+                <Card className="col-span-1 border border-border-color/60 shadow-none rounded-2xl bg-surface/50">
+                    <CardHeader className="pb-2 border-b border-border-color/20 mb-4 px-6 pt-6">
+                        <CardTitle className="text-xs font-black uppercase tracking-widest text-gray-500">Por Semana</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pl-0 pr-6 h-[280px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={weekData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
+                                <XAxis
+                                    dataKey="name"
+                                    stroke="#888888"
+                                    fontSize={10}
+                                    fontWeight="bold"
+                                    tickLine={false}
+                                    axisLine={false}
+                                    dy={10}
+                                />
+                                <YAxis
+                                    stroke="#888888"
+                                    fontSize={10}
+                                    fontWeight="bold"
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={(value) => `${value}`}
+                                    dx={-10}
+                                />
+                                <Tooltip
+                                    cursor={{ fill: 'rgba(255,255,255,0.02)' }}
+                                    contentStyle={{ background: 'var(--surface)', borderColor: 'var(--border-color)', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}
+                                    itemStyle={{ color: 'var(--foreground)' }}
+                                />
+                                <Bar dataKey="value" fill="currentColor" radius={[6, 6, 6, 6]} barSize={40} className="fill-blue-500/80 hover:fill-blue-500 transition-colors">
+                                    <LabelList dataKey="value" position="top" className="fill-foreground text-[10px] font-black" offset={8} />
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
                     </CardContent>
                 </Card>
             </div>
