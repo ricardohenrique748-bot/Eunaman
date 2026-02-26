@@ -39,6 +39,7 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
 }) {
     const router = useRouter()
     const searchParams = useSearchParams()
+    const isVisitor = searchParams.get('visitor') === 'true'
 
     const [localFilters, setLocalFilters] = useState(filters)
 
@@ -76,10 +77,11 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
         if (localFilters.status) params.set('status', localFilters.status)
         if (localFilters.os) params.set('os', localFilters.os)
         if (localFilters.tipo) params.set('tipo', localFilters.tipo)
+        if (isVisitor) params.set('visitor', 'true')
         const finalUrl = `/dashboard?${params.toString()}`
         console.log('[Client] Redirecionando para:', finalUrl)
         router.push(finalUrl)
-    }, [localFilters, router])
+    }, [localFilters, router, isVisitor])
 
     const meses = [
         "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -169,26 +171,28 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
                         <Filter className="w-4 h-4" />
                         Filtrar
                     </button>
-                    <button
-                        onClick={() => {
-                            const params = new URLSearchParams()
-                            if (localFilters.dataInicio) params.set('dataInicio', localFilters.dataInicio)
-                            if (localFilters.dataFim) params.set('dataFim', localFilters.dataFim)
-                            if (localFilters.placa) params.set('placa', localFilters.placa)
-                            if (localFilters.status) params.set('status', localFilters.status)
-                            if (localFilters.os) params.set('os', localFilters.os)
-                            if (localFilters.tipo) params.set('tipo', localFilters.tipo)
-                            params.set('visitor', 'true')
-                            const url = `${window.location.origin}/dashboard?${params.toString()}`
-                            navigator.clipboard.writeText(url)
-                            alert('Link de visitante copiado para a área de transferência!')
-                        }}
-                        className="bg-surface hover:bg-surface-highlight text-primary border border-primary/20 px-4 py-2.5 rounded-xl font-black text-sm transition-all flex items-center gap-2"
-                        title="Copiar link de visitante"
-                    >
-                        <Share2 className="w-4 h-4" />
-                        Compartilhar
-                    </button>
+                    {!isVisitor && (
+                        <button
+                            onClick={() => {
+                                const params = new URLSearchParams()
+                                if (localFilters.dataInicio) params.set('dataInicio', localFilters.dataInicio)
+                                if (localFilters.dataFim) params.set('dataFim', localFilters.dataFim)
+                                if (localFilters.placa) params.set('placa', localFilters.placa)
+                                if (localFilters.status) params.set('status', localFilters.status)
+                                if (localFilters.os) params.set('os', localFilters.os)
+                                if (localFilters.tipo) params.set('tipo', localFilters.tipo)
+                                params.set('visitor', 'true')
+                                const url = `${window.location.origin}/dashboard?${params.toString()}`
+                                navigator.clipboard.writeText(url)
+                                alert('Link de visitante copiado para a área de transferência!')
+                            }}
+                            className="bg-surface hover:bg-surface-highlight text-primary border border-primary/20 px-4 py-2.5 rounded-xl font-black text-sm transition-all flex items-center gap-2"
+                            title="Copiar link de visitante"
+                        >
+                            <Share2 className="w-4 h-4" />
+                            Compartilhar
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -248,18 +252,18 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
                         <div className="flex flex-col w-full">
                             <p className="text-[10px] font-black uppercase text-gray-500 mb-2 tracking-widest">Documentos da Frota</p>
                             <div className="grid grid-cols-3 gap-3 w-full">
-                                <Link href="/dashboard/admin" className="flex flex-col hover:bg-surface-highlight/50 p-1 rounded-lg transition-colors">
+                                <div className="flex flex-col p-1 rounded-lg transition-colors">
                                     <span className="text-xl font-black text-emerald-500 leading-none">{metrics.docs?.valid ?? 0}</span>
                                     <span className="text-[8px] font-bold text-gray-400 uppercase mt-1">Ok</span>
-                                </Link>
-                                <Link href="/dashboard/admin" className="flex flex-col hover:bg-surface-highlight/50 p-1 rounded-lg transition-colors">
+                                </div>
+                                <div className="flex flex-col p-1 rounded-lg transition-colors">
                                     <span className="text-xl font-black text-yellow-500 leading-none">{metrics.docs?.attention ?? 0}</span>
                                     <span className="text-[8px] font-bold text-gray-400 uppercase mt-1">Avisos</span>
-                                </Link>
-                                <Link href="/dashboard/admin" className="flex flex-col hover:bg-surface-highlight/50 p-1 rounded-lg transition-colors">
+                                </div>
+                                <div className="flex flex-col p-1 rounded-lg transition-colors">
                                     <span className="text-xl font-black text-red-500 leading-none">{metrics.docs?.expired ?? 0}</span>
                                     <span className="text-[8px] font-bold text-gray-400 uppercase mt-1">Venc</span>
-                                </Link>
+                                </div>
                             </div>
                             <div className="mt-3 flex items-center justify-between border-t border-border-color/30 pt-2">
                                 <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Status Geral</span>
@@ -439,7 +443,6 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
                         <h3 className="text-foreground text-xl font-black tracking-tight">Atividades Recentes</h3>
                         <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">Últimas Ordens de Serviço abertas</p>
                     </div>
-                    <Link href="/dashboard/pcm/os" className="bg-surface-highlight hover:bg-border-color px-4 py-2 rounded-xl text-[10px] font-black text-primary transition-all uppercase tracking-widest shadow-sm border border-border-color">Ver Todas</Link>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
