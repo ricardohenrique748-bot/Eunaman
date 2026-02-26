@@ -31,89 +31,92 @@ export default async function PneusPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-6">
+            <div className="bg-surface border border-border-color rounded-2xl shadow-sm overflow-hidden">
                 {boletins.length > 0 ? (
-                    boletins.map((boletim) => (
-                        <div key={boletim.id} className="dashboard-card p-6 group hover:translate-y-[-4px] hover:border-primary/40 transition-all duration-300 relative overflow-hidden flex flex-col h-full">
-                            {/* Accent Icon Background */}
-                            <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
-                                <Disc className="w-32 h-32 rotate-12 stroke-[3px]" />
-                            </div>
-
-                            <div className="relative z-10 flex flex-col flex-1">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-surface-highlight border border-border-color flex flex-col items-center justify-center shadow-inner group-hover:border-primary/30 transition-colors">
-                                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">FROTA</span>
-                                            <span className="text-sm font-black text-foreground leading-none">
-                                                {boletim.veiculo.codigoInterno.substring(0, 3)}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-black text-foreground tracking-tight leading-none mb-1">
-                                                {boletim.veiculo.placa || boletim.veiculo.codigoInterno}
-                                            </h3>
-                                            <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">
-                                                {boletim.veiculo.modelo}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <BoletimActions id={boletim.id} />
-                                </div>
-
-                                <div className="flex items-center gap-4 mb-6 border-b border-border-color/50 pb-4">
-                                    <div className="flex items-center gap-2 bg-background border border-border-color/40 px-3 py-1.5 rounded-xl">
-                                        <Calendar className="w-3.5 h-3.5 text-primary" />
-                                        <span className="text-[10px] font-black text-foreground">{new Date(boletim.data).toLocaleDateString('pt-BR')}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 bg-background border border-border-color/40 px-3 py-1.5 rounded-xl">
-                                        <Activity className="w-3.5 h-3.5 text-blue-500" />
-                                        <span className="text-[10px] font-black text-foreground">{boletim.km.toLocaleString()} KM</span>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4 mb-6">
-                                    <div className="flex justify-between items-center px-1">
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Medição (Sulco)</p>
-                                        <span className="text-[9px] bg-primary/10 text-primary px-2 py-0.5 rounded-lg font-black uppercase tracking-tighter">
-                                            {boletim.itens.length} Pneus
-                                        </span>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {boletim.itens.slice(0, 4).map((item, idx) => (
-                                            <div key={idx} className={`flex justify-between items-center px-3 py-2.5 rounded-xl border transition-all ${item.sulcoMm < 3 ? 'bg-red-500/5 border-red-500/20 text-red-500' : 'bg-surface-highlight/50 border-border-color/30 hover:border-border-color'}`}>
-                                                <span className="text-[10px] font-black opacity-60 uppercase">{item.posicao}</span>
-                                                <div className="flex items-baseline gap-0.5">
-                                                    <span className="text-sm font-black tracking-tight">{item.sulcoMm}</span>
-                                                    <span className="text-[8px] font-bold opacity-40 uppercase">mm</span>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse whitespace-nowrap">
+                            <thead>
+                                <tr className="bg-surface-highlight border-b border-border-color">
+                                    <th className="px-6 py-4 text-[10px] font-black tracking-widest text-gray-500 uppercase">Frota</th>
+                                    <th className="px-6 py-4 text-[10px] font-black tracking-widest text-gray-500 uppercase">Data</th>
+                                    <th className="px-6 py-4 text-[10px] font-black tracking-widest text-gray-500 uppercase">KM</th>
+                                    <th className="px-6 py-4 text-[10px] font-black tracking-widest text-gray-500 uppercase">Pneus Inspecionados</th>
+                                    <th className="px-6 py-4 text-[10px] font-black tracking-widest text-gray-500 uppercase">Medições (Sulco)</th>
+                                    <th className="px-6 py-4 text-[10px] font-black tracking-widest text-gray-500 uppercase text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border-color">
+                                {boletins.map((boletim) => (
+                                    <tr key={boletim.id} className="hover:bg-surface-highlight/50 transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-surface-highlight border border-border-color flex items-center justify-center shadow-inner group-hover:border-primary/30 transition-colors">
+                                                    <Truck className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-black text-foreground tracking-tight">
+                                                        {boletim.veiculo.placa || boletim.veiculo.codigoInterno}
+                                                    </p>
+                                                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                                                        {boletim.veiculo.modelo} ({boletim.veiculo.codigoInterno.substring(0, 3)})
+                                                    </p>
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                    {boletim.itens.length > 4 && (
-                                        <div className="flex justify-center">
-                                            <div className="w-1 h-1 rounded-full bg-gray-300 mx-0.5"></div>
-                                            <div className="w-1 h-1 rounded-full bg-gray-300 mx-0.5"></div>
-                                            <div className="w-1 h-1 rounded-full bg-gray-300 mx-0.5"></div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {boletim.observacoes && (
-                                    <div className="mt-auto pt-4 border-t border-border-color/50">
-                                        <div className="flex gap-3 p-3 bg-orange-500/5 border border-orange-500/10 rounded-xl relative overflow-hidden">
-                                            <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                                            <p className="text-[10px] font-bold text-gray-500 leading-relaxed line-clamp-2">
-                                                {boletim.observacoes}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    ))
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <Calendar className="w-4 h-4 text-primary" />
+                                                <span className="text-xs font-bold text-foreground">
+                                                    {new Date(boletim.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <Activity className="w-4 h-4 text-blue-500" />
+                                                <span className="text-xs font-bold text-foreground">
+                                                    {boletim.km.toLocaleString()} KM
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-black uppercase tracking-tighter">
+                                                {boletim.itens.length} Pneus
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex flex-col gap-2">
+                                                <div className="flex flex-wrap gap-2 min-w-[200px]">
+                                                    {boletim.itens.slice(0, 4).map((item, idx) => (
+                                                        <div key={idx} className={`flex items-center gap-1.5 px-2 py-1 rounded-md border text-[10px] font-bold ${item.sulcoMm < 3 ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-surface border-border-color text-foreground'}`}>
+                                                            <span className="opacity-60">{item.posicao}:</span>
+                                                            <span>{item.sulcoMm}mm</span>
+                                                        </div>
+                                                    ))}
+                                                    {boletim.itens.length > 4 && (
+                                                        <span className="text-[10px] font-bold text-gray-400 flex items-center">+{boletim.itens.length - 4} mais</span>
+                                                    )}
+                                                </div>
+                                                {boletim.observacoes && (
+                                                    <div className="text-[10px] text-orange-500 max-w-[300px] truncate flex items-center gap-1 bg-orange-500/5 px-2 py-1 rounded-md border border-orange-500/10 inline-flex w-fit">
+                                                        <AlertTriangle className="w-3 h-3 shrink-0" />
+                                                        <span className="truncate">{boletim.observacoes}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex justify-end">
+                                                <BoletimActions id={boletim.id} />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 ) : (
-                    <div className="col-span-full dashboard-card h-[60vh] flex items-center justify-center flex-col text-center p-8 bg-surface/30">
+                    <div className="p-12 flex flex-col items-center justify-center text-center bg-surface/30">
                         <div className="p-8 bg-surface-highlight rounded-full mb-8 shadow-inner relative">
                             <Disc className="w-16 h-16 text-gray-400 opacity-20 animate-[spin_10s_linear_infinite]" />
                             <Plus className="w-6 h-6 text-primary absolute bottom-6 right-6" />
