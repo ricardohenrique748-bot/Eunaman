@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import { Wrench, Search, Filter, ArrowUpDown, Truck, Edit, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import Link from 'next/link'
+import PreventivaActions from './PreventivaActions'
 import { deletePreventiva } from '@/app/actions/preventiva-actions'
 
 interface Plano {
@@ -232,25 +232,8 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <div className="flex justify-end items-center gap-2">
-                                                    <Link
-                                                        href={`/dashboard/pcm/preventivas/${plano.id}/editar`}
-                                                        className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-lg transition-all font-black text-[10px] uppercase tracking-wider shadow-sm"
-                                                    >
-                                                        <Edit className="w-3.5 h-3.5" />
-                                                        Editar
-                                                    </Link>
-                                                    <button
-                                                        onClick={async () => {
-                                                            if (confirm('Deseja realmente excluir esta preventiva?')) {
-                                                                await deletePreventiva(plano.id)
-                                                            }
-                                                        }}
-                                                        className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-all font-black text-[10px] uppercase tracking-wider shadow-sm"
-                                                    >
-                                                        <Trash2 className="w-3.5 h-3.5" />
-                                                        Excluir
-                                                    </button>
+                                                <div className="flex justify-end transition-all duration-300">
+                                                    <PreventivaActions id={plano.id} />
                                                 </div>
                                             </td>
                                         </tr>
