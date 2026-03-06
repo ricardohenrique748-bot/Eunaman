@@ -235,10 +235,10 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
                                                 <div className="flex justify-end items-center gap-2">
                                                     <Link
                                                         href={`/dashboard/pcm/preventivas/${plano.id}/editar`}
-                                                        className="p-2 hover:bg-primary/10 text-gray-400 hover:text-primary rounded-lg transition-all"
-                                                        title="Editar"
+                                                        className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-lg transition-all font-black text-[10px] uppercase tracking-wider shadow-sm"
                                                     >
-                                                        <Edit className="w-4 h-4" />
+                                                        <Edit className="w-3.5 h-3.5" />
+                                                        Editar
                                                     </Link>
                                                     <button
                                                         onClick={async () => {
@@ -246,10 +246,10 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
                                                                 await deletePreventiva(plano.id)
                                                             }
                                                         }}
-                                                        className="p-2 hover:bg-red-500/10 text-gray-400 hover:text-red-500 rounded-lg transition-all"
-                                                        title="Excluir"
+                                                        className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-all font-black text-[10px] uppercase tracking-wider shadow-sm"
                                                     >
-                                                        <Trash2 className="w-4 h-4" />
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                        Excluir
                                                     </button>
                                                 </div>
                                             </td>
