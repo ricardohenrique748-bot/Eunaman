@@ -7,10 +7,10 @@ export default async function PreencherChecklistPage(props: any) {
     const { tipo } = await props.searchParams
     const session = await getSession()
 
-    // Fetch form matching the tipo (e.g. "COMBOIO")
+    // Fetch form matching the tipo (nome exato passado na URL)
     const formulario = await prisma.checklistFormulario.findFirst({
         where: {
-            nome: { contains: tipo, mode: 'insensitive' },
+            nome: { equals: tipo, mode: 'insensitive' },
             ativo: true
         },
         include: {
