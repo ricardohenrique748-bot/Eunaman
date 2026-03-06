@@ -42,7 +42,8 @@ const STATUS_CONFIG = {
 }
 
 // Pneu positions extracted from item text
-const PNEU_POSITIONS = ['DD', 'DE', 'TD1E', 'TD1I', 'TD2E', 'TD2I', 'TE1E', 'TE11', 'TE2E', 'TE2I', 'TE1', 'TE2', 'TD', 'TE', 'Tração']
+// Pneu positions requested by user
+const PNEU_POSITIONS = ['DE', 'DD', 'TEI', 'TEE', 'TDI', 'TDE', 'TEI1', 'TEE1', 'TDI1', 'TDE1', 'ESTEPE']
 
 export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos, usuarioNome }: Props) {
     const [respostas, setRespostas] = useState<Record<string, StatusType>>({})
@@ -252,33 +253,25 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
                     </button>
 
                     {/* PNEUS: special number inputs before items */}
-                    {!collapsed[categoria] && categoria.toLowerCase().includes('pneu') && (() => {
-                        // Extract which positions are mentioned in the items text
-                        const allText = items.map(i => i.texto).join(' ').toUpperCase()
-                        const positions = ['DD', 'DE', 'TD1E', 'TD1I', 'TD2E', 'TD2I', 'TE1E', 'TE11', 'TE2E', 'TE2I', 'TRAÇÃO', 'TD', 'TE']
-                            .filter(p => allText.includes(p))
-                        // Always show at minimum: DD, DE, TD, TE
-                        const finalPositions = positions.length > 0 ? positions : ['DD', 'DE', 'TD', 'TE', 'Tração']
-                        return (
-                            <div className="border-t border-border-color/50 px-5 py-4 bg-surface-highlight/30">
-                                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Nº de série / identificação de cada pneu</p>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                    {finalPositions.map(pos => (
-                                        <div key={pos} className="space-y-1">
-                                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider">{pos}</label>
-                                            <input
-                                                type="text"
-                                                placeholder="Nº do pneu"
-                                                value={pneuNumeros[pos] || ''}
-                                                onChange={e => setPneuNumeros(p => ({ ...p, [pos]: e.target.value }))}
-                                                className="w-full bg-white dark:bg-surface border border-border-color rounded-lg px-3 py-2 text-sm font-semibold text-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
+                    {!collapsed[categoria] && categoria.toLowerCase().includes('pneu') && (
+                        <div className="border-t border-border-color/50 px-5 py-4 bg-surface-highlight/30">
+                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Identificação dos Pneus (Nº de Série)</p>
+                            <div className="grid grid-cols-2 gap-3">
+                                {PNEU_POSITIONS.map(pos => (
+                                    <div key={pos} className={`${pos === 'ESTEPE' ? 'col-span-2' : ''} space-y-1`}>
+                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider">{pos}</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Nº do pneu"
+                                            value={pneuNumeros[pos] || ''}
+                                            onChange={e => setPneuNumeros(p => ({ ...p, [pos]: e.target.value }))}
+                                            className="w-full bg-white dark:bg-surface border border-border-color rounded-lg px-3 py-2 text-sm font-semibold text-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                        />
+                                    </div>
+                                ))}
                             </div>
-                        )
-                    })()}
+                        </div>
+                    )}
 
                     {/* Items */}
                     {!collapsed[categoria] && (
