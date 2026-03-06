@@ -20,12 +20,26 @@ export default function PreventivaActions({ id }: { id: string }) {
     }
 
     useEffect(() => {
-        if (isOpen && buttonRef.current) {
-            const rect = buttonRef.current.getBoundingClientRect()
-            setPosition({
-                top: rect.bottom,
-                right: window.innerWidth - rect.right,
-            })
+        const updatePosition = () => {
+            if (isOpen && buttonRef.current) {
+                const rect = buttonRef.current.getBoundingClientRect()
+                setPosition({
+                    top: rect.bottom + 4,
+                    right: window.innerWidth - rect.right,
+                })
+            }
+        }
+
+        updatePosition()
+
+        if (isOpen) {
+            window.addEventListener('scroll', updatePosition, true)
+            window.addEventListener('resize', updatePosition)
+        }
+
+        return () => {
+            window.removeEventListener('scroll', updatePosition, true)
+            window.removeEventListener('resize', updatePosition)
         }
     }, [isOpen])
 
@@ -34,7 +48,7 @@ export default function PreventivaActions({ id }: { id: string }) {
             <button
                 ref={buttonRef}
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-1 hover:bg-surface-highlight rounded-full transition-colors"
+                className="p-1 hover:bg-surface-highlight rounded-full transition-colors opacity-100"
             >
                 <MoreVertical className="w-5 h-5 text-gray-400 hover:text-foreground" />
             </button>
@@ -46,18 +60,19 @@ export default function PreventivaActions({ id }: { id: string }) {
                         onClick={() => setIsOpen(false)}
                     />
                     <div
-                        className="fixed w-32 bg-surface text-sm border border-border-color rounded-lg shadow-xl z-50 overflow-hidden"
+                        className="fixed w-36 bg-surface text-sm border border-border-color rounded-xl shadow-xl z-50 overflow-hidden font-black tracking-widest uppercase"
                         style={{ top: `${position.top}px`, right: `${position.right}px` }}
                     >
-                        <Link href={`/dashboard/pcm/preventivas/${id}/editar`} className="w-full text-left px-4 py-2 hover:bg-surface-highlight flex items-center gap-2 text-foreground">
-                            <Edit className="w-4 h-4" /> Editar
+                        <Link href={`/dashboard/pcm/preventivas/${id}/editar`} className="w-full text-left px-4 py-3 hover:bg-surface-highlight flex items-center gap-2 text-foreground transition-colors group text-[10px]">
+                            <Edit className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:text-primary transition-all" />
+                            Editar
                         </Link>
                         <button
                             onClick={handleDelete}
                             disabled={loading}
-                            className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 hover:text-red-600 flex items-center gap-2 transition-colors disabled:opacity-50"
+                            className="w-full text-left px-4 py-3 hover:bg-red-500/10 text-red-500 flex items-center gap-2 transition-colors disabled:opacity-50 group text-[10px]"
                         >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-all" />
                             {loading ? '...' : 'Excluir'}
                         </button>
                     </div>
