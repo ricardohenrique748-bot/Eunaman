@@ -2,12 +2,14 @@
 
 import { MoreVertical, Trash2, Edit } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { deletePreventiva } from '@/app/actions/preventiva-actions'
 
 export default function PreventivaActions({ id }: { id: string }) {
     const [isOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const buttonRef = useRef<HTMLButtonElement>(null)
+    const [position, setPosition] = useState({ top: 0, right: 0 })
 
     const handleDelete = async () => {
         if (confirm('Tem certeza que deseja excluir esta preventiva?')) {
@@ -17,9 +19,20 @@ export default function PreventivaActions({ id }: { id: string }) {
         }
     }
 
+    useEffect(() => {
+        if (isOpen && buttonRef.current) {
+            const rect = buttonRef.current.getBoundingClientRect()
+            setPosition({
+                top: rect.bottom,
+                right: window.innerWidth - rect.right,
+            })
+        }
+    }, [isOpen])
+
     return (
         <div className="relative">
             <button
+                ref={buttonRef}
                 onClick={() => setIsOpen(!isOpen)}
                 className="p-1 hover:bg-surface-highlight rounded-full transition-colors"
             >
@@ -29,10 +42,13 @@ export default function PreventivaActions({ id }: { id: string }) {
             {isOpen && (
                 <>
                     <div
-                        className="fixed inset-0 z-10"
+                        className="fixed inset-0 z-40"
                         onClick={() => setIsOpen(false)}
                     />
-                    <div className="absolute right-0 top-8 w-32 bg-surface text-sm border border-border-color rounded-lg shadow-xl z-20 overflow-hidden">
+                    <div
+                        className="fixed w-32 bg-surface text-sm border border-border-color rounded-lg shadow-xl z-50 overflow-hidden"
+                        style={{ top: `${position.top}px`, right: `${position.right}px` }}
+                    >
                         <Link href={`/dashboard/pcm/preventivas/${id}/editar`} className="w-full text-left px-4 py-2 hover:bg-surface-highlight flex items-center gap-2 text-foreground">
                             <Edit className="w-4 h-4" /> Editar
                         </Link>

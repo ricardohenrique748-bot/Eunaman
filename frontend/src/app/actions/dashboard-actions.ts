@@ -65,7 +65,7 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
             ]
         }
         if (filters.tipo) {
-            veiculoSubWhere.tipoVeiculo = { equals: filters.tipo }
+            veiculoSubWhere.tipoVeiculo = { equals: filters.tipo, mode: 'insensitive' }
         }
 
         // OS Query
@@ -119,11 +119,7 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
                 }
             }),
             prisma.ordemServico.findMany({
-                where: {
-                    veiculo: {
-                        unidadeId: session.perfil !== 'ADMIN' ? session.unidadeId : undefined
-                    }
-                },
+                where: osWhere,
                 take: 5,
                 orderBy: { dataAbertura: 'desc' },
                 include: { veiculo: true }
