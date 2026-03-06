@@ -46,12 +46,12 @@ export default function NovoVeiculoPage() {
                     </div>
                 </div>
 
-                {/* HORÍMETRO */}
+                {/* HORÍMETRO / KM */}
                 <div className="bg-emerald-50/40 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/30 rounded-xl p-6">
-                    <h3 className="text-sm font-bold text-gray-700 dark:text-emerald-200 mb-4">Horímetro</h3>
+                    <h3 className="text-sm font-bold text-gray-700 dark:text-emerald-200 mb-4">Horímetro / Km</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-500">Horímetro Atual</label>
+                            <label className="text-xs font-bold text-gray-500">Valor Atual (h ou km)</label>
                             <input name="horimetro" type="number" placeholder="0" className="w-full bg-surface border border-border-color rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary outline-none" />
                         </div>
                         <div className="space-y-1.5">

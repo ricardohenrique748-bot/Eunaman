@@ -11,6 +11,7 @@ interface VeiculoSimple {
     placa: string | null;
     codigoInterno: string;
     horimetroAtual: number;
+    tipoVeiculo: string;
 }
 
 export default function NovaPreventivaPage() {
@@ -31,6 +32,12 @@ export default function NovaPreventivaPage() {
         const v = veiculos.find(x => x.id === vId)
         if (v) setHorimetroAtual(v.horimetroAtual || 0)
     }
+
+    const selectedV = veiculos.find(v => v.id === selectedVeiculo)
+    const isLeve = selectedV?.tipoVeiculo === 'LEVE'
+    const unit = isLeve ? 'km' : 'h'
+    const unitLabel = isLeve ? 'Km' : 'Horímetro'
+    const unitLabelSmall = isLeve ? 'Quilometragem' : 'Horímetro'
 
     return (
         <div className="max-w-3xl mx-auto space-y-8">
@@ -98,13 +105,13 @@ export default function NovaPreventivaPage() {
                     {/* Horímetro / Intervalo Section */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div className="space-y-2">
-                            <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Última Revisão (h)</label>
+                            <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Última Revisão ({unit})</label>
                             <input type="number" name="ultimoHorimetro" placeholder="0" className="w-full bg-background border border-border-color rounded-xl px-4 py-3 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all" />
-                            <p className="text-[9px] text-gray-500 leading-none ml-1">Horímetro da última parada.</p>
+                            <p className="text-[9px] text-gray-500 leading-none ml-1">{unitLabelSmall} da última parada.</p>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Atual (h) *</label>
+                            <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Atual ({unit}) *</label>
                             <input
                                 type="number"
                                 name="horimetroAtual"
@@ -112,13 +119,13 @@ export default function NovaPreventivaPage() {
                                 onChange={(e) => setHorimetroAtual(Number(e.target.value))}
                                 className="w-full bg-background border border-border-color rounded-xl px-4 py-3 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all"
                             />
-                            <p className="text-[9px] text-gray-500 leading-none ml-1">Horímetro lido hoje.</p>
+                            <p className="text-[9px] text-gray-500 leading-none ml-1">{unitLabelSmall} lido hoje.</p>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Intervalo (h) *</label>
+                            <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Intervalo ({unit}) *</label>
                             <input type="number" name="intervalo" defaultValue={500} required className="w-full bg-background border border-border-color rounded-xl px-4 py-3 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all" />
-                            <p className="text-[9px] text-gray-500 leading-none ml-1">A cada quantas horas?</p>
+                            <p className="text-[9px] text-gray-500 leading-none ml-1">A cada quantos {unit}?</p>
                         </div>
                     </div>
 

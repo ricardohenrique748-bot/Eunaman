@@ -69,7 +69,7 @@ export async function getVeiculosSimples() {
 
     return await prisma.veiculo.findMany({
         where,
-        select: { id: true, modelo: true, placa: true, codigoInterno: true, horimetroAtual: true }
+        select: { id: true, modelo: true, placa: true, codigoInterno: true, horimetroAtual: true, tipoVeiculo: true }
     })
 }
 
@@ -122,7 +122,7 @@ export async function getPreventivaById(id: string) {
         where: { id },
         include: {
             veiculo: {
-                select: { horimetroAtual: true, placa: true, codigoInterno: true, modelo: true }
+                select: { horimetroAtual: true, placa: true, codigoInterno: true, modelo: true, tipoVeiculo: true }
             }
         }
     })

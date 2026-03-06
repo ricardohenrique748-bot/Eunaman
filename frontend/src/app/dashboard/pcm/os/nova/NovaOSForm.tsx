@@ -296,7 +296,7 @@ export default function NovaOSForm({ veiculos, osOptions }: {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Horímetro Atual</label>
+                                <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest ml-1">Horímetro / Km Atual</label>
                                 <input type="number" name="horimetro" placeholder="Ex: 1450" className="w-full bg-background border border-border-color rounded-xl px-4 py-3 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all" />
                             </div>
                         </div>

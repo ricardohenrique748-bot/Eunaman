@@ -335,7 +335,7 @@ export default function SettingsClient({ veiculos, usuarios, empresas, systemPar
                                                 <input name="modulo" defaultValue={editItem.data.moduloSistema ?? 'BASE'} className="w-full p-2 text-sm rounded bg-surface-highlight border border-border-color" />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="text-xs font-bold text-gray-500">Horímetro Atual</label>
+                                                <label className="text-xs font-bold text-gray-500">Horímetro / Km Atual</label>
                                                 <input name="horimetro" type="number" defaultValue={editItem.data.horimetroAtual} className="w-full p-2 text-sm rounded bg-surface-highlight border border-border-color" />
                                             </div>
                                         </div>

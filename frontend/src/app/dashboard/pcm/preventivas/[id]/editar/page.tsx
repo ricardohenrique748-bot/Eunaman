@@ -12,6 +12,7 @@ interface VeiculoSimple {
     placa: string | null;
     codigoInterno: string;
     horimetroAtual: number;
+    tipoVeiculo: string;
 }
 
 export default function EditarPreventivaPage() {
@@ -74,6 +75,11 @@ export default function EditarPreventivaPage() {
     if (initialLoading) {
         return <div className="p-8 text-center text-gray-500">Carregando dados...</div>
     }
+
+    const selectedV = veiculos.find(v => v.id === formData.veiculoId)
+    const isLeve = selectedV?.tipoVeiculo === 'LEVE'
+    const unit = isLeve ? 'km' : 'h'
+    const unitLabelSmall = isLeve ? 'Quilometragem' : 'Horímetro'
 
     return (
         <div className="max-w-2xl mx-auto py-6">
@@ -155,7 +161,7 @@ export default function EditarPreventivaPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Último Horímetro */}
                         <div className="space-y-2">
-                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Último Horímetro (h)</label>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Última Revisão ({unit})</label>
                             <input
                                 type="number"
                                 name="ultimoHorimetro"
@@ -168,7 +174,7 @@ export default function EditarPreventivaPage() {
 
                         {/* Horímetro Atual */}
                         <div className="space-y-2">
-                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Horímetro Atual (h)</label>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Atual ({unit})</label>
                             <input
                                 type="number"
                                 name="horimetroAtual"
@@ -180,7 +186,7 @@ export default function EditarPreventivaPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Intervalo (h)</label>
+                        <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Intervalo ({unit})</label>
                         <input
                             type="number"
                             name="intervalo"

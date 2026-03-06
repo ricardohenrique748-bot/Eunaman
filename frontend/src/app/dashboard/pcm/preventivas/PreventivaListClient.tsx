@@ -169,7 +169,7 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
                                         statusText = 'ATENÇÃO'
                                     }
 
-                                    const unidade = 'h' // Use 'h' or 'km' based on logic if needed
+                                    const unidade = plano.veiculo.tipoVeiculo === 'LEVE' ? 'km' : 'h'
 
                                     return (
                                         <tr key={plano.id} className="hover:bg-surface-highlight transition-colors group">
