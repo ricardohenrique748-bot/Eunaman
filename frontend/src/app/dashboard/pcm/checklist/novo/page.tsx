@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma'
 export const dynamic = 'force-dynamic'
 
 export default async function NovoChecklistPage() {
+    // Busca TODOS os formulários ativos do banco dinamicamente
     const formularios = await prisma.checklistFormulario.findMany({
         where: { ativo: true },
         include: { _count: { select: { itens: true } } },
