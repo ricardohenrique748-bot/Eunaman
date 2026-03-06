@@ -31,7 +31,7 @@ export default function EditarPreventivaPage() {
         ultimoHorimetro: 0,
         horimetroAtual: 0,
         intervalo: 500,
-        dataAtualizacao: new Date().toISOString().split('T')[0]
+        dataAtualizacao: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`
     })
 
     useEffect(() => {
@@ -49,7 +49,10 @@ export default function EditarPreventivaPage() {
                     ultimoHorimetro: preventivaData.ultimoHorimetro,
                     horimetroAtual: preventivaData.veiculo.horimetroAtual,
                     intervalo: preventivaData.intervalo,
-                    dataAtualizacao: new Date(preventivaData.dataAtualizacao).toISOString().split('T')[0]
+                    dataAtualizacao: (() => {
+                        const d = new Date(preventivaData.dataAtualizacao);
+                        return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+                    })()
                 })
             }
 

@@ -13,8 +13,12 @@ export async function createPreventiva(formData: FormData) {
     const ultimoHorimetro = Number(formData.get('ultimoHorimetro'))
     const horimetroAtual = Number(formData.get('horimetroAtual'))
     const intervalo = Number(formData.get('intervalo'))
-    const dataAtualizacao = new Date(formData.get('dataAtualizacao') as string)
-
+    const dataAtualizacaoStr = formData.get('dataAtualizacao') as string
+    let dataAtualizacao = new Date()
+    if (dataAtualizacaoStr) {
+        const [year, month, day] = dataAtualizacaoStr.split('-').map(Number)
+        dataAtualizacao = new Date(year, month - 1, day, 12, 0, 0)
+    }
     if (!veiculoId || !tipo || !intervalo) {
         return { success: false, error: 'Campos obrigatórios faltando' }
     }
@@ -133,7 +137,12 @@ export async function updatePreventiva(id: string, formData: FormData) {
     const modulo = formData.get('modulo') as string
     const ultimoHorimetro = Number(formData.get('ultimoHorimetro'))
     const intervalo = Number(formData.get('intervalo'))
-    const dataAtualizacao = new Date(formData.get('dataAtualizacao') as string)
+    const dataAtualizacaoStr = formData.get('dataAtualizacao') as string
+    let dataAtualizacao = new Date()
+    if (dataAtualizacaoStr) {
+        const [year, month, day] = dataAtualizacaoStr.split('-').map(Number)
+        dataAtualizacao = new Date(year, month - 1, day, 12, 0, 0)
+    }
     const horimetroAtual = Number(formData.get('horimetroAtual'))
     const veiculoId = formData.get('veiculoId') as string
 

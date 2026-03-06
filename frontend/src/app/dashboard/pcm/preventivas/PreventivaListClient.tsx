@@ -214,7 +214,10 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
                                                 </span>
                                             </td>
                                             <td className="px-4 py-4 text-xs font-bold text-gray-500">
-                                                {plano.dataAtualizacao ? format(new Date(plano.dataAtualizacao), 'dd/MM/yyyy', { locale: ptBR }) : '-'}
+                                                {plano.dataAtualizacao ? (() => {
+                                                    const d = new Date(plano.dataAtualizacao);
+                                                    return format(new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()), 'dd/MM/yyyy', { locale: ptBR });
+                                                })() : '-'}
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <span className={`inline-block text-[9px] font-black px-3 py-1 rounded-lg border border-current/20 ${statusBg} ${statusColor} tracking-widest shadow-sm`}>

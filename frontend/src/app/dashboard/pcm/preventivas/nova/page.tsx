@@ -135,7 +135,7 @@ export default function NovaPreventivaPage() {
                             <input
                                 type="date"
                                 name="dataAtualizacao"
-                                defaultValue={new Date().toISOString().split('T')[0]}
+                                defaultValue={`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`}
                                 className="w-full bg-background border border-border-color rounded-xl px-4 py-3 text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all pl-11"
                             />
                             <Calendar className="absolute left-3.5 top-3.5 w-5 h-5 text-gray-500 pointer-events-none" />
