@@ -1,0 +1,32 @@
+﻿[
+  {
+    "email": "ricardo.luz@eunaman.com.br",
+    "senha": "15975321",
+    "ativo": true
+  },
+  {
+    "email": "marcos.rocha@eunaman.com.br",
+    "senha": "912059",
+    "ativo": true
+  },
+  {
+    "email": "thiago@eunaman.com.br",
+    "senha": "Tpa@1988",
+    "ativo": true
+  },
+  {
+    "email": "douglas@eunaman.com.br",
+    "senha": "Limato88",
+    "ativo": true
+  },
+  {
+    "email": "mecanico.corretiva@eunaman.com.br",
+    "senha": "123",
+    "ativo": true
+  },
+  {
+    "email": "mecanico.preventiva@eunaman.com.br",
+    "senha": "123",
+    "ativo": true
+  }
+]

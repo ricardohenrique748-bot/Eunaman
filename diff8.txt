@@ -1,0 +1,165 @@
+﻿commit 4269365d84246a8472c38e32099a698e71f13c52
+Author: ricardohenrique748-bot <dev@eunaman.com>
+Date:   Fri Mar 6 14:31:52 2026 -0300
+
+    fix: restore 3-dots actions dropdown with scroll tracking
+
+diff --git a/frontend/src/app/dashboard/pcm/preventivas/PreventivaActions.tsx b/frontend/src/app/dashboard/pcm/preventivas/PreventivaActions.tsx
+index 3df6063..54f54f1 100644
+--- a/frontend/src/app/dashboard/pcm/preventivas/PreventivaActions.tsx
++++ b/frontend/src/app/dashboard/pcm/preventivas/PreventivaActions.tsx
+@@ -20,12 +20,26 @@ export default function PreventivaActions({ id }: { id: string }) {
+     }
+ 
+     useEffect(() => {
+-        if (isOpen && buttonRef.current) {
+-            const rect = buttonRef.current.getBoundingClientRect()
+-            setPosition({
+-                top: rect.bottom,
+-                right: window.innerWidth - rect.right,
+-            })
++        const updatePosition = () => {
++            if (isOpen && buttonRef.current) {
++                const rect = buttonRef.current.getBoundingClientRect()
++                setPosition({
++                    top: rect.bottom + 4,
++                    right: window.innerWidth - rect.right,
++                })
++            }
++        }
++
++        updatePosition()
++
++        if (isOpen) {
++            window.addEventListener('scroll', updatePosition, true)
++            window.addEventListener('resize', updatePosition)
++        }
++
++        return () => {
++            window.removeEventListener('scroll', updatePosition, true)
++            window.removeEventListener('resize', updatePosition)
+         }
+     }, [isOpen])
+ 
+@@ -34,7 +48,7 @@ export default function PreventivaActions({ id }: { id: string }) {
+             <button
+                 ref={buttonRef}
+                 onClick={() => setIsOpen(!isOpen)}
+-                className="p-1 hover:bg-surface-highlight rounded-full transition-colors"
++                className="p-1 hover:bg-surface-highlight rounded-full transition-colors opacity-100"
+             >
+                 <MoreVertical className="w-5 h-5 text-gray-400 hover:text-foreground" />
+             </button>
+@@ -46,18 +60,19 @@ export default function PreventivaActions({ id }: { id: string }) {
+                         onClick={() => setIsOpen(false)}
+                     />
+                     <div
+-                        className="fixed w-32 bg-surface text-sm border border-border-color rounded-lg shadow-xl z-50 overflow-hidden"
++                        className="fixed w-36 bg-surface text-sm border border-border-color rounded-xl shadow-xl z-50 overflow-hidden font-black tracking-widest uppercase"
+                         style={{ top: `${position.top}px`, right: `${position.right}px` }}
+                     >
+-                        <Link href={`/dashboard/pcm/preventivas/${id}/editar`} className="w-full text-left px-4 py-2 hover:bg-surface-highlight flex items-center gap-2 text-foreground">
+-                            <Edit className="w-4 h-4" /> Editar
++                        <Link href={`/dashboard/pcm/preventivas/${id}/editar`} className="w-full text-left px-4 py-3 hover:bg-surface-highlight flex items-center gap-2 text-foreground transition-colors group text-[10px]">
++                            <Edit className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:text-primary transition-all" />
++                            Editar
+                         </Link>
+                         <button
+                             onClick={handleDelete}
+                             disabled={loading}
+-                            className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 hover:text-red-600 flex items-center gap-2 transition-colors disabled:opacity-50"
++                            className="w-full text-left px-4 py-3 hover:bg-red-500/10 text-red-500 flex items-center gap-2 transition-colors disabled:opacity-50 group text-[10px]"
+                         >
+-                            <Trash2 className="w-4 h-4" />
++                            <Trash2 className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-all" />
+                             {loading ? '...' : 'Excluir'}
+                         </button>
+                     </div>
+diff --git a/frontend/src/app/dashboard/pcm/preventivas/PreventivaListClient.tsx b/frontend/src/app/dashboard/pcm/preventivas/PreventivaListClient.tsx
+index 2cdfa77..640ffd6 100644
+--- a/frontend/src/app/dashboard/pcm/preventivas/PreventivaListClient.tsx
++++ b/frontend/src/app/dashboard/pcm/preventivas/PreventivaListClient.tsx
+@@ -5,6 +5,7 @@ import { Wrench, Search, Filter, ArrowUpDown, Truck, Edit, Trash2 } from 'lucide
+ import { format } from 'date-fns'
+ import { ptBR } from 'date-fns/locale'
+ import Link from 'next/link'
++import PreventivaActions from './PreventivaActions'
+ import { deletePreventiva } from '@/app/actions/preventiva-actions'
+ 
+ interface Plano {
+@@ -232,25 +233,8 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
+                                                 </span>
+                                             </td>
+                                             <td className="px-6 py-4 text-right">
+-                                                <div className="flex justify-end items-center gap-2">
+-                                                    <Link
+-                                                        href={`/dashboard/pcm/preventivas/${plano.id}/editar`}
+-                                                        className="p-2 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-all shadow-sm"
+-                                                        title="Editar Plano"
+-                                                    >
+-                                                        <Edit className="w-4 h-4" />
+-                                                    </Link>
+-                                                    <button
+-                                                        onClick={async () => {
+-                                                            if (confirm('Deseja realmente excluir esta preventiva?')) {
+-                                                                await deletePreventiva(plano.id)
+-                                                            }
+-                                                        }}
+-                                                        className="p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-all shadow-sm"
+-                                                        title="Excluir Plano"
+-                                                    >
+-                                                        <Trash2 className="w-4 h-4" />
+-                                                    </button>
++                                                <div className="flex justify-end transition-all duration-300 opacity-100">
++                                                    <PreventivaActions id={plano.id} />
+                                                 </div>
+                                             </td>
+                                         </tr>
+
+commit c32fd4caf46b5503fab0872443a6b9488bd37761
+Author: ricardohenrique748-bot <dev@eunaman.com>
+Date:   Fri Mar 6 14:24:13 2026 -0300
+
+    feat: Cria o componente `PreventivaListClient` para exibir, filtrar, pesquisar e ordenar a listagem de planos de manuten├º├úo preventiva.
+
+diff --git a/frontend/src/app/dashboard/pcm/preventivas/PreventivaListClient.tsx b/frontend/src/app/dashboard/pcm/preventivas/PreventivaListClient.tsx
+index 8cecffd..2cdfa77 100644
+--- a/frontend/src/app/dashboard/pcm/preventivas/PreventivaListClient.tsx
++++ b/frontend/src/app/dashboard/pcm/preventivas/PreventivaListClient.tsx
+@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
+ import { Wrench, Search, Filter, ArrowUpDown, Truck, Edit, Trash2 } from 'lucide-react'
+ import { format } from 'date-fns'
+ import { ptBR } from 'date-fns/locale'
+-import PreventivaActions from './PreventivaActions'
++import Link from 'next/link'
+ import { deletePreventiva } from '@/app/actions/preventiva-actions'
+ 
+ interface Plano {
+@@ -232,8 +232,25 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
+                                                 </span>
+                                             </td>
+                                             <td className="px-6 py-4 text-right">
+-                                                <div className="flex justify-end transition-all duration-300">
+-                                                    <PreventivaActions id={plano.id} />
++                                                <div className="flex justify-end items-center gap-2">
++                                                    <Link
++                                                        href={`/dashboard/pcm/preventivas/${plano.id}/editar`}
++                                                        className="p-2 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-all shadow-sm"
++                                                        title="Editar Plano"
++                                                    >
++                                                        <Edit className="w-4 h-4" />
++                                                    </Link>
++                                                    <button
++                                                        onClick={async () => {
++                                                            if (confirm('Deseja realmente excluir esta preventiva?')) {
++                                                                await deletePreventiva(plano.id)
++                                                            }
++                                                        }}
++                                                        className="p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-all shadow-sm"
++                                                        title="Excluir Plano"
++                                                    >
++                                                        <Trash2 className="w-4 h-4" />
++                                                    </button>
+                                                 </div>
+                                             </td>
+                                         </tr>
