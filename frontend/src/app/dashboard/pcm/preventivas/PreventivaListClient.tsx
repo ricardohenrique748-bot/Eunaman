@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Wrench, Search, Filter, ArrowUpDown, Truck } from 'lucide-react'
-import PreventivaActions from './PreventivaActions'
+import { Wrench, Search, Filter, ArrowUpDown, Truck, Edit, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import Link from 'next/link'
+import { deletePreventiva } from '@/app/actions/preventiva-actions'
 
 interface Plano {
     id: string
@@ -199,9 +200,15 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
                                                 </span>
                                             </td>
                                             <td className="px-4 py-4">
-                                                <span className="text-xs font-bold text-gray-600 dark:text-gray-300 tracking-tight">
-                                                    {horimetroAtual}{unidade}
-                                                </span>
+                                                <Link
+                                                    href={`/dashboard/pcm/preventivas/${plano.id}/editar`}
+                                                    className="flex items-center gap-1.5 text-primary hover:text-blue-600 transition-all font-black group/value"
+                                                >
+                                                    <span className="text-sm tracking-tight border-b border-primary/20 group-hover/value:border-primary">
+                                                        {horimetroAtual}{unidade}
+                                                    </span>
+                                                    <Edit className="w-3 h-3 opacity-30 group-hover/value:opacity-100" />
+                                                </Link>
                                             </td>
                                             <td className="px-4 py-4">
                                                 <span className="text-xs font-bold text-gray-600 dark:text-gray-300 tracking-tight">
@@ -225,8 +232,25 @@ export default function PreventivaListClient({ initialPlanos }: PreventivaListCl
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-1 group-hover:translate-x-0">
-                                                    <PreventivaActions id={plano.id} />
+                                                <div className="flex justify-end items-center gap-2">
+                                                    <Link
+                                                        href={`/dashboard/pcm/preventivas/${plano.id}/editar`}
+                                                        className="p-2 hover:bg-primary/10 text-gray-400 hover:text-primary rounded-lg transition-all"
+                                                        title="Editar"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </Link>
+                                                    <button
+                                                        onClick={async () => {
+                                                            if (confirm('Deseja realmente excluir esta preventiva?')) {
+                                                                await deletePreventiva(plano.id)
+                                                            }
+                                                        }}
+                                                        className="p-2 hover:bg-red-500/10 text-gray-400 hover:text-red-500 rounded-lg transition-all"
+                                                        title="Excluir"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
