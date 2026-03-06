@@ -41,6 +41,9 @@ const STATUS_CONFIG = {
     NA: { label: 'N/A', color: 'bg-gray-400 text-white ring-gray-400', icon: MinusCircle, textColor: 'text-gray-500' },
 }
 
+// Pneu positions extracted from item text
+const PNEU_POSITIONS = ['DD', 'DE', 'TD1E', 'TD1I', 'TD2E', 'TD2I', 'TE1E', 'TE11', 'TE2E', 'TE2I', 'TE1', 'TE2', 'TD', 'TE', 'Tração']
+
 export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos, usuarioNome }: Props) {
     const [respostas, setRespostas] = useState<Record<string, StatusType>>({})
     const [veiculoId, setVeiculoId] = useState('')
@@ -58,6 +61,7 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
     const [obsGerais, setObsGerais] = useState('')
     const [submitted, setSubmitted] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [pneuNumeros, setPneuNumeros] = useState<Record<string, string>>({})
 
     const allItems = Object.values(grouped).flat()
     const totalItems = allItems.length
@@ -246,6 +250,35 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
                         </div>
                         {collapsed[categoria] ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronUp className="w-4 h-4 text-gray-400" />}
                     </button>
+
+                    {/* PNEUS: special number inputs before items */}
+                    {!collapsed[categoria] && categoria.toLowerCase().includes('pneu') && (() => {
+                        // Extract which positions are mentioned in the items text
+                        const allText = items.map(i => i.texto).join(' ').toUpperCase()
+                        const positions = ['DD', 'DE', 'TD1E', 'TD1I', 'TD2E', 'TD2I', 'TE1E', 'TE11', 'TE2E', 'TE2I', 'TRAÇÃO', 'TD', 'TE']
+                            .filter(p => allText.includes(p))
+                        // Always show at minimum: DD, DE, TD, TE
+                        const finalPositions = positions.length > 0 ? positions : ['DD', 'DE', 'TD', 'TE', 'Tração']
+                        return (
+                            <div className="border-t border-border-color/50 px-5 py-4 bg-surface-highlight/30">
+                                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Nº de série / identificação de cada pneu</p>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    {finalPositions.map(pos => (
+                                        <div key={pos} className="space-y-1">
+                                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider">{pos}</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Nº do pneu"
+                                                value={pneuNumeros[pos] || ''}
+                                                onChange={e => setPneuNumeros(p => ({ ...p, [pos]: e.target.value }))}
+                                                className="w-full bg-white dark:bg-surface border border-border-color rounded-lg px-3 py-2 text-sm font-semibold text-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )
+                    })()}
 
                     {/* Items */}
                     {!collapsed[categoria] && (
