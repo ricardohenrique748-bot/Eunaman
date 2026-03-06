@@ -37,11 +37,14 @@ function DashboardShellContent({ children, user }: { children: React.ReactNode, 
     const checkAccess = (allowedAreas: string[]) => {
         if (!user) return false
         if (user.perfil === 'ADMIN') return true
+        if (user.perfil === 'OPERACIONAL') return false // Perfil operacional só acessa o que for explícito
         if (user.perfil !== 'GESTOR') return true
         const userArea = user.area || 'GERAL'
         if (userArea === 'GERAL') return true
         return allowedAreas.includes(userArea)
     }
+
+    const isOperacional = user?.perfil === 'OPERACIONAL'
 
     return (
         <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans">
@@ -57,16 +60,20 @@ function DashboardShellContent({ children, user }: { children: React.ReactNode, 
                     </div>
 
                     <nav className="flex-1 py-8 px-4 space-y-8 overflow-y-auto custom-scrollbar">
-                        <div className="space-y-1">
-                            <NavItem href="/dashboard" icon={LayoutDashboard} label="Visão Geral" active={pathname === '/dashboard'} />
-                        </div>
+                        {!isOperacional && (
+                            <div className="space-y-1">
+                                <NavItem href="/dashboard" icon={LayoutDashboard} label="Visão Geral" active={pathname === '/dashboard'} />
+                            </div>
+                        )}
 
-                        {(checkAccess(['PCM', 'FROTA'])) && (
+                        {(checkAccess(['PCM', 'FROTA']) || isOperacional) && (
                             <div className="space-y-1">
                                 <div className="px-4 mb-2">
                                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Controle PCM</span>
                                 </div>
-                                {checkAccess(['PCM']) && (
+                                {isOperacional ? (
+                                    <NavItem href="/dashboard/pcm/checklist" icon={Wrench} label="Checklist" active={isActive('/dashboard/pcm/checklist')} />
+                                ) : checkAccess(['PCM']) && (
                                     <>
                                         <NavItem href="/dashboard/pcm/os" icon={Wrench} label="Gestão de O.S." active={isActive('/dashboard/pcm/os')} />
                                         <NavItem href="/dashboard/pcm/semanal" icon={CalendarClock} label="Prog. Semanal" active={isActive('/dashboard/pcm/semanal')} />
@@ -75,8 +82,8 @@ function DashboardShellContent({ children, user }: { children: React.ReactNode, 
                                         <NavItem href="/dashboard/pcm/checklist" icon={Wrench} label="Checklist" active={isActive('/dashboard/pcm/checklist')} />
                                     </>
                                 )}
-                                {checkAccess(['PCM', 'FROTA']) && <NavItem href="/dashboard/pcm/pneus" icon={Disc} label="Controle de Pneus" active={isActive('/dashboard/pcm/pneus')} />}
-                                {checkAccess(['PCM', 'FROTA', 'COLHEITA', 'SILVICULTURA', 'CARREGAMENTO']) && <NavItem href="/dashboard/pcm/localizacao" icon={MapPin} label="Localização" active={isActive('/dashboard/pcm/localizacao')} />}
+                                {!isOperacional && checkAccess(['PCM', 'FROTA']) && <NavItem href="/dashboard/pcm/pneus" icon={Disc} label="Controle de Pneus" active={isActive('/dashboard/pcm/pneus')} />}
+                                {!isOperacional && checkAccess(['PCM', 'FROTA', 'COLHEITA', 'SILVICULTURA', 'CARREGAMENTO']) && <NavItem href="/dashboard/pcm/localizacao" icon={MapPin} label="Localização" active={isActive('/dashboard/pcm/localizacao')} />}
                             </div>
                         )}
 
@@ -113,7 +120,7 @@ function DashboardShellContent({ children, user }: { children: React.ReactNode, 
                     </nav>
 
                     <div className="p-4 border-t border-border-color">
-                        <NavItem href="/dashboard/admin" icon={Settings} label="Administração" active={isActive('/dashboard/admin')} />
+                        {!isOperacional && <NavItem href="/dashboard/admin" icon={Settings} label="Administração" active={isActive('/dashboard/admin')} />}
                         <Link href="/" className="flex items-center w-full px-4 py-3 mt-1 text-[11px] font-black text-gray-400 hover:text-red-500 hover:bg-red-500/5 rounded-xl transition-all group uppercase tracking-widest">
                             <LogOut className="w-4 h-4 mr-3 opacity-50 group-hover:opacity-100 transition-opacity" />
                             Encerrar Sessão

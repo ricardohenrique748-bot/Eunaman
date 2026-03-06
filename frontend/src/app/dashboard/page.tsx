@@ -1,9 +1,16 @@
 import { getDashboardMetrics } from '../actions/dashboard-actions'
 import DashboardClient from './DashboardClient'
+import { getSession } from '../actions/auth-actions'
+import { redirect } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage(props: any) {
+    const session = await getSession()
+    if (session?.perfil === 'OPERACIONAL') {
+        redirect('/dashboard/pcm/checklist')
+    }
+
     const searchParams = props.searchParams
     const params = await searchParams
     console.log('[Page] RAW PROPS:', props)
