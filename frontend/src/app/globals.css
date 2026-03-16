@@ -110,6 +110,18 @@ body {
   animation: logo-glow 3s ease-in-out infinite;
 }
 
+/* Mobile optimization for APK */
+@media (max-width: 768px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  
+  input, textarea, [contenteditable="true"] {
+    user-select: text;
+  }
+}
+
 /* Forçar remoção dos indicadores do Next.js */
 #nextjs-portal, 
 .nextjs-static-indicator,

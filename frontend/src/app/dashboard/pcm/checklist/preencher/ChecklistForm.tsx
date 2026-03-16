@@ -184,22 +184,22 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
             </div>
 
             {/* Identification Card */}
-            <div className="dashboard-card p-5 space-y-4">
-                <h3 className="font-black text-xs text-gray-400 uppercase tracking-widest">Identificação</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="dashboard-card p-4 sm:p-5 space-y-4">
+                <h3 className="font-black text-[10px] text-gray-400 uppercase tracking-widest">Identificação</h3>
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     {/* Placa / Veículo */}
-                    <div className="sm:col-span-2 space-y-1.5">
-                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><Truck className="w-3 h-3" /> Placa / Equipamento *</label>
+                    <div className="col-span-2 space-y-1.5">
+                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><Truck className="w-3 h-3" /> Placa / Equipamento *</label>
                         <select
                             value={veiculoId}
                             onChange={e => setVeiculoId(e.target.value)}
                             required
-                            className="w-full bg-surface-highlight border border-border-color rounded-xl px-4 py-3 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                            className="w-full bg-surface-highlight border border-border-color rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                         >
-                            <option value="">Selecione o veículo...</option>
+                            <option value="">Selecione...</option>
                             {veiculos.map(v => (
                                 <option key={v.id} value={v.id}>
-                                    {v.codigoInterno}{v.placa ? ` · ${v.placa}` : ''} — {v.modelo}
+                                    {v.codigoInterno} {v.placa ? `(${v.placa})` : ''}
                                 </option>
                             ))}
                         </select>
@@ -207,35 +207,35 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
 
                     {/* Data */}
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Data *</label>
+                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Data *</label>
                         <input
                             type="date"
                             value={dataHora.data}
                             onChange={e => setDataHora(p => ({ ...p, data: e.target.value }))}
-                            className="w-full bg-surface-highlight border border-border-color rounded-xl px-4 py-3 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                            className="w-full bg-surface-highlight border border-border-color rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground focus:outline-none"
                         />
                     </div>
 
                     {/* Hora */}
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><Clock className="w-3 h-3" /> Hora *</label>
+                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><Clock className="w-3 h-3" /> Hora *</label>
                         <input
                             type="time"
                             value={dataHora.hora}
                             onChange={e => setDataHora(p => ({ ...p, hora: e.target.value }))}
-                            className="w-full bg-surface-highlight border border-border-color rounded-xl px-4 py-3 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                            className="w-full bg-surface-highlight border border-border-color rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground focus:outline-none"
                         />
                     </div>
 
                     {/* Responsável */}
-                    <div className="sm:col-span-2 space-y-1.5">
-                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><User className="w-3 h-3" /> Nome do Responsável *</label>
+                    <div className="col-span-2 space-y-1.5">
+                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><User className="w-3 h-3" /> Responsável *</label>
                         <input
                             type="text"
                             value={responsavel}
                             onChange={e => setResponsavel(e.target.value)}
-                            placeholder="Nome completo do motorista/operador"
-                            className="w-full bg-surface-highlight border border-border-color rounded-xl px-4 py-3 text-sm font-semibold text-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                            placeholder="Nome do operador"
+                            className="w-full bg-surface-highlight border border-border-color rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground placeholder-gray-400 focus:outline-none"
                         />
                     </div>
 

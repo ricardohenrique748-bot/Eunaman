@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { LogOut, LayoutDashboard, Truck, Wrench } from 'lucide-react'
+import { LogOut, LayoutDashboard, Truck, Wrench, Plus } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { ModeToggle } from '@/components/ui/mode-toggle'
 import { Suspense } from 'react'
@@ -66,54 +66,50 @@ function ChecklistAppShellContent({ children, user }: { children: React.ReactNod
             </aside>
 
             <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-                {/* Mobile Header / Top Bar */}
-                <header className="h-14 bg-background/80 backdrop-blur-md border-b border-border-color flex items-center justify-between px-4 z-30 sticky top-0">
+                {/* Mobile Header / Top Bar - Adjusted for Safe Areas */}
+                <header className="h-[calc(3.5rem+env(safe-area-inset-top))] bg-background/80 backdrop-blur-md border-b border-border-color flex items-end justify-between px-4 pb-3 z-30 sticky top-0" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
                     <div className="flex items-center gap-2.5">
                         <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
                             <Wrench className="w-3.5 h-3.5 text-primary" />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-foreground/80">Checklist v1.0</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.12em] text-foreground/80">Eunaman Pro</span>
                     </div>
 
                     <div className="flex items-center gap-3">
                         <ModeToggle />
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-black text-[10px] shadow-lg shadow-primary/20">
-                                {user?.nome?.substring(0, 2).toUpperCase()}
-                            </div>
+                        <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-black text-[10px] shadow-lg shadow-primary/20">
+                            {user?.nome?.substring(0, 2).toUpperCase()}
                         </div>
                     </div>
                 </header>
 
                 {/* Content Area */}
-                <div className="flex-1 overflow-auto p-4 relative scroll-smooth custom-scrollbar pb-24 lg:pb-8">
+                <div className="flex-1 overflow-auto p-4 relative scroll-smooth custom-scrollbar pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-8">
                     <div className="max-w-4xl mx-auto">
                         {children}
                     </div>
                 </div>
 
-                {/* Mobile Bottom Nav - Float bar style */}
-                <div className="lg:hidden absolute bottom-4 left-4 right-4 z-40">
-                    <nav className="h-16 bg-surface/90 backdrop-blur-lg border border-border-color/50 rounded-2xl shadow-2xl flex items-center justify-around px-2">
+                {/* Mobile Bottom Nav - Styled for APK with Safe Area handling */}
+                <div className="lg:hidden absolute bottom-0 left-0 right-0 z-40 bg-surface/90 backdrop-blur-xl border-t border-border-color/50 shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.1)]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+                    <nav className="h-16 flex items-center justify-around px-2">
                         <Link
                             href="/checklist-app"
-                            className={`flex flex-col items-center justify-center flex-1 h-full gap-1 rounded-xl transition-all ${pathname === '/checklist-app' ? 'text-primary bg-primary/5' : 'text-gray-400'}`}
+                            className={`flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all ${pathname === '/checklist-app' ? 'text-primary' : 'text-gray-400'}`}
                         >
                             <LayoutDashboard className={`w-5 h-5 ${pathname === '/checklist-app' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-                            <span className="text-[9px] font-black uppercase tracking-tighter">Histórico</span>
+                            <span className="text-[9px] font-black uppercase tracking-tighter">Início</span>
                         </Link>
-
-                        <div className="w-px h-8 bg-border-color/30" />
 
                         <Link
                             href="/checklist-app/novo"
-                            className={`flex flex-col items-center justify-center flex-1 h-full gap-1 rounded-xl transition-all ${pathname?.includes('/novo') || pathname?.includes('/preencher') ? 'text-primary bg-primary/5' : 'text-gray-400'}`}
+                            className={`flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all ${pathname?.includes('/novo') || pathname?.includes('/preencher') ? 'text-primary' : 'text-gray-400'}`}
                         >
-                            <Wrench className={`w-5 h-5 ${pathname?.includes('/novo') || pathname?.includes('/preencher') ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-                            <span className="text-[9px] font-black uppercase tracking-tighter">Iniciar</span>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center -mt-2 shadow-lg transition-all ${pathname?.includes('/novo') || pathname?.includes('/preencher') ? 'bg-primary text-white scale-110' : 'bg-surface-highlight text-gray-400 border border-border-color'}`}>
+                                <Plus className="w-6 h-6 stroke-[3px]" />
+                            </div>
+                            <span className="text-[9px] font-black uppercase tracking-tighter">Novo</span>
                         </Link>
-
-                        <div className="w-px h-8 bg-border-color/30" />
 
                         <Link
                             href="/"

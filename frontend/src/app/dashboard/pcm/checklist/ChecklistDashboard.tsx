@@ -16,24 +16,24 @@ export default function ChecklistDashboard({ forms }: { forms: any[] }) {
     }))).sort((a, b) => new Date(b.dataResposta).getTime() - new Date(a.dataResposta).getTime())
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-6 animate-in fade-in duration-500">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-foreground tracking-tight">Checklist</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Gerencie inspeções e checklists de implementos e frota.</p>
+                    <h1 className="text-2xl font-bold text-foreground tracking-tight sm:text-3xl">Checklist</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-[11px] sm:text-sm mt-0.5">Gerencie inspeções e frota.</p>
                 </div>
                 <Link
                     href={novoPath}
-                    className="bg-primary hover:bg-emerald-600 text-white px-8 py-3.5 rounded-2xl font-black text-xs flex items-center gap-2 transition-all shadow-xl shadow-primary/20 active:scale-95 uppercase tracking-widest border border-white/10"
+                    className="w-full sm:w-auto bg-primary hover:bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black text-[11px] flex items-center justify-center gap-2 transition-all shadow-xl shadow-primary/20 active:scale-95 uppercase tracking-widest border border-white/10"
                 >
-                    <Plus className="w-5 h-5 stroke-[3px]" />
-                    Preencher Checklist
+                    <Plus className="w-4 h-4 stroke-[3px]" />
+                    Novo Checklist
                 </Link>
             </div>
 
             {/* History Section */}
-            <div className="space-y-4">
+            <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-2">
                     <History className="w-4 h-4 text-primary" />
                     <h2 className="text-xs font-black text-gray-400 uppercase tracking-widest">Histórico Recente</h2>

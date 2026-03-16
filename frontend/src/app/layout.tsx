@@ -16,11 +16,17 @@ export const metadata: Metadata = {
   title: "Eunaman",
   description: "Eunaman - Central de Controle e PCM",
   manifest: "/manifest.json",
-  themeColor: "#10b981",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Eunaman",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: "cover",
   },
 };
 
