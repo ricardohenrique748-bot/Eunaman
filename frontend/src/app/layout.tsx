@@ -15,6 +15,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Eunaman",
   description: "Eunaman - Central de Controle e PCM",
+  manifest: "/manifest.json",
+  themeColor: "#10b981",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Eunaman",
+  },
 };
 
 import { ThemeProvider } from "@/components/theme-provider"

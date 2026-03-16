@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronUp, ArrowLeft, Send, Truck, User, Calendar, Clock, Camera, X, ImagePlus, LogIn, LogOut } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { saveChecklist } from '@/app/actions/pcm-actions'
 
 type StatusType = 'OK' | 'NC' | 'NA' | null
@@ -47,6 +48,11 @@ const STATUS_CONFIG = {
 const PNEU_POSITIONS = ['DE', 'DD', 'TEI', 'TEE', 'TDI', 'TDE', 'TEI1', 'TEE1', 'TDI1', 'TDE1', 'ESTEPE']
 
 export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos, usuarioNome }: Props) {
+    const pathname = usePathname()
+    const isStandalone = pathname?.startsWith('/checklist-app')
+    const backPath = isStandalone ? '/checklist-app' : '/dashboard/pcm/checklist'
+    const selectionPath = isStandalone ? '/checklist-app/novo' : '/dashboard/pcm/checklist/novo'
+
     const [respostas, setRespostas] = useState<Record<string, StatusType>>({})
     const [veiculoId, setVeiculoId] = useState('')
     const [responsavel, setResponsavel] = useState(usuarioNome)
@@ -152,7 +158,7 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
                     {answered} itens respondidos · <span className="text-red-500 font-bold">{ncCount} não conformes</span>
                 </p>
                 <p className="text-sm text-gray-400 mb-8">O checklist foi registrado com sucesso.</p>
-                <Link href="/dashboard/pcm/checklist" className="inline-flex items-center gap-2 bg-primary text-white px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-600 transition-all">
+                <Link href={backPath} className="inline-flex items-center gap-2 bg-primary text-white px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-600 transition-all">
                     <ArrowLeft className="w-4 h-4" />
                     Voltar ao Checklist
                 </Link>
@@ -164,7 +170,7 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
         <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-300">
             {/* Header */}
             <div className="flex items-center gap-4">
-                <Link href="/dashboard/pcm/checklist/novo" className="w-10 h-10 rounded-xl bg-surface-highlight border border-border-color flex items-center justify-center hover:border-primary/40 transition-all">
+                <Link href={selectionPath} className="w-10 h-10 rounded-xl bg-surface-highlight border border-border-color flex items-center justify-center hover:border-primary/40 transition-all">
                     <ArrowLeft className="w-4 h-4 text-foreground" />
                 </Link>
                 <div className="flex-1">

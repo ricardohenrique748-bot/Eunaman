@@ -1,0 +1,17 @@
+{
+    "name": "Eunaman Checklist",
+    "short_name": "EChecklist",
+    "description": "Sistema de checklists operacionais - Eunaman",
+    "start_url": "/checklist-app",
+    "display": "standalone",
+    "background_color": "#020817",
+    "theme_color": "#10b981",
+    "icons": [
+        {
+            "src": "/icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
