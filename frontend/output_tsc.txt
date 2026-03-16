@@ -1,0 +1,4 @@
+﻿src/app/actions/auth-actions.ts(3,20): error TS2307: Cannot find module '@/lib/prisma' or its corresponding type declarations.
+src/app/actions/pcm-actions.ts(5,20): error TS2307: Cannot find module '@/lib/prisma' or its corresponding type declarations.
+src/app/dashboard/pcm/os/ImportOsDialog.tsx(6,37): error TS2307: Cannot find module '@/app/actions/pcm-actions' or its corresponding type declarations.
+src/app/dashboard/pcm/os/ImportOsDialog.tsx(7,85): error TS2307: Cannot find module '@/components/ui/dialog' or its corresponding type declarations.

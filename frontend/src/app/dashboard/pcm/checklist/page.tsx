@@ -17,7 +17,10 @@ export default async function ChecklistPage() {
         }
     })
 
+    // Serialize dates for Client Component
+    const serializedForms = JSON.parse(JSON.stringify(forms))
+
     return (
-        <ChecklistDashboard forms={forms} />
+        <ChecklistDashboard forms={serializedForms} />
     )
 }

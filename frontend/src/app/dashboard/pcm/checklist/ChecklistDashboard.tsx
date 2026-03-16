@@ -2,7 +2,6 @@
 
 import { Plus, History, Clock, LogIn, LogOut, Search } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
 
 export default function ChecklistDashboard({ forms }: { forms: any[] }) {
     // Flatten responses from all forms into a single history list

@@ -489,8 +489,8 @@ export async function importOrdensServico(data: any[]) {
                 const veiculo = await prisma.veiculo.findFirst({
                     where: {
                         OR: [
-                            { placa: { equals: item.placa?.toString().replace(/\s/g, ''), mode: 'insensitive' } },
-                            { codigoInterno: { equals: item.codigoInterno?.toString(), mode: 'insensitive' } }
+                            { placa: { equals: (item.placa?.toString() || '').replace(/\s/g, ''), mode: 'insensitive' } },
+                            { codigoInterno: { equals: item.codigoInterno?.toString() || '', mode: 'insensitive' } }
                         ]
                     }
                 })
@@ -517,8 +517,8 @@ export async function importOrdensServico(data: any[]) {
                     'MELHORIA': 'MELHORIA'
                 }
 
-                const osStatus = statusMap[item.status?.toString().toUpperCase()] || 'ABERTA'
-                const osTipo = tipoMap[item.tipo?.toString().toUpperCase()] || 'CORRETIVA'
+                const osStatus = statusMap[(item.status?.toString() || '').toUpperCase()] || 'ABERTA'
+                const osTipo = tipoMap[(item.tipo?.toString() || '').toUpperCase()] || 'CORRETIVA'
 
                 // Parse date
                 let dataAbertura = new Date()
