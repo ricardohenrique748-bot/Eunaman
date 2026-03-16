@@ -1,7 +1,7 @@
 'use server'
 
 import prisma from '@/lib/prisma'
-import { differenceInHours, startOfMonth, endOfMonth, min } from 'date-fns'
+import { differenceInHours, startOfMonth, endOfMonth, min, max, differenceInMinutes } from 'date-fns'
 import { getSession } from './auth-actions'
 import { revalidatePath, unstable_noStore as noStore } from 'next/cache'
 
@@ -70,7 +70,11 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
 
         // OS Query
         const osWhere: any = {
-            dataAbertura: { gte: firstDay, lte: lastDay },
+            dataAbertura: { lte: lastDay },
+            OR: [
+                { dataConclusao: null },
+                { dataConclusao: { gte: firstDay } }
+            ],
             veiculo: veiculoSubWhere
         }
         if (filters.status) osWhere.status = filters.status
@@ -97,7 +101,13 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
                 include: {
                     os: {
                         where: {
-                            dataAbertura: { gte: firstDay, lte: lastDay },
+                            // OS que abrem antes ou durante o período
+                            dataAbertura: { lte: lastDay },
+                            // E que fecham DURANTE ou DEPOIS do período (ou ainda estão abertas)
+                            OR: [
+                                { dataConclusao: null },
+                                { dataConclusao: { gte: firstDay } }
+                            ],
                             // Inclui TODOS os status que representam veículo indisponível
                             status: { in: ['ABERTA', 'PLANEJADA', 'EM_EXECUCAO', 'CONCLUIDA'] }
                         }
@@ -140,14 +150,19 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
             let totalDowntimeHours = 0
 
             v.os.forEach((os: any) => {
-                const start = new Date(os.dataAbertura)
-                const end = os.dataConclusao ? new Date(os.dataConclusao) : referenceEnd
-                const actualEnd = min([end, referenceEnd])
-                const hours = differenceInHours(actualEnd, start)
-                if (hours > 0) totalDowntimeHours += hours
+                // Cálculo de interseção: o tempo que a OS ficou ativa dentro do período de interesse
+                const osStart = new Date(os.dataAbertura)
+                const osEnd = os.dataConclusao ? new Date(os.dataConclusao) : referenceEnd
+
+                const startCalculo = max([osStart, firstDay])
+                const endCalculo = min([osEnd, referenceEnd])
+
+                const minutes = differenceInMinutes(endCalculo, startCalculo)
+                if (minutes > 0) totalDowntimeHours += (minutes / 60)
             })
 
-            const availability = Math.max(0, ((totalHoursInPeriod - totalDowntimeHours) / totalHoursInPeriod) * 100)
+            const totalHoursInPeriodMath = Math.max(1, differenceInMinutes(referenceEnd, firstDay) / 60)
+            const availability = Math.max(0, ((totalHoursInPeriodMath - totalDowntimeHours) / totalHoursInPeriodMath) * 100)
 
             return {
                 id: v.id,
