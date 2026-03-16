@@ -474,3 +474,81 @@ export async function saveChecklist(data: {
         return { success: false, error: `Falha ao salvar checklist: ${error.message}` }
     }
 }
+
+export async function importOrdensServico(data: any[]) {
+    try {
+        const session = await getSession()
+        if (!session) return { success: false, error: 'Não autenticado' }
+
+        let count = 0
+        let errors = 0
+
+        for (const item of data) {
+            try {
+                // Find vehicle by plate or code
+                const veiculo = await prisma.veiculo.findFirst({
+                    where: {
+                        OR: [
+                            { placa: { equals: item.placa?.toString().replace(/\s/g, ''), mode: 'insensitive' } },
+                            { codigoInterno: { equals: item.codigoInterno?.toString(), mode: 'insensitive' } }
+                        ]
+                    }
+                })
+
+                if (!veiculo) {
+                    console.error(`Vehicle not found for OS import: ${item.placa || item.codigoInterno}`)
+                    errors++
+                    continue
+                }
+
+                // Map status and type
+                const statusMap: Record<string, any> = {
+                    'ABERTA': 'ABERTA',
+                    'PLANEJADA': 'PLANEJADA',
+                    'EM_EXECUCAO': 'EM_EXECUCAO',
+                    'CONCLUIDA': 'CONCLUIDA',
+                    'FECHADA': 'CONCLUIDA'
+                }
+
+                const tipoMap: Record<string, any> = {
+                    'PREVENTIVA': 'PREVENTIVA',
+                    'CORRETIVA': 'CORRETIVA',
+                    'INSPECAO': 'INSPECAO',
+                    'MELHORIA': 'MELHORIA'
+                }
+
+                const osStatus = statusMap[item.status?.toString().toUpperCase()] || 'ABERTA'
+                const osTipo = tipoMap[item.tipo?.toString().toUpperCase()] || 'CORRETIVA'
+
+                // Parse date
+                let dataAbertura = new Date()
+                if (item.dataAbertura) {
+                    const parsed = new Date(item.dataAbertura)
+                    if (!isNaN(parsed.getTime())) dataAbertura = parsed
+                }
+
+                await prisma.ordemServico.create({
+                    data: {
+                        veiculoId: veiculo.id,
+                        tipoOS: osTipo,
+                        status: osStatus,
+                        descricao: item.descricao || 'Importado via sistema',
+                        dataAbertura: dataAbertura,
+                        origem: 'IMPORT',
+                    }
+                })
+                count++
+            } catch (e) {
+                console.error('Error importing OS item:', e)
+                errors++
+            }
+        }
+
+        revalidatePath('/dashboard/pcm/os')
+        return { success: true, count, errors }
+    } catch (error: any) {
+        console.error('[PCM Action] Erro na importação:', error)
+        return { success: false, error: `Falha na importação: ${error.message}` }
+    }
+}
+

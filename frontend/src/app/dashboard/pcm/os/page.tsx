@@ -4,6 +4,7 @@ import { getOrdensServico } from '@/app/actions/pcm-actions'
 import { OrdemServico, Veiculo } from '@prisma/client'
 import OsRowActions from './OsRowActions'
 import SearchInput from './SearchInput'
+import OsHeaderActions from './OsHeaderActions'
 
 type OrdemServicoComVeiculo = OrdemServico & { veiculo: Veiculo }
 
@@ -27,12 +28,7 @@ export default async function PcmPage(props: any) {
                     <h1 className="text-3xl font-bold text-foreground tracking-tight text-gradient bg-clip-text">Histórico de O.S.</h1>
                     <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Gerencie a manutenção preventiva e corretiva da frota.</p>
                 </div>
-                <Link href="/dashboard/pcm/os/nova">
-                    <button className="bg-primary hover:bg-blue-600 text-white px-8 py-3.5 rounded-2xl font-black text-xs flex items-center gap-2 transition-all shadow-xl shadow-primary/20 active:scale-95 uppercase tracking-widest border border-white/10">
-                        <Plus className="w-5 h-5 stroke-[3px]" />
-                        Nova Ordem de Serviço
-                    </button>
-                </Link>
+                <OsHeaderActions />
             </div>
 
             {/* Filters & Command Bar */}
