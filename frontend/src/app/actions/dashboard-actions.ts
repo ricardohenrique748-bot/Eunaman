@@ -98,7 +98,8 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
                     os: {
                         where: {
                             dataAbertura: { gte: firstDay, lte: lastDay },
-                            status: { in: ['CONCLUIDA', 'EM_EXECUCAO'] }
+                            // Inclui TODOS os status que representam veículo indisponível
+                            status: { in: ['ABERTA', 'PLANEJADA', 'EM_EXECUCAO', 'CONCLUIDA'] }
                         }
                     }
                 }
