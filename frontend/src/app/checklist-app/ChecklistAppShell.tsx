@@ -23,8 +23,8 @@ function ChecklistAppShellContent({ children, user }: { children: React.ReactNod
 
     return (
         <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans">
-            {/* Simple Mobile-First Sidebar for App feel */}
-            <aside className="hidden md:flex w-64 bg-surface border-r border-border-color flex-col z-20 shadow-2xl">
+            {/* Sidebar - HIDDEN on mobile, visible on tablet/desktop */}
+            <aside className="hidden lg:flex w-64 bg-surface border-r border-border-color flex-col z-20 shadow-2xl">
                 <div className="h-28 flex items-center px-4 border-b border-border-color/50 justify-center">
                     <div className="relative w-48 h-16 flex items-center justify-center mix-blend-multiply">
                         <LogoAnimation fill className="scale-[1.8]" />
@@ -67,26 +67,18 @@ function ChecklistAppShellContent({ children, user }: { children: React.ReactNod
 
             <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
                 {/* Mobile Header / Top Bar */}
-                <header className="h-16 bg-background/80 backdrop-blur-md border-b border-border-color flex items-center justify-between px-6 z-30 sticky top-0">
-                    <div className="flex items-center gap-3 md:hidden">
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                            <Wrench className="w-4 h-4 text-primary" />
+                <header className="h-14 bg-background/80 backdrop-blur-md border-b border-border-color flex items-center justify-between px-4 z-30 sticky top-0">
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <Wrench className="w-3.5 h-3.5 text-primary" />
                         </div>
-                        <span className="text-xs font-black uppercase tracking-widest">Checklist</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-foreground/80">Checklist v1.0</span>
                     </div>
 
-                    <div className="hidden md:block">
-                        <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Checklist App · Modulo Operacional</h2>
-                    </div>
-
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                         <ModeToggle />
                         <div className="flex items-center gap-2">
-                            <div className="text-right hidden sm:block">
-                                <p className="text-[10px] font-black leading-none">{user?.nome}</p>
-                                <p className="text-[8px] text-primary font-bold uppercase mt-1 tracking-tighter">{user?.perfil}</p>
-                            </div>
-                            <div className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-black text-xs shadow-lg">
+                            <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-black text-[10px] shadow-lg shadow-primary/20">
                                 {user?.nome?.substring(0, 2).toUpperCase()}
                             </div>
                         </div>
@@ -94,23 +86,44 @@ function ChecklistAppShellContent({ children, user }: { children: React.ReactNod
                 </header>
 
                 {/* Content Area */}
-                <div className="flex-1 overflow-auto p-4 md:p-8 relative scroll-smooth custom-scrollbar">
+                <div className="flex-1 overflow-auto p-4 relative scroll-smooth custom-scrollbar pb-24 lg:pb-8">
                     <div className="max-w-4xl mx-auto">
                         {children}
                     </div>
                 </div>
 
-                {/* Mobile Bottom Nav */}
-                <nav className="md:hidden h-16 bg-surface border-t border-border-color grid grid-cols-2">
-                    <Link href="/checklist-app" className={`flex flex-col items-center justify-center gap-1 ${pathname === '/checklist-app' ? 'text-primary' : 'text-gray-400'}`}>
-                        <LayoutDashboard className="w-5 h-5" />
-                        <span className="text-[9px] font-black uppercase">Histórico</span>
-                    </Link>
-                    <Link href="/checklist-app/novo" className={`flex flex-col items-center justify-center gap-1 ${pathname?.includes('/novo') || pathname?.includes('/preencher') ? 'text-primary' : 'text-gray-400'}`}>
-                        <Wrench className="w-5 h-5" />
-                        <span className="text-[9px] font-black uppercase">Novo</span>
-                    </Link>
-                </nav>
+                {/* Mobile Bottom Nav - Float bar style */}
+                <div className="lg:hidden absolute bottom-4 left-4 right-4 z-40">
+                    <nav className="h-16 bg-surface/90 backdrop-blur-lg border border-border-color/50 rounded-2xl shadow-2xl flex items-center justify-around px-2">
+                        <Link
+                            href="/checklist-app"
+                            className={`flex flex-col items-center justify-center flex-1 h-full gap-1 rounded-xl transition-all ${pathname === '/checklist-app' ? 'text-primary bg-primary/5' : 'text-gray-400'}`}
+                        >
+                            <LayoutDashboard className={`w-5 h-5 ${pathname === '/checklist-app' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                            <span className="text-[9px] font-black uppercase tracking-tighter">Histórico</span>
+                        </Link>
+
+                        <div className="w-px h-8 bg-border-color/30" />
+
+                        <Link
+                            href="/checklist-app/novo"
+                            className={`flex flex-col items-center justify-center flex-1 h-full gap-1 rounded-xl transition-all ${pathname?.includes('/novo') || pathname?.includes('/preencher') ? 'text-primary bg-primary/5' : 'text-gray-400'}`}
+                        >
+                            <Wrench className={`w-5 h-5 ${pathname?.includes('/novo') || pathname?.includes('/preencher') ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                            <span className="text-[9px] font-black uppercase tracking-tighter">Iniciar</span>
+                        </Link>
+
+                        <div className="w-px h-8 bg-border-color/30" />
+
+                        <Link
+                            href="/"
+                            className="flex flex-col items-center justify-center flex-1 h-full gap-1 text-gray-400"
+                        >
+                            <LogOut className="w-5 h-5" />
+                            <span className="text-[9px] font-black uppercase tracking-tighter">Sair</span>
+                        </Link>
+                    </nav>
+                </div>
             </main>
         </div>
     )
