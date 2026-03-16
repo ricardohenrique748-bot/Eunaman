@@ -37,12 +37,15 @@ export default async function PreencherChecklistPage(props: any) {
         orderBy: { codigoInterno: 'asc' }
     })
 
+    const serializedForm = JSON.parse(JSON.stringify(formulario))
+    const serializedVeiculos = JSON.parse(JSON.stringify(veiculos))
+
     return (
         <ChecklistForm
-            formulario={formulario}
+            formulario={serializedForm}
             grouped={grouped}
             tipoLabel={tipo}
-            veiculos={veiculos}
+            veiculos={serializedVeiculos}
             usuarioNome={session?.nome || ''}
         />
     )

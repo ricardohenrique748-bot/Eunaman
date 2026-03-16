@@ -20,6 +20,8 @@ export default async function PcmPage(props: any) {
         q: queryFilter
     })
 
+    const serializedOrdens = JSON.parse(JSON.stringify(ordens || []))
+
     return (
         <div className="space-y-8">
             {/* Header */}
@@ -73,8 +75,8 @@ export default async function PcmPage(props: any) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border-color/30">
-                            {ordens && ordens.length > 0 ? (
-                                ordens.map((os: OrdemServicoComVeiculo) => (
+                            {serializedOrdens && serializedOrdens.length > 0 ? (
+                                serializedOrdens.map((os: OrdemServicoComVeiculo) => (
                                     <tr key={os.id} className="hover:bg-primary/[0.02] transition-colors group">
                                         <td className="px-8 py-6">
                                             <span className="font-black text-primary text-xs tracking-tighter">

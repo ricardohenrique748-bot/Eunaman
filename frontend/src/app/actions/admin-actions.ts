@@ -16,12 +16,14 @@ export async function getAdminVeiculos() {
         where.unidadeId = session.unidadeId
     }
 
-    return await prisma.veiculo.findMany({
+    const result = await prisma.veiculo.findMany({
         where,
         orderBy: { codigoInterno: 'asc' },
         // @ts-ignore
         include: { unidade: true, documentos: true }
     })
+
+    return JSON.parse(JSON.stringify(result))
 }
 
 export async function getAdminUsuarios() {

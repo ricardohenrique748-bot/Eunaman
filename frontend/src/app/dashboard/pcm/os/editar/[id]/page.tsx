@@ -28,5 +28,7 @@ export default async function EditarOSPage({ params }: PageProps) {
         horimetro: osResult.data.veiculo.horimetroAtual // Use vehicle's current horimeter as reference
     }
 
-    return <EditarOSForm veiculos={veiculos} osOptions={osOptions} initialData={initialData as any} />
+    const serializedInitialData = JSON.parse(JSON.stringify(initialData))
+
+    return <EditarOSForm veiculos={veiculos} osOptions={osOptions} initialData={serializedInitialData} />
 }

@@ -253,7 +253,8 @@ export async function getVehicleDetails(id: string) {
             }
         })
         if (!veiculo) return { success: false, error: 'Veículo não encontrado.' }
-        return { success: true, data: veiculo }
+        const response = { success: true, data: veiculo }
+        return JSON.parse(JSON.stringify(response))
     } catch (e: any) {
         return { success: false, error: 'Erro ao buscar veículo: ' + e.message }
     }
