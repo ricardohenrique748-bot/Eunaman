@@ -7,5 +7,8 @@ export default async function BacklogPage() {
     const result = await getBacklogItems()
     const initialData = result.success ? (result.data || []) : []
 
-    return <BacklogClient initialData={initialData} />
+    // Serializar para evitar erro de objeto Date entre Server e Client Component
+    const serializedData = JSON.parse(JSON.stringify(initialData))
+
+    return <BacklogClient initialData={serializedData} />
 }

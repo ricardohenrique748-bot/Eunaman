@@ -31,12 +31,10 @@ export default function BacklogFormDialog({ isOpen, onClose, onSuccess, initialD
             let result;
             if (initialData && initialData.id) {
                 // Update
-                // @ts-ignore
-                result = await updateBacklogItem(initialData.id, formData)
+                result = await updateBacklogItem(initialData.id, formData as Partial<BacklogItem>)
             } else {
                 // Create
-                // @ts-ignore
-                result = await createBacklogItem(formData)
+                result = await createBacklogItem(formData as Partial<BacklogItem>)
             }
 
             if (result.success) {
@@ -139,6 +137,8 @@ export default function BacklogFormDialog({ isOpen, onClose, onSuccess, initialD
                                 <Input label="Fornecedor" value={formData.fornecedor} onChange={(v: string) => handleChange('fornecedor', v)} />
                                 <Input label="Material" value={formData.material} onChange={(v: string) => handleChange('material', v)} />
                                 <Input label="Situação RC" value={formData.situacaoRc} onChange={(v: string) => handleChange('situacaoRc', v)} />
+                                <Input label="Descrição da Atividade" value={formData.descricaoAtividade} onChange={(v: string) => handleChange('descricaoAtividade', v)} />
+                                <Input label="Unidade/Projeto" value={formData.unidade} onChange={(v: string) => handleChange('unidade', v)} />
                                 <div className="col-span-2">
                                     <Input label="Detalhamento Pedido" value={formData.detalhamentoPedido} onChange={(v: string) => handleChange('detalhamentoPedido', v)} />
                                 </div>
@@ -153,6 +153,9 @@ export default function BacklogFormDialog({ isOpen, onClose, onSuccess, initialD
                                 <Input label="Mão de Obra" value={formData.maoDeObra} onChange={(v: string) => handleChange('maoDeObra', v)} />
                                 <Input label="Tempo Exec. Previsto" value={formData.tempoExecucaoPrevisto} onChange={(v: string) => handleChange('tempoExecucaoPrevisto', v)} />
                                 <Input label="Semana" value={formData.semana} onChange={(v: string) => handleChange('semana', v)} />
+                                <Input label="Previsão Conclusão" type="date" value={formData.previsaoConclusaoPendencia} onChange={(v: string) => handleChange('previsaoConclusaoPendencia', v)} />
+                                <Input label="Data Conclusão" type="date" value={formData.dataConclusaoPendencia} onChange={(v: string) => handleChange('dataConclusaoPendencia', v)} />
+                                <Input label="Dias para Resolução" type="number" value={formData.diasResolucaoPendencia} onChange={(v: string) => handleChange('diasResolucaoPendencia', v)} />
                             </div>
                         )}
                     </div>

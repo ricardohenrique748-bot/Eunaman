@@ -344,6 +344,7 @@ model Backlog {
   diasResolucaoPendencia     Int?      @map("dias_resolucao_pendencia")
   status                     String?
   observacao                 String?
+  unidade                    String?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

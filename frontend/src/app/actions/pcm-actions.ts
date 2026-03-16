@@ -489,7 +489,7 @@ export async function importOrdensServico(data: any[]) {
                 const veiculo = await prisma.veiculo.findFirst({
                     where: {
                         OR: [
-                            { placa: { equals: (item.placa?.toString() || '').replace(/\s/g, ''), mode: 'insensitive' } },
+                            { placa: { contains: (item.placa?.toString() || '').replace(/\s/g, ''), mode: 'insensitive' } },
                             { codigoInterno: { equals: item.codigoInterno?.toString() || '', mode: 'insensitive' } }
                         ]
                     }
@@ -527,12 +527,14 @@ export async function importOrdensServico(data: any[]) {
                     if (!isNaN(parsed.getTime())) dataAbertura = parsed
                 }
 
+                const descricaoVal = item.descricao || item.problema || item.atividades || item.observacao || item.diagnostico || 'Importado via sistema'
+
                 await prisma.ordemServico.create({
                     data: {
                         veiculoId: veiculo.id,
                         tipoOS: osTipo,
                         status: osStatus,
-                        descricao: item.descricao || 'Importado via sistema',
+                        descricao: descricaoVal.toString(),
                         dataAbertura: dataAbertura,
                         origem: 'IMPORT',
                     }

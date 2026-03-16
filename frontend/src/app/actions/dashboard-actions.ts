@@ -211,7 +211,7 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
             }
         }).sort((a, b) => a.value - b.value)
 
-        return {
+        const response = {
             success: true,
             data: {
                 kpis: {
@@ -228,6 +228,9 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
                 recentActivity
             }
         }
+
+        // Serializar para evitar erros de objeto Date entre Server e Client
+        return JSON.parse(JSON.stringify(response))
     } catch (e: any) {
         console.error('[Dashboard Action] Error:', e)
         return { success: false, error: 'Failed to fetch metrics: ' + e.message }
