@@ -163,7 +163,7 @@ export async function getBacklogByVehicle(identifiers: string[]) {
     }
 }
 
-export async function createBacklogItem(data: Omit<BacklogItem, 'id' | 'createdAt' | 'updatedAt'>) {
+export async function createBacklogItem(data: Partial<BacklogItem>) {
     try {
         // Construct INSERT statement dynamically
         const fields = [
@@ -325,7 +325,7 @@ export async function deleteBacklogItem(id: string) {
     }
 }
 
-export async function importBacklogItems(items: Omit<BacklogItem, 'id' | 'createdAt' | 'updatedAt'>[]) {
+export async function importBacklogItems(items: Partial<BacklogItem>[]) {
     try {
         if (items.length === 0) return { success: true, count: 0, duplicates: 0 }
 
