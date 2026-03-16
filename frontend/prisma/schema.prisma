@@ -387,6 +387,7 @@ model ChecklistResposta {
   usuarioId    String @map("usuario_id")
 
   dataResposta      DateTime @default(now()) @map("data_resposta")
+  tipo              String?  @default("ENTRADA") // ENTRADA ou SAIDA
   observacoesGerais String?  @map("observacoes_gerais")
   assinatura        String?
 

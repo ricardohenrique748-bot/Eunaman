@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronUp, ArrowLeft, Send, Truck, User, Calendar, Clock, Camera, X, ImagePlus } from 'lucide-react'
+import { CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronUp, ArrowLeft, Send, Truck, User, Calendar, Clock, Camera, X, ImagePlus, LogIn, LogOut } from 'lucide-react'
 import Link from 'next/link'
+import { saveChecklist } from '@/app/actions/pcm-actions'
 
 type StatusType = 'OK' | 'NC' | 'NA' | null
 
@@ -63,6 +64,7 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
     const [submitted, setSubmitted] = useState(false)
     const [loading, setLoading] = useState(false)
     const [pneuNumeros, setPneuNumeros] = useState<Record<string, string>>({})
+    const [tipo, setTipo] = useState<'ENTRADA' | 'SAIDA'>('ENTRADA')
 
     const allItems = Object.values(grouped).flat()
     const totalItems = allItems.length
@@ -108,10 +110,35 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
             return
         }
         setLoading(true)
-        // TODO: save to backend
-        await new Promise(r => setTimeout(r, 1000))
-        setSubmitted(true)
-        setLoading(false)
+        try {
+            const dataResposta = new Date(`${dataHora.data}T${dataHora.hora}`)
+
+            const payload = {
+                formularioId: formulario.id,
+                veiculoId: veiculoId,
+                tipo: tipo,
+                dataResposta,
+                observacoesGerais: obsGerais,
+                respostas: allItems.map(item => ({
+                    itemId: item.id,
+                    status: respostas[item.id] || 'OK',
+                    observacao: observacoes[item.id] || undefined
+                }))
+            }
+
+            const result = await saveChecklist(payload)
+
+            if (result.success) {
+                setSubmitted(true)
+            } else {
+                alert(result.error || 'Erro ao salvar checklist.')
+            }
+        } catch (error) {
+            console.error('Submit error:', error)
+            alert('Falha ao enviar checklist. Verifique sua conexão.')
+        } finally {
+            setLoading(false)
+        }
     }
 
     if (submitted) {
@@ -204,6 +231,35 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
                             placeholder="Nome completo do motorista/operador"
                             className="w-full bg-surface-highlight border border-border-color rounded-xl px-4 py-3 text-sm font-semibold text-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                         />
+                    </div>
+
+                    {/* Tipo de Checklist (Entrada/Saída) */}
+                    <div className="sm:col-span-2 space-y-1.5 pt-2">
+                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5">Identificação do Fluxo *</label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setTipo('ENTRADA')}
+                                className={`flex items-center justify-center gap-2 py-3 rounded-xl border-2 transition-all font-bold text-sm ${tipo === 'ENTRADA'
+                                    ? 'bg-primary/5 border-primary text-primary shadow-sm'
+                                    : 'bg-surface-highlight border-border-color text-gray-400 hover:border-gray-300'
+                                    }`}
+                            >
+                                <LogIn className="w-4 h-4" />
+                                Entrada
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setTipo('SAIDA')}
+                                className={`flex items-center justify-center gap-2 py-3 rounded-xl border-2 transition-all font-bold text-sm ${tipo === 'SAIDA'
+                                    ? 'bg-amber-500/5 border-amber-500 text-amber-600 shadow-sm'
+                                    : 'bg-surface-highlight border-border-color text-gray-400 hover:border-gray-300'
+                                    }`}
+                            >
+                                <LogOut className="w-4 h-4" />
+                                Saída
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

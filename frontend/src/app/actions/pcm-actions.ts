@@ -437,3 +437,40 @@ export async function updateWeekDates(dates: Record<number, { start: string, end
         return { success: false, error: 'Falha ao salvar datas' }
     }
 }
+export async function saveChecklist(data: {
+    formularioId: string,
+    veiculoId: string,
+    tipo: string,
+    dataResposta: Date,
+    observacoesGerais: string,
+    respostas: Array<{ itemId: string, status: string, observacao?: string }>
+}) {
+    try {
+        const session = await getSession()
+        if (!session) return { success: false, error: 'Não autenticado' }
+
+        const checklistResposta = await prisma.checklistResposta.create({
+            data: {
+                formularioId: data.formularioId,
+                veiculoId: data.veiculoId,
+                usuarioId: session.id,
+                tipo: data.tipo,
+                dataResposta: data.dataResposta,
+                observacoesGerais: data.observacoesGerais,
+                respostasItem: {
+                    create: data.respostas.map(r => ({
+                        itemId: r.itemId,
+                        status: r.status,
+                        observacao: r.observacao
+                    }))
+                }
+            }
+        })
+
+        revalidatePath('/dashboard/pcm/checklist')
+        return { success: true, id: checklistResposta.id }
+    } catch (error: any) {
+        console.error('[PCM Action] Erro ao salvar checklist:', error)
+        return { success: false, error: `Falha ao salvar checklist: ${error.message}` }
+    }
+}

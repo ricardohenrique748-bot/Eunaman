@@ -6,7 +6,14 @@ export default async function ChecklistPage() {
         where: { ativo: true },
         include: {
             itens: true,
-            respostas: true
+            respostas: {
+                include: {
+                    veiculo: { select: { codigoInterno: true, placa: true } },
+                    usuario: { select: { nome: true } }
+                },
+                orderBy: { dataResposta: 'desc' },
+                take: 50
+            }
         }
     })
 
