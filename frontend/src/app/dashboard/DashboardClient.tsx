@@ -18,6 +18,32 @@ interface DashboardFilters {
     tipo?: string
 }
 
+function ModernKpiCard({ title, value, sub, icon: Icon, iconColor, iconBg, isSuccess }: {
+    title: string;
+    value: string | number;
+    sub: string;
+    icon: React.ElementType;
+    iconColor: string;
+    iconBg: string;
+    isSuccess?: boolean
+}) {
+    return (
+        <div className="dashboard-card p-4 flex flex-col justify-between relative overflow-hidden group hover:border-primary/30 transition-all hover:translate-y-[-2px]">
+            <div className="flex justify-between items-start">
+                <div className="flex flex-col">
+                    <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">{title}</p>
+                    <h3 className={`text-3xl font-black text-foreground tracking-tighter ${isSuccess ? 'text-primary' : ''}`}>{value}</h3>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase mt-1 transition-colors">{sub}</p>
+                </div>
+                <div className={`p-3 rounded-xl ${iconBg} ${iconColor} mb-2 shadow-sm`}>
+                    <Icon className="w-6 h-6 stroke-[2.5px]" />
+                </div>
+            </div>
+            <div className="absolute bottom-0 left-0 h-1 w-0 bg-primary group-hover:w-full transition-all duration-500" />
+        </div>
+    )
+}
+
 export default function DashboardClient({ metrics, chartData, preventiveData, recentActivity, filters }: {
     metrics: {
         totalOS: number;
@@ -427,16 +453,104 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
                                 </BarChart>
                             </ResponsiveContainer>
                         ) : (
-                            <div className="flex flex-col items-center justify-center h-full text-gray-500 bg-surface-highlight/10 rounded-2xl border-2 border-dashed border-border-color">
-                                <Settings className="w-12 h-12 mb-3 opacity-10" />
-                                <p className="text-sm font-black uppercase tracking-widest opacity-40">Tudo em dia por aqui</p>
+                            <div className="py-20 flex flex-col items-center justify-center text-gray-400 opacity-30">
+                                <CheckCircle2 className="w-12 h-12 mb-3" />
+                                <p className="text-sm font-black uppercase tracking-widest">Tudo em dia</p>
                             </div>
                         )}
                     </div>
                 </div>
             </div>
+            
+            {/* Alerts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Overdue Preventives List */}
+                <div className="dashboard-card p-6 border-l-4 border-l-red-500">
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 className="text-foreground text-lg font-black tracking-tight flex items-center gap-2">
+                                <AlertCircle className="w-5 h-5 text-red-500" />
+                                Preventivas Atrasadas
+                            </h3>
+                            <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-1">Ações imediatas necessárias</p>
+                        </div>
+                        <span className="bg-red-500/10 text-red-500 px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                            {preventiveData.filter(p => p.value < 0).length} Alertas
+                        </span>
+                    </div>
 
-            {/* Recent Activity Section */}
+                    <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                        {preventiveData.filter(p => p.value < 0).length > 0 ? (
+                            preventiveData.filter(p => p.value < 0).map((p, i) => (
+                                <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-red-500/5 border border-red-500/10 hover:bg-red-500/10 transition-all group">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center text-red-600 font-black text-xs">
+                                            {p.placa.substring(0, 3)}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-black text-foreground">{p.name}</p>
+                                            <p className="text-[10px] text-red-500 font-bold uppercase">Atrasada em {Math.abs(p.value)}h</p>
+                                        </div>
+                                    </div>
+                                    <button className="p-2 rounded-lg bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white">
+                                        <Settings className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="py-12 flex flex-col items-center justify-center text-gray-400 opacity-30 border-2 border-dashed border-border-color rounded-2xl">
+                                <CheckCircle2 className="w-10 h-10 mb-2" />
+                                <p className="text-xs font-black uppercase tracking-widest">Nenhum atraso crítico</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Expiring Docs List (Brief View) */}
+                <div className="dashboard-card p-6 border-l-4 border-l-amber-500">
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 className="text-foreground text-lg font-black tracking-tight flex items-center gap-2">
+                                <FileText className="w-5 h-5 text-amber-500" />
+                                Documentação Crítica
+                            </h3>
+                            <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-1">Vencidos ou a vencer (30 dias)</p>
+                        </div>
+                         <button 
+                            onClick={async () => {
+                                // Logic to fetch ALL critical docs could go here, or just open a generic view
+                                setIsDetailOpen(true);
+                            }}
+                            className="text-amber-500 text-[10px] font-black uppercase hover:underline"
+                        >
+                            Ver Todos
+                        </button>
+                    </div>
+
+                    <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                         {/* Here we would ideally have a list of specific critical docs across all vehicles */}
+                         {/* For now, we show a summary or sample since kpis.docs has the stats */}
+                         <div className="grid grid-cols-3 gap-3 mb-4">
+                            <div className="bg-red-500/5 p-3 rounded-xl border border-red-500/10 text-center">
+                                <p className="text-[10px] font-black text-red-500 uppercase">Vencidos</p>
+                                <p className="text-xl font-black text-red-600">{metrics.docs?.expired || 0}</p>
+                            </div>
+                            <div className="bg-amber-500/5 p-3 rounded-xl border border-amber-500/10 text-center">
+                                <p className="text-[10px] font-black text-amber-500 uppercase">A Vencer</p>
+                                <p className="text-xl font-black text-amber-600">{metrics.docs?.attention || 0}</p>
+                            </div>
+                            <div className="bg-emerald-500/5 p-3 rounded-xl border border-emerald-500/10 text-center">
+                                <p className="text-[10px] font-black text-emerald-500 uppercase">Válidos</p>
+                                <p className="text-xl font-black text-emerald-600">{metrics.docs?.valid || 0}</p>
+                            </div>
+                         </div>
+                         
+                         <p className="text-[10px] text-gray-500 font-bold text-center italic mt-4">
+                            Clique em "Ver Todos" ou selecione um veículo no gráfico para ver detalhes por frota.
+                         </p>
+                    </div>
+                </div>
+            </div>
             <div className="dashboard-card p-6 flex flex-col">
                 <div className="flex justify-between items-start mb-8">
                     <div>
@@ -590,27 +704,3 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
     )
 }
 
-function ModernKpiCard({ title, value, sub, icon: Icon, iconColor, iconBg, isSuccess }: {
-    title: string;
-    value: string | number;
-    sub: string;
-    icon: React.ElementType;
-    iconColor: string;
-    iconBg: string;
-    isSuccess?: boolean
-}) {
-    return (
-        <div className="bg-surface border border-border-color p-4 rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-primary/30 transition-all hover:translate-y-[-2px]">
-            <div className="flex justify-between items-start">
-                <div className="flex flex-col">
-                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 leading-snug">{title}</p>
-                    <h3 className={`text-2xl font-bold text-foreground tracking-tight ${isSuccess ? 'text-emerald-600 dark:text-emerald-400' : ''}`}>{value}</h3>
-                    <p className="text-[10px] text-gray-400 mt-1 cursor-pointer hover:text-primary transition-colors">{sub}</p>
-                </div>
-                <div className={`p-2.5 rounded-xl ${iconBg} ${iconColor} mb-2`}>
-                    <Icon className="w-5 h-5 stroke-[2.5px]" />
-                </div>
-            </div>
-        </div>
-    )
-}
