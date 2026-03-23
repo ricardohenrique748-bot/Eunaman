@@ -1,0 +1,45 @@
+src/app/dashboard/pcm/page.tsx(2,25): error TS2304: Cannot find name 'getPCMSummary'.
+src/app/dashboard/pcm/page.tsx(8,12): error TS2304: Cannot find name 'AlertCircle'.
+src/app/dashboard/pcm/page.tsx(39,17): error TS2304: Cannot find name 'Wrench'.
+src/app/dashboard/pcm/page.tsx(47,17): error TS2304: Cannot find name 'ListTodo'.
+src/app/dashboard/pcm/page.tsx(55,17): error TS2304: Cannot find name 'Disc'.
+src/app/dashboard/pcm/page.tsx(63,17): error TS2304: Cannot find name 'ClipboardCheck'.
+src/app/dashboard/pcm/page.tsx(77,16): error TS2304: Cannot find name 'Activity'.
+src/app/dashboard/pcm/page.tsx(80,14): error TS2304: Cannot find name 'Link'.
+src/app/dashboard/pcm/page.tsx(82,15): error TS2304: Cannot find name 'Link'.
+src/app/dashboard/pcm/page.tsx(85,12): error TS2304: Cannot find name 'Card'.
+src/app/dashboard/pcm/page.tsx(86,14): error TS2304: Cannot find name 'CardContent'.
+src/app/dashboard/pcm/page.tsx(90,22): error TS2304: Cannot find name 'Link'.
+src/app/dashboard/pcm/page.tsx(93,28): error TS2304: Cannot find name 'Wrench'.
+src/app/dashboard/pcm/page.tsx(111,26): error TS2304: Cannot find name 'ArrowRight'.
+src/app/dashboard/pcm/page.tsx(113,23): error TS2304: Cannot find name 'Link'.
+src/app/dashboard/pcm/page.tsx(121,15): error TS2304: Cannot find name 'CardContent'.
+src/app/dashboard/pcm/page.tsx(122,13): error TS2304: Cannot find name 'Card'.
+src/app/dashboard/pcm/page.tsx(129,16): error TS2304: Cannot find name 'Disc'.
+src/app/dashboard/pcm/page.tsx(132,14): error TS2304: Cannot find name 'Link'.
+src/app/dashboard/pcm/page.tsx(134,15): error TS2304: Cannot find name 'Link'.
+src/app/dashboard/pcm/page.tsx(137,12): error TS2304: Cannot find name 'Card'.
+src/app/dashboard/pcm/page.tsx(138,14): error TS2304: Cannot find name 'CardContent'.
+src/app/dashboard/pcm/page.tsx(145,28): error TS2304: Cannot find name 'TrendingUp'.
+src/app/dashboard/pcm/page.tsx(152,30): error TS2304: Cannot find name 'format'.
+src/app/dashboard/pcm/page.tsx(152,87): error TS2304: Cannot find name 'ptBR'.
+src/app/dashboard/pcm/page.tsx(170,15): error TS2304: Cannot find name 'CardContent'.
+src/app/dashboard/pcm/page.tsx(171,13): error TS2304: Cannot find name 'Card'.
+src/app/dashboard/pcm/page.tsx(186,21): error TS2304: Cannot find name 'Calendar'.
+src/app/dashboard/pcm/page.tsx(192,21): error TS2304: Cannot find name 'ClipboardCheck'.
+src/app/dashboard/pcm/page.tsx(198,21): error TS2304: Cannot find name 'ListTodo'.
+src/app/dashboard/pcm/page.tsx(204,21): error TS2304: Cannot find name 'Disc'.
+src/app/dashboard/pcm/page.tsx(231,6): error TS2304: Cannot find name 'Link'.
+src/app/dashboard/pcm/page.tsx(232,8): error TS2304: Cannot find name 'Card'.
+src/app/dashboard/pcm/page.tsx(233,10): error TS2304: Cannot find name 'CardContent'.
+src/app/dashboard/pcm/page.tsx(254,11): error TS2304: Cannot find name 'CardContent'.
+src/app/dashboard/pcm/page.tsx(261,9): error TS2304: Cannot find name 'Card'.
+src/app/dashboard/pcm/page.tsx(262,7): error TS2304: Cannot find name 'Link'.
+src/app/dashboard/pcm/page.tsx(275,6): error TS2304: Cannot find name 'Link'.
+src/app/dashboard/pcm/page.tsx(284,7): error TS2304: Cannot find name 'Link'.
+src/app/dashboard/pcm/pneus/PneuManagement.tsx(139,35): error TS2322: Type '(data: any) => Promise<{ success: boolean; data: { id: string; data: Date; observacoes: string | null; veiculoId: string; km: number; condicao: string | null; criadoEm: Date; }; error?: undefined; } | { ...; }>' is not assignable to type 'string | ((formData: FormData) => void | Promise<void>) | undefined'.
+  Type '(data: any) => Promise<{ success: boolean; data: { id: string; data: Date; observacoes: string | null; veiculoId: string; km: number; condicao: string | null; criadoEm: Date; }; error?: undefined; } | { ...; }>' is not assignable to type '(formData: FormData) => void | Promise<void>'.
+    Type 'Promise<{ success: boolean; data: { id: string; data: Date; observacoes: string | null; veiculoId: string; km: number; condicao: string | null; criadoEm: Date; }; error?: undefined; } | { ...; }>' is not assignable to type 'void | Promise<void>'.
+      Type 'Promise<{ success: boolean; data: { id: string; data: Date; observacoes: string | null; veiculoId: string; km: number; condicao: string | null; criadoEm: Date; }; error?: undefined; } | { ...; }>' is not assignable to type 'Promise<void>'.
+        Type '{ success: boolean; data: { id: string; data: Date; observacoes: string | null; veiculoId: string; km: number; condicao: string | null; criadoEm: Date; }; error?: undefined; } | { success: boolean; error: any; data?: undefined; }' is not assignable to type 'void'.
+          Type '{ success: boolean; data: { id: string; data: Date; observacoes: string | null; veiculoId: string; km: number; condicao: string | null; criadoEm: Date; }; error?: undefined; }' is not assignable to type 'void'.

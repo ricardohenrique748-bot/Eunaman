@@ -7,7 +7,35 @@ import { usePathname } from 'next/navigation'
 import { format, isSameDay, isWithinInterval, subDays, startOfDay, endOfDay } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
-export default function ChecklistDashboard({ forms }: { forms: any[] }) {
+interface Usuario {
+    nome: string;
+}
+
+interface Veiculo {
+    codigoInterno: string;
+    placa?: string | null;
+    modelo?: string;
+}
+
+interface ChecklistResponse {
+    id: string;
+    dataResposta: string | Date;
+    tipo?: 'ENTRADA' | 'SAIDA' | string;
+    veiculo: Veiculo;
+    usuario: Usuario;
+    [key: string]: unknown;
+}
+
+interface ChecklistForm {
+    nome: string;
+    respostas?: ChecklistResponse[];
+}
+
+interface FlattenedResponse extends ChecklistResponse {
+    formularioNome: string;
+}
+
+export default function ChecklistDashboard({ forms }: { forms: ChecklistForm[] }) {
     const pathname = usePathname()
     const isStandalone = pathname?.startsWith('/checklist-app')
     const novoPath = isStandalone ? '/checklist-app/novo' : '/dashboard/pcm/checklist/novo'
@@ -19,15 +47,15 @@ export default function ChecklistDashboard({ forms }: { forms: any[] }) {
 
     // Flatten e Ordenação inicial
     const allResponses = useMemo(() => {
-        return (forms || []).flatMap(f => (f.respostas || []).map((r: any) => ({
+        return (forms || []).flatMap(f => (f.respostas || []).map((r: ChecklistResponse) => ({
             ...r,
             formularioNome: f.nome
-        }))).sort((a: any, b: any) => new Date(b.dataResposta).getTime() - new Date(a.dataResposta).getTime())
+        }))).sort((a: FlattenedResponse, b: FlattenedResponse) => new Date(b.dataResposta).getTime() - new Date(a.dataResposta).getTime())
     }, [forms])
 
     // Filtragem de Histórico
     const history = useMemo(() => {
-        return allResponses.filter((item: any) => {
+        return allResponses.filter((item: FlattenedResponse) => {
             const matchesVeiculo = item.veiculo.codigoInterno.toLowerCase().includes(filtroVeiculo.toLowerCase())
             const matchesTipo = filtroTipo === 'TODOS' || item.tipo === filtroTipo
             
@@ -184,7 +212,7 @@ export default function ChecklistDashboard({ forms }: { forms: any[] }) {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {history.map((item: any) => (
+                        {history.map((item: FlattenedResponse) => (
                             <div key={item.id} className="dashboard-card p-5 hover:border-primary/30 transition-all group overflow-hidden relative">
                                 {/* Decorative indicator for entry/exit */}
                                 <div className={`absolute top-0 right-0 w-16 h-16 -mr-4 -mt-4 rotate-45 opacity-5 ${item.tipo === 'SAIDA' ? 'bg-amber-500' : 'bg-primary'}`} />
