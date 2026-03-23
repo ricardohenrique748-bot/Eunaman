@@ -465,31 +465,73 @@ export async function saveChecklist(data: {
     tipo: string,
     dataResposta: Date,
     observacoesGerais: string,
-    respostas: Array<{ itemId: string, status: string, observacao?: string }>
+    respostas: Array<{ itemId: string, status: string, observacao?: string, fotos?: string[] }>,
+    pneus?: Record<string, string>,
+    assinatura?: string,
+    responsavel?: string
 }) {
     try {
         const session = await getSession()
-        if (!session) return { success: false, error: 'Não autenticado' }
+        
+        // Se for público, não precisamos de sessão mas precisamos de um nome no responsavel
+        if (!session && !data.responsavel) {
+            return { success: false, error: 'Acesso não autorizado ou nome do responsável ausente' }
+        }
 
         const checklistResposta = await prisma.checklistResposta.create({
             data: {
                 formularioId: data.formularioId,
                 veiculoId: data.veiculoId,
-                usuarioId: session.id,
+                usuarioId: session?.id,
+                responsavel: data.responsavel || session?.nome,
+                assinatura: data.assinatura,
                 tipo: data.tipo,
                 dataResposta: data.dataResposta,
                 observacoesGerais: data.observacoesGerais,
+                pneus: data.pneus || {},
                 respostasItem: {
                     create: data.respostas.map(r => ({
                         itemId: r.itemId,
                         status: r.status,
-                        observacao: r.observacao
+                        observacao: r.observacao,
+                        fotos: r.fotos || []
                     }))
                 }
             }
         })
 
+        // Gerar OS automaticamente para itens "NÃO OK"
+        const itensNaoOk = data.respostas.filter(r => r.status === 'NAO_OK')
+        
+        if (itensNaoOk.length > 0) {
+            // Buscar os textos dos itens para a descrição da OS
+            const itensInfo = await prisma.checklistItem.findMany({
+                where: { id: { in: itensNaoOk.map(i => i.itemId) } },
+                select: { id: true, texto: true }
+            })
+
+            for (const resposta of itensNaoOk) {
+                const item = itensInfo.find(i => i.id === resposta.itemId)
+                const itemTexto = item?.texto || 'Item não identificado'
+                const obs = resposta.observacao ? ` | Observação: ${resposta.observacao}` : ''
+
+                await prisma.ordemServico.create({
+                    data: {
+                        veiculoId: data.veiculoId,
+                        tipoOS: 'CORRETIVA',
+                        status: 'ABERTA',
+                        descricao: `[CHECKLIST ${data.tipo.toUpperCase()}] Falha identificada: ${itemTexto}${obs}`,
+                        origem: 'CHECKLIST',
+                        dataAbertura: new Date()
+                    }
+                })
+            }
+        }
+
         revalidatePath('/dashboard/pcm/checklist')
+        revalidatePath('/dashboard/pcm/os')
+        revalidatePath('/dashboard')
+        
         return { success: true, id: checklistResposta.id }
     } catch (error: any) {
         console.error('[PCM Action] Erro ao salvar checklist:', error)

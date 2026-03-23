@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Plus, History, Clock, LogIn, LogOut, Search, Filter, Calendar, Car } from 'lucide-react'
+import { Plus, History, Clock, LogIn, LogOut, Search, Filter, Calendar, Car, Share2 } from 'lucide-react'
+import { toast } from 'sonner'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { format, isSameDay, isWithinInterval, subDays, startOfDay, endOfDay } from 'date-fns'
@@ -99,13 +100,26 @@ export default function ChecklistDashboard({ forms }: { forms: ChecklistForm[] }
                     <p className="text-gray-500 dark:text-gray-400 text-[11px] sm:text-sm mt-0.5">Gerencie inspeções e frota.</p>
                 </div>
                 {!isStandalone && (
-                  <Link
-                      href={novoPath}
-                      className="w-full sm:w-auto bg-primary hover:bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black text-[11px] flex items-center justify-center gap-2 transition-all shadow-xl shadow-primary/20 active:scale-95 uppercase tracking-widest border border-white/10"
-                  >
-                      <Plus className="w-4 h-4 stroke-[3px]" />
-                      Novo Checklist
-                  </Link>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <button
+                        onClick={() => {
+                          const url = `${window.location.origin}/share/premium`
+                          navigator.clipboard.writeText(url)
+                          toast.success('Link para visitante copiado!')
+                        }}
+                        className="w-full sm:w-auto bg-surface border border-border-color hover:bg-surface-highlight text-foreground px-4 py-3 rounded-2xl font-black text-[11px] flex items-center justify-center gap-2 transition-all active:scale-95 uppercase tracking-widest"
+                    >
+                        <Share2 className="w-4 h-4" />
+                        Compartilhar com Visitante
+                    </button>
+                    <Link
+                        href={novoPath}
+                        className="w-full sm:w-auto bg-primary hover:bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black text-[11px] flex items-center justify-center gap-2 transition-all shadow-xl shadow-primary/20 active:scale-95 uppercase tracking-widest border border-white/10"
+                    >
+                        <Plus className="w-4 h-4 stroke-[3px]" />
+                        Novo Checklist
+                    </Link>
+                  </div>
                 )}
             </div>
 

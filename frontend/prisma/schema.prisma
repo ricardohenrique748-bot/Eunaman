@@ -387,17 +387,18 @@ model ChecklistResposta {
   id           String @id @default(uuid())
   formularioId String @map("formulario_id")
   veiculoId    String @map("veiculo_id")
-  usuarioId    String @map("usuario_id")
+  usuarioId    String? @map("usuario_id")
 
   dataResposta      DateTime @default(now()) @map("data_resposta")
   tipo              String?  @default("ENTRADA") // ENTRADA ou SAIDA
   observacoesGerais String?  @map("observacoes_gerais")
-  assinatura        String?
+  responsavel       String?  // Nome de quem preencheu (para links públicos)
+  assinatura        String?  // Base64 da assinatura
   pneus             Json?    @map("pneus")
 
   formulario ChecklistFormulario @relation(fields: [formularioId], references: [id])
   veiculo    Veiculo             @relation(fields: [veiculoId], references: [id])
-  usuario    Usuario             @relation(fields: [usuarioId], references: [id])
+  usuario    Usuario?             @relation(fields: [usuarioId], references: [id])
 
   respostasItem ChecklistItemResposta[]
 
@@ -411,6 +412,7 @@ model ChecklistItemResposta {
 
   status     String  @default("OK")
   observacao String?
+  fotos      Json?   @default("[]")
 
   resposta ChecklistResposta @relation(fields: [respostaId], references: [id], onDelete: Cascade)
   item     ChecklistItem     @relation(fields: [itemId], references: [id])

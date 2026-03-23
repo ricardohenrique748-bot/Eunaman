@@ -128,8 +128,10 @@ export default function ChecklistForm({ formulario, grouped, tipoLabel, veiculos
                 respostas: allItems.map(item => ({
                     itemId: item.id,
                     status: respostas[item.id] || 'OK',
-                    observacao: observacoes[item.id] || undefined
-                }))
+                    observacao: observacoes[item.id] || undefined,
+                    fotos: fotos[item.id] || []
+                })),
+                pneus: pneuNumeros // Agora enviando os números de série dos pneus
             }
 
             const result = await saveChecklist(payload)
