@@ -175,7 +175,9 @@ enum StatusOS {
   PLANEJADA
   EM_EXECUCAO
   CONCLUIDA
+  CANCELADA
 }
+
 
 model PlanoManutencao {
   id              String           @id @default(uuid())

@@ -31,6 +31,7 @@ interface ProgrammingDetails {
     descricao: string
     dataInicio: string
     dataFim: string
+    isPreventiva?: boolean
 }
 
 const DEFAULT_DETAILS: ProgrammingDetails = {
@@ -39,7 +40,8 @@ const DEFAULT_DETAILS: ProgrammingDetails = {
     modulo: '',
     descricao: '',
     dataInicio: '',
-    dataFim: ''
+    dataFim: '',
+    isPreventiva: false
 }
 
 export default function SemanalClient({ initialData, unidadeId }: { initialData: Veiculo[], unidadeId?: string }) {
@@ -189,7 +191,8 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
                 : (weekInfo?.start || ''),
             dataFim: currentVeiculo?.programacaoDataFim
                 ? new Date(currentVeiculo.programacaoDataFim).toISOString().split('T')[0]
-                : (weekInfo?.end || '')
+                : (weekInfo?.end || ''),
+            isPreventiva: currentVeiculo?.programacaoModulo === 'MPBT'
         })
 
         setIsModalOpen(true)
@@ -513,6 +516,27 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
                             </button>
                         </div>
                         <div className="p-6 space-y-4">
+                            <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/10 rounded-xl mb-4">
+                                <input
+                                    type="checkbox"
+                                    id="preventiva"
+                                    checked={details.isPreventiva}
+                                    onChange={e => {
+                                        const checked = e.target.checked
+                                        setDetails(prev => ({
+                                            ...prev,
+                                            isPreventiva: checked,
+                                            modulo: checked ? 'MPBT' : prev.modulo,
+                                            descricao: checked ? 'PLANO DE MANUTENÇÃO ( )' : prev.descricao
+                                        }))
+                                    }}
+                                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                />
+                                <label htmlFor="preventiva" className="text-xs font-black uppercase text-primary cursor-pointer select-none">
+                                    Manutenção Preventiva (MPBT)
+                                </label>
+                            </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Status</label>
@@ -551,10 +575,10 @@ export default function SemanalClient({ initialData, unidadeId }: { initialData:
                             </div>
 
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Descrição do Serviço (MPBT)</label>
+                                <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Descrição do Serviço</label>
                                 <textarea
                                     value={details.descricao}
-                                    placeholder="Ex: PLANO DE MANUTENÇÃO (REVISÃO DE 10000 HORAS)"
+                                    placeholder="Ex: PLANO DE MANUTENÇÃO (REVISÃO DE 1000H)"
                                     onChange={e => setDetails(prev => ({ ...prev, descricao: e.target.value }))}
                                     className="w-full h-20 bg-surface-highlight border border-border-color rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-primary transition-colors resize-none"
                                 />
@@ -657,8 +681,8 @@ function VehicleCard({
             {weekId !== undefined && veiculo.programacaoDescricao && (
                 <div className="mt-2 pt-2 border-t border-border-color/50 space-y-1">
                     <div className="flex justify-between items-start gap-2">
-                        <p className="text-[9px] font-bold text-foreground line-clamp-2 leading-tight flex-1">
-                            {veiculo.programacaoDescricao}
+                        <p className="text-[9px] font-bold text-foreground line-clamp-2 leading-tight flex-1 italic">
+                            {veiculo.programacaoModulo ? `${veiculo.programacaoModulo} - ` : ''}{veiculo.programacaoDescricao}
                         </p>
                     </div>
 

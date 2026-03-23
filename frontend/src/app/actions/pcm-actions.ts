@@ -1,7 +1,7 @@
 'use server'
 
 import { getSession } from './auth-actions'
-import { TipoOS } from '@prisma/client'
+import { TipoOS, StatusOS } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
@@ -384,6 +384,28 @@ export async function deleteOrdemServico(id: string) {
         return { success: false, error: `Falha ao excluir O.S.: ${error.message}` }
     }
 }
+
+export async function deleteMultipleOrdensServico(ids: string[]) {
+    try {
+        const session = await getSession()
+        if (!session) return { success: false, error: 'Não autenticado' }
+
+        if (!ids || ids.length === 0) return { success: false, error: 'Nenhuma OS selecionada' }
+
+        await prisma.ordemServico.deleteMany({
+            where: {
+                id: { in: ids }
+            }
+        })
+
+        revalidatePath('/dashboard/pcm/os')
+        revalidatePath('/dashboard')
+        return { success: true }
+    } catch (error: any) {
+        console.error('[PCM Action] Erro ao excluir múltiplas OS:', error)
+        return { success: false, error: `Falha ao excluir O.S. selecionadas: ${error.message}` }
+    }
+}
 export async function updateAllVehiclesToPesado() {
     try {
         await prisma.veiculo.updateMany({
@@ -554,3 +576,78 @@ export async function importOrdensServico(data: any[]) {
     }
 }
 
+
+export async function cancelOrdemServico(id: string) {
+    try {
+        const session = await getSession()
+        if (!session) return { success: false, error: 'Não autenticado' }
+
+        await prisma.ordemServico.update({
+            where: { id },
+            data: { status: 'CANCELADA' as StatusOS }
+        })
+
+        revalidatePath('/dashboard/pcm/os')
+        return { success: true }
+    } catch (error: any) {
+        console.error('[PCM Action] Erro ao cancelar OS:', error)
+        return { success: false, error: `Falha ao cancelar O.S.: ${error.message}` }
+    }
+}
+
+export async function finishOrdemServico(id: string) {
+    try {
+        const session = await getSession()
+        if (!session) return { success: false, error: 'Não autenticado' }
+
+        await prisma.ordemServico.update({
+            where: { id },
+            data: {
+                status: 'CONCLUIDA' as StatusOS,
+                dataConclusao: new Date()
+            }
+        })
+
+        revalidatePath('/dashboard/pcm/os')
+        return { success: true }
+    } catch (error: any) {
+        console.error('[PCM Action] Erro ao concluir OS:', error)
+        return { success: false, error: `Falha ao concluir O.S.: ${error.message}` }
+    }
+}
+
+export async function approveOrdemServicoPlan(id: string) {
+    try {
+        const session = await getSession()
+        if (!session) return { success: false, error: 'Não autenticado' }
+
+        await prisma.ordemServico.update({
+            where: { id },
+            data: { status: 'EM_EXECUCAO' }
+        })
+
+        revalidatePath('/dashboard/pcm/os')
+        return { success: true }
+    } catch (error: any) {
+        console.error('[PCM Action] Erro ao aprovar plano OS:', error)
+        return { success: false, error: `Falha ao aprovar plano O.S.: ${error.message}` }
+    }
+}
+
+export async function resumeOrdemServicoExecution(id: string) {
+    try {
+        const session = await getSession()
+        if (!session) return { success: false, error: 'Não autenticado' }
+
+        await prisma.ordemServico.update({
+            where: { id },
+            data: { status: 'EM_EXECUCAO' }
+        })
+
+        revalidatePath('/dashboard/pcm/os')
+        return { success: true }
+    } catch (error: any) {
+        console.error('[PCM Action] Erro ao retomar execução OS:', error)
+        return { success: false, error: `Falha ao iniciar execução O.S.: ${error.message}` }
+    }
+}
