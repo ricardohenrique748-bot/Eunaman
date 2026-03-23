@@ -209,7 +209,7 @@ export default function PneuDashboard({ boletins }: { boletins: Boletim[] }) {
                 <tr key={b.id} className="hover:bg-surface-highlight transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
-                      <span className="text-sm font-black text-foreground">{b.veiculo.codigoInterno}</span>
+                      <span className="text-sm font-black text-foreground">{b.veiculo.placa || b.veiculo.codigoInterno}</span>
                       <span className="text-[9px] text-gray-500 uppercase font-bold">{b.veiculo.modelo}</span>
                     </div>
                   </td>
