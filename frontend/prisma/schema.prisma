@@ -393,6 +393,7 @@ model ChecklistResposta {
   tipo              String?  @default("ENTRADA") // ENTRADA ou SAIDA
   observacoesGerais String?  @map("observacoes_gerais")
   assinatura        String?
+  pneus             Json?    @map("pneus")
 
   formulario ChecklistFormulario @relation(fields: [formularioId], references: [id])
   veiculo    Veiculo             @relation(fields: [veiculoId], references: [id])

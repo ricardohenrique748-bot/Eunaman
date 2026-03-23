@@ -1,7 +1,26 @@
 'use client'
 
 import Link from 'next/link'
-import { LayoutDashboard, Wrench, Shield, Package, DollarSign, Users, Settings, LogOut, ChevronDown, Disc, MapPin, CalendarClock, ListTodo, Tractor, Trees, Sprout, Truck } from 'lucide-react'
+import { 
+    LayoutDashboard, 
+    Wrench, 
+    Shield, 
+    Package, 
+    DollarSign, 
+    Users, 
+    Settings, 
+    LogOut, 
+    ChevronDown, 
+    Disc, 
+    MapPin, 
+    CalendarClock, 
+    ListTodo, 
+    Tractor, 
+    Trees, 
+    Sprout, 
+    Truck,
+    ClipboardCheck
+} from 'lucide-react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { ModeToggle } from '@/components/ui/mode-toggle'
@@ -75,11 +94,12 @@ function DashboardShellContent({ children, user }: { children: React.ReactNode, 
                                     <NavItem href="/dashboard/pcm/checklist" icon={Wrench} label="Checklist" active={isActive('/dashboard/pcm/checklist')} />
                                 ) : checkAccess(['PCM']) && (
                                     <>
+                                        <NavItem href="/dashboard/pcm" icon={LayoutDashboard} label="Visão Geral PCM" active={pathname === '/dashboard/pcm'} />
                                         <NavItem href="/dashboard/pcm/os" icon={Wrench} label="Gestão de O.S." active={isActive('/dashboard/pcm/os')} />
                                         <NavItem href="/dashboard/pcm/semanal" icon={CalendarClock} label="Prog. Semanal" active={isActive('/dashboard/pcm/semanal')} />
                                         <NavItem href="/dashboard/pcm/backlog" icon={ListTodo} label="Fila de Backlog" active={isActive('/dashboard/pcm/backlog')} />
                                         <NavItem href="/dashboard/pcm/preventivas" icon={Settings} label="Planos de Preventiva" active={isActive('/dashboard/pcm/preventivas')} />
-                                        <NavItem href="/dashboard/pcm/checklist" icon={Wrench} label="Checklist" active={isActive('/dashboard/pcm/checklist')} />
+                                        <NavItem href="/dashboard/pcm/checklist" icon={ClipboardCheck} label="Checklist" active={isActive('/dashboard/pcm/checklist')} />
                                     </>
                                 )}
                                 {!isOperacional && checkAccess(['PCM', 'FROTA']) && <NavItem href="/dashboard/pcm/pneus" icon={Disc} label="Controle de Pneus" active={isActive('/dashboard/pcm/pneus')} />}
