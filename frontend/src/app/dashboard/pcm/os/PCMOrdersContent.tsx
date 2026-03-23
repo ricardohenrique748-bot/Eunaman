@@ -6,6 +6,8 @@ import OsTable from './OsTable'
 import OsFilters from './OsFilters'
 import OsStatsCards from './OsStatsCards'
 
+import ImportOsButton from './ImportOsButton'
+
 interface PCMOrdersContentProps {
     ordens: any[]
     searchParams: any
@@ -32,6 +34,7 @@ export default function PCMOrdersContent({ ordens, searchParams }: PCMOrdersCont
                 </div>
 
                 <div className="flex flex-wrap items-center gap-4">
+                    <ImportOsButton />
                     <Link href="/dashboard/pcm/os/nova">
                         <button className="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 group transition-all transform hover:scale-[1.03] active:scale-[0.97] shadow-xl shadow-primary/20">
                             <Plus className="w-4 h-4 transition-transform group-hover:rotate-90 duration-300" />

@@ -507,18 +507,31 @@ export async function importOrdensServico(data: any[]) {
 
         for (const item of data) {
             try {
+                // Better header mapping
+                const placa = item.placa || item.veiculo || item.veículo || item.equipamento || item.prefixo || item.prefixoItem || item.codigoExterno
+                const codigoInterno = item.codigoInterno || item.interno || item.id_veiculo || item.id_veículo
+                const statusInput = item.status || item.situacao || item.situação || item.estado || item.condicao || item.condição
+                const tipoInput = item.tipo || item.tipo_os || item.tipo_servico || item.tipo_serviço || item.categoria
+                const descricaoVal = item.descricao || item.descrição || item.problema || item.atividades || item.observacao || item.observação || item.diagnostico || item.diagnóstico || 'Importado via sistema'
+                const dataAberturaInput = item.dataAbertura || item.data_abertura || item.data || item.abertura || item.abertura_os
+
+                if (!placa && !codigoInterno) {
+                    errors++
+                    continue
+                }
+
                 // Find vehicle by plate or code
                 const veiculo = await prisma.veiculo.findFirst({
                     where: {
                         OR: [
-                            { placa: { contains: (item.placa?.toString() || '').replace(/\s/g, ''), mode: 'insensitive' } },
-                            { codigoInterno: { equals: item.codigoInterno?.toString() || '', mode: 'insensitive' } }
-                        ]
+                            placa ? { placa: { contains: placa.toString().replace(/\s/g, '').toUpperCase(), mode: 'insensitive' } } : undefined,
+                            codigoInterno ? { codigoInterno: { equals: codigoInterno.toString(), mode: 'insensitive' } } : undefined
+                        ].filter(Boolean) as any
                     }
                 })
 
                 if (!veiculo) {
-                    console.error(`Vehicle not found for OS import: ${item.placa || item.codigoInterno}`)
+                    console.error(`Vehicle not found for OS import: ${placa || codigoInterno}`)
                     errors++
                     continue
                 }
@@ -526,30 +539,35 @@ export async function importOrdensServico(data: any[]) {
                 // Map status and type
                 const statusMap: Record<string, any> = {
                     'ABERTA': 'ABERTA',
+                    'EM_ABERTO': 'ABERTA',
                     'PLANEJADA': 'PLANEJADA',
+                    'AGENDADA': 'PLANEJADA',
                     'EM_EXECUCAO': 'EM_EXECUCAO',
+                    'EM_ANDAMENTO': 'EM_EXECUCAO',
                     'CONCLUIDA': 'CONCLUIDA',
-                    'FECHADA': 'CONCLUIDA'
+                    'CONCLUÍDA': 'CONCLUIDA',
+                    'FECHADA': 'CONCLUIDA',
+                    'FINALIZADA': 'CONCLUIDA'
                 }
 
                 const tipoMap: Record<string, any> = {
                     'PREVENTIVA': 'PREVENTIVA',
                     'CORRETIVA': 'CORRETIVA',
                     'INSPECAO': 'INSPECAO',
-                    'MELHORIA': 'MELHORIA'
+                    'INSPEÇÃO': 'INSPECAO',
+                    'MELHORIA': 'MELHORIA',
+                    'PREDITIVA': 'INSPECAO'
                 }
 
-                const osStatus = statusMap[(item.status?.toString() || '').toUpperCase()] || 'ABERTA'
-                const osTipo = tipoMap[(item.tipo?.toString() || '').toUpperCase()] || 'CORRETIVA'
+                const osStatus = statusMap[(statusInput?.toString() || '').toUpperCase()] || 'ABERTA'
+                const osTipo = tipoMap[(tipoInput?.toString() || '').toUpperCase()] || 'CORRETIVA'
 
                 // Parse date
                 let dataAbertura = new Date()
-                if (item.dataAbertura) {
-                    const parsed = new Date(item.dataAbertura)
+                if (dataAberturaInput) {
+                    const parsed = new Date(dataAberturaInput)
                     if (!isNaN(parsed.getTime())) dataAbertura = parsed
                 }
-
-                const descricaoVal = item.descricao || item.problema || item.atividades || item.observacao || item.diagnostico || 'Importado via sistema'
 
                 await prisma.ordemServico.create({
                     data: {
