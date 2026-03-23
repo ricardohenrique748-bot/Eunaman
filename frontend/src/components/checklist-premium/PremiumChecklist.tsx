@@ -252,7 +252,7 @@ export default function PremiumChecklist() {
                       {veiculo?.id === v.id && (
                         <CheckCircle className="ml-auto w-6 h-6 text-green-500 animate-bounce" />
                       )}
-                      {!veiculo?.id === v.id && (
+                      {veiculo?.id !== v.id && (
                         <ChevronRight className="ml-auto w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
                       )}
                     </div>
