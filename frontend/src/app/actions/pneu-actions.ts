@@ -138,9 +138,38 @@ export async function deleteBoletim(id: string) {
   }
 }
 
-export async function saveBoletimPneu(data: any) {
+export async function createBoletimPneu(data: any) {
   try {
-    const { veiculoId, data: dataBoletim, km, observacoes, itens } = data
+    let veiculoId, dataBoletim, km, observacoes, itens: any[] = []
+
+    if (data instanceof FormData) {
+      veiculoId = data.get('veiculoId') as string
+      dataBoletim = data.get('data') as string
+      km = data.get('km') as string
+      observacoes = data.get('observacoes') as string
+      
+      const posicoes = [
+        'DE', 'DD', 'TEI', 'TEE', 'TDI', 'TDE', 'TEI1', 'TEE1', 'TDI1', 'TDE1', 'ESTEPE'
+      ]
+      
+      itens = posicoes.map(pos => {
+        const sulco = data.get(`sulco_${pos}`)
+        if (sulco) {
+          return {
+            posicao: pos,
+            sulcoMm: parseFloat(sulco as string),
+            pneuId: null // TODO: Relacionar com pneu real se necessário
+          }
+        }
+        return null
+      }).filter(Boolean) as any[]
+    } else {
+      ({ veiculoId, data: dataBoletim, km, observacoes, itens } = data)
+    }
+
+    if (!veiculoId || !dataBoletim) {
+      throw new Error('Veículo e Data são obrigatórios')
+    }
     
     const result = await prisma.$transaction(async (tx) => {
       // 1. Criar o boletim
@@ -148,7 +177,7 @@ export async function saveBoletimPneu(data: any) {
         data: {
           veiculoId,
           data: new Date(dataBoletim),
-          km: parseInt(km),
+          km: km ? parseInt(km) : 0,
           observacoes,
           itens: {
             create: itens.map((item: any) => ({
@@ -160,7 +189,7 @@ export async function saveBoletimPneu(data: any) {
         }
       })
 
-      // 2. Atualizar o sulco_atual_mm de cada pneu
+      // 2. Atualizar o sulco_atual_mm de cada pneu (se tiver pneuId)
       for (const item of itens) {
         if (item.pneuId) {
           await tx.pneu.update({
