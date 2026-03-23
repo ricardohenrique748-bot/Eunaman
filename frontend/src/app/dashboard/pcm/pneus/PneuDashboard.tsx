@@ -1,4 +1,6 @@
 'use client'
+ 
+import { useState } from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { 
@@ -31,6 +33,7 @@ const COLORS = {
 }
 
 export default function PneuDashboard({ boletins }: { boletins: Boletim[] }) {
+  const [filterCategory, setFilterCategory] = useState<string | null>(null)
   // 1. Process data for KPI cards
   // We only count the LATEST inspection for each vehicle
   const latestInspections: Record<string, Boletim> = {}
@@ -103,6 +106,18 @@ export default function PneuDashboard({ boletins }: { boletins: Boletim[] }) {
     return 'text-red-600 bg-red-600/10'
   }
 
+  // 6. Filter logic
+  const filteredInspections = Object.values(latestInspections).filter(b => {
+    if (!filterCategory) return true
+    return b.itens.some(item => {
+      if (filterCategory === 'Bom') return item.sulcoMm > 8
+      if (filterCategory === 'Regular') return item.sulcoMm > 4 && item.sulcoMm <= 8
+      if (filterCategory === 'Crítico') return item.sulcoMm >= 2 && item.sulcoMm <= 4
+      if (filterCategory === 'Trocar') return item.sulcoMm < 2
+      return false
+    })
+  })
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* KPI Cards */}
@@ -115,6 +130,8 @@ export default function PneuDashboard({ boletins }: { boletins: Boletim[] }) {
           color="text-emerald-500" 
           bgColor="bg-emerald-500/10"
           description="Pneus em ótimas condições (> 8mm)"
+          isActive={filterCategory === 'Bom'}
+          onClick={() => setFilterCategory(filterCategory === 'Bom' ? null : 'Bom')}
         />
         <KpiCard 
           title="Regular" 
@@ -124,6 +141,8 @@ export default function PneuDashboard({ boletins }: { boletins: Boletim[] }) {
           color="text-amber-500" 
           bgColor="bg-amber-500/10"
           description="Pneus em desgaste normal (4-8mm)"
+          isActive={filterCategory === 'Regular'}
+          onClick={() => setFilterCategory(filterCategory === 'Regular' ? null : 'Regular')}
         />
         <KpiCard 
           title="Crítico" 
@@ -133,6 +152,8 @@ export default function PneuDashboard({ boletins }: { boletins: Boletim[] }) {
           color="text-red-400" 
           bgColor="bg-red-400/10"
           description="Atenção para reposição (2-4mm)"
+          isActive={filterCategory === 'Crítico'}
+          onClick={() => setFilterCategory(filterCategory === 'Crítico' ? null : 'Crítico')}
         />
         <KpiCard 
           title="Trocar" 
@@ -142,6 +163,8 @@ export default function PneuDashboard({ boletins }: { boletins: Boletim[] }) {
           color="text-red-600" 
           bgColor="bg-red-600/10"
           description="Pneus no limite legal (< 2mm)"
+          isActive={filterCategory === 'Trocar'}
+          onClick={() => setFilterCategory(filterCategory === 'Trocar' ? null : 'Trocar')}
         />
       </div>
 
@@ -155,7 +178,7 @@ export default function PneuDashboard({ boletins }: { boletins: Boletim[] }) {
           <CardContent className="h-80 relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie
+                  <Pie
                   data={pieData}
                   cx="50%"
                   cy="50%"
@@ -165,9 +188,17 @@ export default function PneuDashboard({ boletins }: { boletins: Boletim[] }) {
                   dataKey="value"
                   animationBegin={0}
                   animationDuration={1500}
+                  onClick={(data) => setFilterCategory(filterCategory === data.name ? null : data.name)}
+                  style={{ cursor: 'pointer' }}
                 >
                   {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={entry.color} 
+                      stroke={filterCategory === entry.name ? '#fff' : 'none'}
+                      strokeWidth={2}
+                      opacity={!filterCategory || filterCategory === entry.name ? 1 : 0.3}
+                    />
                   ))}
                 </Pie>
                 <RechartsTooltip 
@@ -256,7 +287,17 @@ export default function PneuDashboard({ boletins }: { boletins: Boletim[] }) {
         {/* Detailed Table (Now wider) */}
         <Card className="bg-surface border-border-color shadow-sm lg:col-span-2 overflow-hidden">
           <CardHeader>
-            <CardTitle className="text-sm font-black uppercase tracking-widest text-gray-500 underline decoration-primary/30 underline-offset-8">Condição por Veículo - Todas as Posições</CardTitle>
+            <div className="flex items-center justify-between gap-4">
+              <CardTitle className="text-sm font-black uppercase tracking-widest text-gray-500 underline decoration-primary/30 underline-offset-8">Condição por Veículo - Todas as Posições</CardTitle>
+              {filterCategory && (
+                <button 
+                  onClick={() => setFilterCategory(null)}
+                  className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary/70 transition-colors flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-full"
+                >
+                  Limpar Filtro: {filterCategory}
+                </button>
+              )}
+            </div>
           </CardHeader>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -269,7 +310,7 @@ export default function PneuDashboard({ boletins }: { boletins: Boletim[] }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-color">
-                {Object.values(latestInspections).map(b => (
+                {filteredInspections.map(b => (
                   <tr key={b.id} className="hover:bg-surface-highlight transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
@@ -302,11 +343,14 @@ export default function PneuDashboard({ boletins }: { boletins: Boletim[] }) {
   )
 }
 
-function KpiCard({ title, value, total, icon: Icon, color, bgColor, description }: any) {
+function KpiCard({ title, value, total, icon: Icon, color, bgColor, description, isActive, onClick }: any) {
   const percentage = total > 0 ? ((value / total) * 100).toFixed(0) : 0
   
   return (
-    <Card className="bg-surface border-border-color shadow-sm group hover:border-primary/50 transition-all cursor-default">
+    <Card 
+      className={`bg-surface border-border-color shadow-sm group hover:border-primary/50 transition-all cursor-pointer ${isActive ? 'ring-2 ring-primary border-primary' : ''}`}
+      onClick={onClick}
+    >
       <CardContent className="pt-6">
         <div className="flex items-center justify-between mb-4">
           <div className={`p-3 rounded-2xl ${bgColor} group-hover:scale-110 transition-transform`}>
