@@ -12,15 +12,13 @@ export default async function PCMOrdersPage(props: { searchParams: Promise<any> 
     const cookieStore = await cookies()
     const currentUnitId = cookieStore.get('currentUnitId')?.value
 
-    const { ordens } = await getOrdensServico({
-        page: 1,
-        limit: 100,
-        unitId: currentUnitId,
-        search: searchParams.search,
-        status: searchParams.status,
-        tipo: searchParams.tipo,
-        placa: searchParams.placa
+    const response = await getOrdensServico({
+        status: searchParams.status as string,
+        tipo: searchParams.tipo as string,
+        q: searchParams.q as string
     })
+
+    const ordens = 'data' in response ? (response.data || []) : []
 
     return <PCMOrdersContent ordens={ordens} searchParams={searchParams} />
 }
