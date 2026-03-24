@@ -37,7 +37,8 @@ export default function ImportOsButton() {
                         return
                     }
 
-                    const result = await importOrdensServico(jsonData)
+                    const plainData = JSON.parse(JSON.stringify(jsonData))
+                    const result = await importOrdensServico(plainData)
 
                     if (result.success) {
                         toast.success(`Sucesso! ${result.count} OS importadas. ${result.errors} erros.`, { id: toastId, duration: 5000 })

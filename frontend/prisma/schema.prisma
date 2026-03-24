@@ -101,6 +101,10 @@ model Veiculo {
   moduloSistema            String?           @map("modulo_sistema")
   dataAtualizacaoHorimetro DateTime?         @map("data_atualizacao_horimetro")
   semanaPreventiva         Int?              @map("semana_preventiva")
+  contatoProprietario      String?           @map("contato_proprietario")
+  anoModelo                Int?              @map("ano_modelo")
+  capacidadeCarga          Float?            @map("capacidade_carga")
+  capacidadeVolume         Float?            @map("capacidade_volume")
 
   // Dados da Programação Semanal
   programacaoStatus     String?   @default("PENDENTE") @map("prog_status")
@@ -288,7 +292,7 @@ model ItemBoletimPneu {
   sulcoMm   Float   @map("sulco_mm")
   pneuId    String? @map("pneu_id")
 
-  boletim BoletimPneu @relation(fields: [boletimId], references: [id])
+  boletim BoletimPneu @relation(fields: [boletimId], references: [id], onDelete: Cascade)
   pneu    Pneu?       @relation(fields: [pneuId], references: [id])
 
   @@map("itens_boletim_pneu")

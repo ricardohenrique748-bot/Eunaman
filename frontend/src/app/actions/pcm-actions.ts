@@ -541,39 +541,68 @@ export async function saveChecklist(data: {
 
 export async function importOrdensServico(data: any[]) {
     try {
+        console.log('Starting OS import. Type of data:', typeof data)
+        console.log('Is array:', Array.isArray(data))
+        console.log('Content of data:', JSON.stringify(data).substring(0, 100))
+        
+        if (!Array.isArray(data)) {
+            console.error('Import aborted: data is not an array')
+            return { success: false, message: 'Dados inválidos recebidos pelo servidor.' }
+        }
+
+        console.log('Starting OS import with', data.length, 'records')
         const session = await getSession()
         if (!session) return { success: false, error: 'Não autenticado' }
 
         let count = 0
         let errors = 0
 
-        for (const item of data) {
+        for (const rawItem of data) {
             try {
-                // Better header mapping
-                const placa = item.placa || item.veiculo || item.veículo || item.equipamento || item.prefixo || item.prefixoItem || item.codigoExterno
-                const codigoInterno = item.codigoInterno || item.interno || item.id_veiculo || item.id_veículo
-                const statusInput = item.status || item.situacao || item.situação || item.estado || item.condicao || item.condição
-                const tipoInput = item.tipo || item.tipo_os || item.tipo_servico || item.tipo_serviço || item.categoria
-                const descricaoVal = item.descricao || item.descrição || item.problema || item.atividades || item.observacao || item.observação || item.diagnostico || item.diagnóstico || 'Importado via sistema'
-                const dataAberturaInput = item.dataAbertura || item.data_abertura || item.data || item.abertura || item.abertura_os
+                // Normalize keys to allow 'Placa', 'PLACA', 'placa ', etc.
+                const item: any = {}
+                Object.keys(rawItem).forEach(key => {
+                    const normalizedKey = key.trim().toLowerCase()
+                        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+                        .replace(/\s+/g, '') // Remove spaces
+                    item[normalizedKey] = rawItem[key]
+                })
 
-                if (!placa && !codigoInterno) {
+                // Improved header mapping (after normalization)
+                const placaRaw = item.placa || item.veiculo || item.veiculo || item.equipamento || item.prefixo || item.prefixoitem || item.codigoexterno
+                const codigoInternoRaw = item.codigointerno || item.interno || item.id_veiculo || item.id_veiculo || item.idveiculo
+                const statusInput = item.status || item.situacao || item.situacao || item.estado || item.condicao || item.condicao
+                const tipoInput = item.tipo || item.tipoos || item.tiposervico || item.tiposervico || item.categoria
+                const descricaoVal = item.descricao || item.descricao || item.problema || item.atividades || item.observacao || item.observacao || item.diagnostico || item.diagnostico || 'Importado via sistema'
+                const dataAberturaInput = item.dataabertura || item.data_abertura || item.data || item.abertura || item.aberturaos || item.dataos
+
+                if (!placaRaw && !codigoInternoRaw) {
+                    console.error('Record skipped: No plate or internal code found', item)
                     errors++
                     continue
                 }
+
+                // Clean-up identification fields
+                const placa = placaRaw ? placaRaw.toString().trim().replace(/[-\s]/g, '').toUpperCase() : null
+                const codigoInterno = codigoInternoRaw ? codigoInternoRaw.toString().trim() : null
 
                 // Find vehicle by plate or code
                 const veiculo = await prisma.veiculo.findFirst({
                     where: {
                         OR: [
-                            placa ? { placa: { contains: placa.toString().replace(/\s/g, '').toUpperCase(), mode: 'insensitive' } } : undefined,
-                            codigoInterno ? { codigoInterno: { equals: codigoInterno.toString(), mode: 'insensitive' } } : undefined
+                            placa ? { 
+                                OR: [
+                                    { placa: { contains: placa, mode: 'insensitive' } },
+                                    { placa: { equals: placa, mode: 'insensitive' } }
+                                ]
+                            } : undefined,
+                            codigoInterno ? { codigoInterno: { equals: codigoInterno, mode: 'insensitive' } } : undefined
                         ].filter(Boolean) as any
                     }
                 })
 
                 if (!veiculo) {
-                    console.error(`Vehicle not found for OS import: ${placa || codigoInterno}`)
+                    console.error(`Vehicle not found for OS import: Placa=${placa}, Codigo=${codigoInterno}`)
                     errors++
                     continue
                 }
@@ -582,33 +611,49 @@ export async function importOrdensServico(data: any[]) {
                 const statusMap: Record<string, any> = {
                     'ABERTA': 'ABERTA',
                     'EM_ABERTO': 'ABERTA',
+                    'OPEN': 'ABERTA',
                     'PLANEJADA': 'PLANEJADA',
                     'AGENDADA': 'PLANEJADA',
+                    'PLANNED': 'PLANEJADA',
                     'EM_EXECUCAO': 'EM_EXECUCAO',
                     'EM_ANDAMENTO': 'EM_EXECUCAO',
+                    'IN_PROGRESS': 'EM_EXECUCAO',
                     'CONCLUIDA': 'CONCLUIDA',
-                    'CONCLUÍDA': 'CONCLUIDA',
                     'FECHADA': 'CONCLUIDA',
-                    'FINALIZADA': 'CONCLUIDA'
+                    'FINALIZADA': 'CONCLUIDA',
+                    'COMPLETED': 'CONCLUIDA',
+                    'CLOSED': 'CONCLUIDA',
+                    'CANCELADA': 'CANCELADA',
+                    'CANCELED': 'CANCELADA'
                 }
 
                 const tipoMap: Record<string, any> = {
                     'PREVENTIVA': 'PREVENTIVA',
+                    'MANUTENCAO_PREVENTIVA': 'PREVENTIVA',
                     'CORRETIVA': 'CORRETIVA',
+                    'MANUTENCAO_CORRETIVA': 'CORRETIVA',
                     'INSPECAO': 'INSPECAO',
                     'INSPEÇÃO': 'INSPECAO',
                     'MELHORIA': 'MELHORIA',
                     'PREDITIVA': 'INSPECAO'
                 }
 
-                const osStatus = statusMap[(statusInput?.toString() || '').toUpperCase()] || 'ABERTA'
-                const osTipo = tipoMap[(tipoInput?.toString() || '').toUpperCase()] || 'CORRETIVA'
+                const rawStatusStr = (statusInput?.toString() || '').toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_')
+                const osStatus = statusMap[rawStatusStr] || 'ABERTA'
+                
+                const rawTipoStr = (tipoInput?.toString() || '').toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_')
+                const osTipo = tipoMap[rawTipoStr] || 'CORRETIVA'
 
-                // Parse date
+                // Robust date parsing (handling strings and Excel serial numbers)
                 let dataAbertura = new Date()
                 if (dataAberturaInput) {
-                    const parsed = new Date(dataAberturaInput)
-                    if (!isNaN(parsed.getTime())) dataAbertura = parsed
+                    if (typeof dataAberturaInput === 'number') {
+                        // Excel serial date (days since 1900-01-01)
+                        dataAbertura = new Date((dataAberturaInput - 25569) * 86400 * 1000)
+                    } else {
+                        const parsed = new Date(dataAberturaInput)
+                        if (!isNaN(parsed.getTime())) dataAbertura = parsed
+                    }
                 }
 
                 await prisma.ordemServico.create({

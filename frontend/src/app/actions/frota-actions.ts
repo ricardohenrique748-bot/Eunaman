@@ -18,11 +18,21 @@ export async function createVeiculo(formData: FormData) {
     if (!session) return { success: false, error: 'Usuário não autenticado.' }
 
     const placa = formData.get('placa') as string
+    const codigoInterno = formData.get('codigoInterno') as string || placa
+    const modelo = formData.get('modelo') as string || 'N/A'
+    const ano = parseInt(formData.get('ano') as string) || new Date().getFullYear()
     const tipo = formData.get('tipo') as string
     const categoria = formData.get('categoria') as string
     const modulo = formData.get('modulo') as string
     const horimetro = parseInt(formData.get('horimetro') as string) || 0
+    const kmAtual = parseInt(formData.get('kmAtual') as string) || 0
+    const fabricante = formData.get('fabricante') as string || 'N/A'
     const dataAtualizacao = formData.get('dataAtualizacao') as string
+    const observacoes = formData.get('observacoes') as string
+    const contatoProprietario = formData.get('contatoProprietario') as string
+    const anoModelo = parseInt(formData.get('anoModelo') as string) || null
+    const capacidadeCarga = parseFloat(formData.get('capacidadeCarga') as string) || null
+    const capacidadeVolume = parseFloat(formData.get('capacidadeVolume') as string) || null
 
     try {
         let unidadeId = session.unidadeId
@@ -43,20 +53,25 @@ export async function createVeiculo(formData: FormData) {
         await prisma.$transaction(async (tx: any) => {
             await tx.veiculo.create({
                 data: {
-                    codigoInterno: placa,
+                    codigoInterno,
                     placa,
                     tipoVeiculo: typeMap(tipo),
                     categoria,
                     moduloSistema: modulo,
                     horimetroAtual: horimetro,
                     dataAtualizacaoHorimetro: dataAtualizacao ? new Date(dataAtualizacao) : new Date(),
-                    fabricante: 'N/A',
-                    modelo: 'N/A',
-                    ano: new Date().getFullYear(),
+                    fabricante,
+                    modelo,
+                    ano,
+                    anoModelo,
+                    contatoProprietario,
+                    capacidadeCarga,
+                    capacidadeVolume,
+                    observacoes,
                     status: 'DISPONIVEL',
                     empresaId: empresaId!,
                     unidadeId: unidadeId!,
-                    kmAtual: 0,
+                    kmAtual,
                     documentos: {
                         create: docTypes.map(d => {
                             const num = formData.get(`${d.prefix}_numero`) as string
@@ -138,17 +153,25 @@ export async function importVeiculosExcel(formData: FormData) {
 
             const placa = String(placaRaw).trim()
             console.log(`[Import] Linha ${index + 1} -> Placa: ${placa}`)
+            const codigoInterno = String(findCol('interno') || findCol('codigo') || placa).trim()
             const tipo = String(findCol('tipo') || 'LEVE')
             const categoria = String(findCol('categoria') || 'PROPRIO')
             const modulo = String(findCol('modulo') || 'BASE')
             const horimetro = findCol('horimetro')
             const dataAtu = findCol('atualizacao')
+            const ano = parseInt(findCol('ano')) || new Date().getFullYear()
+            const anoModelo = parseInt(findCol('ano modelo') || findCol('ano_modelo')) || null
+            const contatoProprietario = String(findCol('proprietario') || findCol('contato') || findCol('contato_proprietario') || '')
+            const capacidadeCarga = parseFloat(findCol('capacidade carga') || findCol('capacidade_carga') || findCol('ton')) || null
+            const capacidadeVolume = parseFloat(findCol('capacidade volume') || findCol('capacidade_volume') || findCol('m3')) || null
+            const observacoes = String(findCol('observacoes') || findCol('obs') || '')
 
             try {
                 // Execute individual elements to track errors better
                 const veiculo = await prisma.veiculo.upsert({
-                    where: { codigoInterno: placa },
+                    where: { codigoInterno: codigoInterno },
                     update: {
+                        placa: placa,
                         tipoVeiculo: typeMap(tipo),
                         // @ts-ignore
                         categoria: categoria,
@@ -156,10 +179,16 @@ export async function importVeiculosExcel(formData: FormData) {
                         moduloSistema: modulo,
                         horimetroAtual: Math.floor(Number(horimetro)) || 0,
                         dataAtualizacaoHorimetro: dataAtu instanceof Date ? dataAtu : (dataAtu ? new Date(dataAtu as any) : null),
-                        modelo: String(findCol('modelo') || 'VEICULO')
+                        modelo: String(findCol('modelo') || 'VEICULO'),
+                        ano: ano,
+                        anoModelo: anoModelo,
+                        contatoProprietario: contatoProprietario,
+                        capacidadeCarga: capacidadeCarga,
+                        capacidadeVolume: capacidadeVolume,
+                        observacoes: observacoes
                     },
                     create: {
-                        codigoInterno: placa,
+                        codigoInterno: codigoInterno,
                         placa: placa,
                         tipoVeiculo: typeMap(tipo),
                         // @ts-ignore
@@ -170,7 +199,12 @@ export async function importVeiculosExcel(formData: FormData) {
                         dataAtualizacaoHorimetro: dataAtu instanceof Date ? dataAtu : (dataAtu ? new Date(dataAtu as any) : null),
                         fabricante: 'GENERICO',
                         modelo: String(findCol('modelo') || 'VEICULO'),
-                        ano: new Date().getFullYear(),
+                        ano: ano,
+                        anoModelo: anoModelo,
+                        contatoProprietario: contatoProprietario,
+                        capacidadeCarga: capacidadeCarga,
+                        capacidadeVolume: capacidadeVolume,
+                        observacoes: observacoes,
                         status: 'DISPONIVEL',
                         empresaId: unidade.empresaId,
                         unidadeId: unidade.id,

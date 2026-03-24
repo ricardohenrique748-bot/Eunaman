@@ -127,9 +127,14 @@ export async function getBoletins() {
 
 export async function deleteBoletim(id: string) {
   try {
-    await prisma.boletimPneu.delete({
-      where: { id }
-    })
+    await prisma.$transaction([
+      prisma.itemBoletimPneu.deleteMany({
+        where: { boletimId: id }
+      }),
+      prisma.boletimPneu.delete({
+        where: { id }
+      })
+    ])
     revalidatePath('/dashboard/pcm/pneus')
     return { success: true }
   } catch (error: any) {

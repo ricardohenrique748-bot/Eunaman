@@ -32,8 +32,8 @@ export default function ImportOsDialog({ open, onOpenChange }: { open: boolean, 
                 const worksheet = workbook.Sheets[sheetName]
                 const jsonData = XLSX.utils.sheet_to_json(worksheet)
 
-                console.log('Importing data:', jsonData)
-                const res = await importOrdensServico(jsonData)
+                const plainData = JSON.parse(JSON.stringify(jsonData))
+                const res = await importOrdensServico(plainData)
                 setResult(res)
                 if (res.success) {
                     setFile(null)
