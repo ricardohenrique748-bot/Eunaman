@@ -1,6 +1,6 @@
 import { getVeiculosDropdown, getOrdemServicoById } from '@/app/actions/pcm-actions'
 import { getOsOptions } from '@/app/actions/admin-actions'
-import EditarOSForm from './EditarOSForm'
+import EditarOSForm from '@/app/dashboard/pcm/os/editar/[id]/EditarOSForm'
 import { notFound } from 'next/navigation'
 
 interface PageProps {

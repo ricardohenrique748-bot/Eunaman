@@ -1,6 +1,6 @@
 import { getVeiculosDropdown } from '@/app/actions/pcm-actions'
 import { getOsOptions } from '@/app/actions/admin-actions'
-import NovaOSForm from './NovaOSForm'
+import NovaOSForm from '@/app/dashboard/pcm/os/nova/NovaOSForm'
 
 export default async function NovaOSPage() {
     const [veiculos, osOptions] = await Promise.all([

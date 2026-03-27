@@ -2,11 +2,11 @@
 
 import { Plus, Wrench } from 'lucide-react'
 import Link from 'next/link'
-import OsTable from './OsTable'
-import OsFilters from './OsFilters'
-import OsStatsCards from './OsStatsCards'
+import OsTable from '@/app/dashboard/pcm/os/OsTable'
+import OsFilters from '@/app/dashboard/pcm/os/OsFilters'
+import OsStatsCards from '@/app/dashboard/pcm/os/OsStatsCards'
 
-import ImportOsButton from './ImportOsButton'
+import ImportOsButton from '@/app/dashboard/pcm/os/ImportOsButton'
 
 interface PCMOrdersContentProps {
     ordens: any[]

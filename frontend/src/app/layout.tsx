@@ -32,6 +32,7 @@ export const metadata: Metadata = {
 
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "sonner"
+import { UserProvider } from "@/contexts/UserContext"
 
 export default function RootLayout({
   children,
@@ -49,8 +50,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster position="top-right" richColors closeButton />
+          <UserProvider>
+            {children}
+            <Toaster position="top-right" richColors closeButton />
+          </UserProvider>
         </ThemeProvider>
       </body>
     </html>

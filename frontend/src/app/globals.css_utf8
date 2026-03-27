@@ -1,0 +1,134 @@
+﻿@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-surface: var(--surface);
+  --color-surface-highlight: var(--surface-highlight);
+  --color-border-color: var(--border-color);
+  
+  --color-status-ok: var(--status-ok);
+  --color-status-warning: var(--status-warning);
+  --color-status-critical: var(--status-critical);
+  --color-status-info: var(--status-info);
+}
+
+@layer base {
+  :root {
+    /* Light Mode - Premium SaaS (Cool & Clean) */
+    --background: #f1f5f9;  /* Slate 100 - Slightly darker than white for contrast */
+    --surface: #ffffff;     /* Pure White cards */
+    --surface-highlight: #f8fafc; /* Slate 50 - Very subtle hover */
+    --border-color: #e2e8f0;    /* Slate 200 - Soft borders */
+    --foreground: #0f172a;      /* Slate 900 - High contrast text */
+    
+    --primary: #16a34a;         /* Green 600 - Matches Eunaman logo */
+    --primary-foreground: #ffffff;
+    
+    --status-ok: #10b981;
+    --status-warning: #f59e0b;
+    --status-critical: #ef4444;
+    --status-info: #3b82f6;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Dark Mode - MaintX Pro (Refined) */
+    --background: #0b1121;      /* Deepest Navy/Black */
+    --surface: #151e32;         /* Lighter Navy for Cards */
+    --surface-highlight: #1e2942; /* Even Lighter for Hovers */
+    --border-color: #2a344a;    /* Subtle Separators */
+    --foreground: #f1f5f9;      /* Slate 100 */
+    
+    --primary: #22c55e;         /* Green 500 for dark mode */
+    --primary-foreground: #ffffff;
+    
+    --status-ok: #10b981;
+    --status-warning: #fbbf24;
+    --status-critical: #ef4444;
+    --status-info: #60a5fa;
+  }
+}
+
+@layer utilities {
+  .dashboard-card {
+    @apply bg-surface border border-border-color rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none transition-all duration-200;
+  }
+  
+  .dashboard-card:hover {
+    @apply border-primary/30 shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)];
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-emerald-500 bg-clip-text text-transparent;
+  }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--surface-highlight);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Logo Animations */
+@keyframes logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes logo-glow {
+  0%, 100% { filter: drop-shadow(0 0 2px rgba(22, 163, 74, 0.5)); }
+  50% { filter: drop-shadow(0 0 10px rgba(22, 163, 74, 0.8)); }
+}
+
+.animate-logo-spin {
+  animation: logo-spin 12s linear infinite;
+}
+
+.animate-logo-glow {
+  animation: logo-glow 3s ease-in-out infinite;
+}
+
+/* Mobile optimization for APK */
+@media (max-width: 768px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  
+  input, textarea, [contenteditable="true"] {
+    user-select: text;
+  }
+}
+
+/* ForÃ§ar remoÃ§Ã£o dos indicadores do Next.js */
+#nextjs-portal, 
+.nextjs-static-indicator,
+[hidden-indicator="true"],
+__next-prerender-indicator {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

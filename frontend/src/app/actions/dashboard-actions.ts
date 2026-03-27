@@ -78,7 +78,9 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
             veiculo: veiculoSubWhere
         }
         if (filters.status) osWhere.status = filters.status
-        if (filters.os) osWhere.numeroOS = Number(filters.os)
+        if (filters.os && !isNaN(Number(filters.os))) {
+            osWhere.numeroOS = Number(filters.os)
+        }
 
         // Vehicle Query (for Chart/Availability)
         const veiculoWhere: any = {
@@ -86,9 +88,12 @@ export async function getDashboardMetrics(filters: DashboardFilters = {}) {
             status: { not: 'DESATIVADO' }
         }
 
-        console.log('[Dashboard] Filtros Recebidos:', filters)
-        console.log('[Dashboard] OS Query:', JSON.stringify(osWhere, null, 2))
-        console.log('[Dashboard] Veiculo Query:', JSON.stringify(veiculoWhere, null, 2))
+        if (filters.os && !isNaN(Number(filters.os))) {
+            veiculoWhere.os = {
+                some: { numeroOS: Number(filters.os) }
+            }
+        }
+
 
         // --- 2. Database Fetching (Parallel) ---
         const [osList, veiculos, docs, preventivePlanos, recentActivity] = await Promise.all([

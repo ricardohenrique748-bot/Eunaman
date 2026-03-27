@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { Lock, User, AlertCircle, Shield } from 'lucide-react'
 import Image from 'next/image'
 import LogoAnimation from '@/components/ui/LogoAnimation'
-import { login } from '@/app/actions/auth-actions'
+import { login, logout, getSession, updatePassword, requestPasswordReset } from '@/app/actions/auth-actions'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -66,7 +66,7 @@ export default function LoginPage() {
     setError(null)
 
     const formData = new FormData(e.currentTarget)
-    const { updatePassword } = await import('@/app/actions/auth-actions')
+
 
     // @ts-ignore
     const res = await updatePassword(formData)
@@ -87,7 +87,7 @@ export default function LoginPage() {
     setResetStatus('loading')
 
     // Import dynamically to avoid circular dependencies if any, or just use the imported one
-    const { requestPasswordReset } = await import('@/app/actions/auth-actions')
+
 
     const res = await requestPasswordReset(resetEmail)
 

@@ -62,6 +62,14 @@ export async function getBacklogItems(params?: {
       where.status = params.status
     }
 
+    // Remover itens com origem 'CORRETIVA' conforme solicitado pelo usuário
+    where.NOT = {
+      origem: {
+        equals: 'CORRETIVA',
+        mode: 'insensitive'
+      }
+    }
+
     if (params?.search) {
       where.OR = [
         { frota: { contains: params.search, mode: 'insensitive' } },
@@ -91,7 +99,12 @@ export async function getUnidades() {
     const unidades = await prisma.backlog.findMany({
       select: { unidade: true },
       distinct: ['unidade'],
-      where: { NOT: { unidade: null } }
+      where: { 
+        NOT: [
+          { unidade: null },
+          { origem: { equals: 'CORRETIVA', mode: 'insensitive' } }
+        ]
+      }
     })
     return unidades.map((u: any) => u.unidade as string).sort()
   } catch (error) {
@@ -102,14 +115,21 @@ export async function getUnidades() {
 
 export async function getResumoBacklog() {
   try {
+    const where = {
+      NOT: {
+        origem: { equals: 'CORRETIVA', mode: 'insensitive' }
+      }
+    }
+
     const resumo = await prisma.backlog.groupBy({
       by: ['status'],
+      where,
       _count: {
         status: true
       }
     })
 
-    const total = await prisma.backlog.count()
+    const total = await prisma.backlog.count({ where })
 
     const formattedResumo = {
       total,
@@ -190,6 +210,45 @@ export async function deleteBacklogItem(id: string) {
   } catch (error) {
     console.error('Erro ao excluir item do backlog:', error)
     return { success: false, error: 'Erro ao excluir item' }
+  }
+}
+
+export async function getBacklogByVehicle(identifiers: string[]) {
+  try {
+    if (!identifiers || identifiers.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const orConditions: any[] = []
+
+    for (const id of identifiers) {
+      if (id) {
+        orConditions.push({ frota: { contains: id, mode: 'insensitive' } })
+        orConditions.push({ tag: { contains: id, mode: 'insensitive' } })
+      }
+    }
+
+    if (orConditions.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const items = await prisma.backlog.findMany({
+      where: {
+        OR: orConditions,
+        NOT: {
+          status: {
+            in: ['CONCLUÍDO', 'CONCLUIDO', 'Concluído', 'Concluido']
+          }
+        }
+      },
+      orderBy: { dataEvidencia: 'desc' },
+      take: 20
+    })
+
+    return { success: true, data: items }
+  } catch (error) {
+    console.error('Erro ao buscar backlog por veículo:', error)
+    return { success: false, data: [], error: 'Erro ao buscar pendências do backlog' }
   }
 }
 

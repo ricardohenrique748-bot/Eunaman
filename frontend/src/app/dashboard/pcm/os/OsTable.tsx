@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Plus, Filter, Search, MoreHorizontal, Calendar, Wrench, AlertCircle, CheckCircle2, Trash2, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { OrdemServico, Veiculo } from '@prisma/client'
-import OsRowActions from './OsRowActions'
+import OsRowActions from '@/app/dashboard/pcm/os/OsRowActions'
 import { deleteMultipleOrdensServico } from '@/app/actions/pcm-actions'
 import { toast } from 'sonner'
 

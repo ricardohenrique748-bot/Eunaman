@@ -12,33 +12,8 @@ interface BacklogListProps {
 }
 
 export default function BacklogList({ data, onEdit, onDelete }: BacklogListProps) {
-    const [filter, setFilter] = useState('')
-
-    const filtered = data.filter(item => {
-        const search = filter.toLowerCase()
-        const desc = item.descricaoAtividade?.toLowerCase() || ''
-        const frota = item.frota?.toLowerCase() || ''
-        const ordem = (item.numeroOrdem || item.os)?.toLowerCase() || ''
-
-        return desc.includes(search) || frota.includes(search) || ordem.includes(search)
-    })
-
     return (
         <div className="flex flex-col h-full overflow-hidden">
-            {/* Toolbar */}
-            <div className="p-4 border-b border-border-color flex justify-between items-center bg-surface-highlight/10">
-                <input
-                    type="text"
-                    placeholder="Buscar por descrição, frota, ordem..."
-                    className="bg-surface border border-border-color rounded-lg px-4 py-2 text-xs font-bold w-96 outline-none focus:border-primary transition-colors"
-                    value={filter}
-                    onChange={e => setFilter(e.target.value)}
-                />
-                <span className="text-xs font-black uppercase text-gray-500 tracking-widest">
-                    {filtered.length} Itens
-                </span>
-            </div>
-
             {/* Table */}
             <div className="flex-1 overflow-auto custom-scrollbar">
                 <table className="w-full text-left border-collapse">

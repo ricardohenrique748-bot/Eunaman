@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Plus, Upload } from 'lucide-react'
 import Link from 'next/link'
-import ImportOsDialog from './ImportOsDialog'
+import ImportOsDialog from '@/app/dashboard/pcm/os/ImportOsDialog'
 
 export default function OsHeaderActions() {
     const [importOpen, setImportOpen] = useState(false)

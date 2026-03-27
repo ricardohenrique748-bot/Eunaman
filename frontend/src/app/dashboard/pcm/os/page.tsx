@@ -1,11 +1,13 @@
 import { getOrdensServico } from '@/app/actions/pcm-actions'
 import { cookies } from 'next/headers'
-import PCMOrdersContent from './PCMOrdersContent'
+import PCMOrdersContent from '@/app/dashboard/pcm/os/PCMOrdersContent'
 
 export const metadata = {
     title: 'PCM - Ordens de Serviço | Eunaman',
     description: 'Gestão de manutenção e serviços Eunaman.',
 }
+
+export const dynamic = 'force-dynamic'
 
 export default async function PCMOrdersPage(props: { searchParams: Promise<any> }) {
     const searchParams = await props.searchParams

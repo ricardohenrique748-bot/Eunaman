@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { X, Upload, FileText, CheckCircle2 } from 'lucide-react'
 import * as XLSX from 'xlsx'
+import { Download, Info, AlertTriangle, Upload, X, FileText, CheckCircle2 } from 'lucide-react'
 
 interface Props {
     isOpen: boolean
@@ -14,11 +14,39 @@ export default function ImportBacklogDialog({ isOpen, onClose, onSuccess, onImpo
     const [file, setFile] = useState<File | null>(null)
     const [uploading, setUploading] = useState(false)
     const [progress, setProgress] = useState(0)
+    const [previewData, setPreviewData] = useState<any[] | null>(null)
+    const [showInstructions, setShowInstructions] = useState(false)
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setFile(e.target.files[0])
+            const selectedFile = e.target.files[0]
+            setFile(selectedFile)
+            
+            try {
+                const rawData = await processExcel(selectedFile)
+                const mappedItems = mapDataToBacklogItems(rawData)
+                setPreviewData(mappedItems.slice(0, 5)) // Show first 5 rows
+            } catch (err) {
+                console.error(err)
+            }
         }
+    }
+
+    const downloadTemplate = () => {
+        const headers = [
+            'Semana', 'Mes', 'Ano', 'Data Evidencia', 'Modulo', 'Regiao Programacao', 
+            'Frota', 'TAG', 'Unidade', 'Tipo', 'Descricao Atividade', 'Origem', 
+            'Criticidade', 'Tempo Execucao Previsto', 'Campo Base', 'OS', 'Material', 
+            'Numero RC', 'Numero Ordem', 'Fornecedor', 'Data RC', 'Detalhamento Pedido',
+            'Data Necessidade Material', 'Tipo Pedido', 'Previsao Material', 'Situacao RC',
+            'Data Programacao', 'Mao de Obra', 'Status Programacao', 'Previsao Conclusao',
+            'Data Conclusao', 'Status', 'Observacao'
+        ]
+        
+        const worksheet = XLSX.utils.aoa_to_sheet([headers])
+        const workbook = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Template')
+        XLSX.writeFile(workbook, 'modelo_backlog_eunaman.xlsx')
     }
 
     const processExcel = async (file: File) => {
@@ -189,71 +217,174 @@ export default function ImportBacklogDialog({ isOpen, onClose, onSuccess, onImpo
             <div className="bg-surface border border-border-color w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 <div className="p-4 border-b border-border-color flex justify-between items-center bg-surface-highlight/10">
                     <h3 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+                        <Upload className="w-5 h-5 text-primary" />
                         Importar Backlog
                     </h3>
-                    <button onClick={onClose} className="text-gray-500 hover:text-red-500 transition-colors">
-                        <X className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button 
+                            onClick={downloadTemplate}
+                            className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors flex items-center gap-2 text-[10px] font-black uppercase"
+                            title="Baixar Modelo Excel"
+                        >
+                            <Download className="w-4 h-4" />
+                            Modelo
+                        </button>
+                        <button onClick={onClose} className="text-gray-500 hover:text-red-500 transition-colors">
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
 
-                <div className="p-8 flex flex-col items-center justify-center text-center space-y-4">
-                    <div className={`w-20 h-20 rounded-full flex items-center justify-center ${file ? 'bg-green-500/10 text-green-500' : 'bg-primary/10 text-primary'} transition-colors`}>
-                        {file ? <CheckCircle2 className="w-10 h-10" /> : <Upload className="w-10 h-10" />}
-                    </div>
-
-                    <div className="space-y-2">
-                        <h4 className="text-sm font-bold text-foreground">
-                            {file ? file.name : 'Selecione o arquivo Excel'}
-                        </h4>
-                        <p className="text-xs text-gray-500 max-w-[200px] mx-auto">
-                            Arraste e solte ou clique para selecionar o arquivo de backlog (.xlsx) para importação.
-                        </p>
-                    </div>
-
-                    <input
-                        type="file"
-                        accept=".xlsx,.xls"
-                        onChange={handleFileChange}
-                        className="hidden"
-                        id="file-upload"
-                    />
-
-                    {!file && (
-                        <label
-                            htmlFor="file-upload"
-                            className="px-6 py-2 bg-surface text-foreground border border-border-color hover:bg-surface-highlight rounded-xl text-xs font-black uppercase tracking-widest cursor-pointer transition-all"
-                        >
-                            Escolher Arquivo
-                        </label>
-                    )}
-
-                    {uploading && (
-                        <div className="w-full space-y-1">
-                            <div className="flex justify-between text-[10px] font-black uppercase text-gray-500">
-                                <span>Processando...</span>
-                                <span>{progress}%</span>
+                <div className="max-h-[70vh] overflow-y-auto">
+                    {!file ? (
+                        <div className="p-8 flex flex-col items-center justify-center text-center space-y-4">
+                            <div className="w-20 h-20 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                                <FileText className="w-10 h-10" />
                             </div>
-                            <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
-                                <div className="h-full bg-primary transition-all duration-200" style={{ width: `${progress}%` }} />
+
+                            <div className="space-y-2">
+                                <h4 className="text-sm font-bold text-foreground">
+                                    Selecione o arquivo Excel
+                                </h4>
+                                <p className="text-xs text-gray-400 max-w-[250px] mx-auto">
+                                    Certifique-se que as colunas correspondam aos campos do sistema. Baixe o modelo se tiver dúvidas.
+                                </p>
                             </div>
+
+                            <input
+                                type="file"
+                                accept=".xlsx,.xls"
+                                onChange={handleFileChange}
+                                className="hidden"
+                                id="file-upload"
+                            />
+
+                            <label
+                                htmlFor="file-upload"
+                                className="px-8 py-3 bg-primary text-white hover:bg-primary/90 rounded-xl text-xs font-black uppercase tracking-widest cursor-pointer transition-all shadow-lg shadow-primary/20"
+                            >
+                                Escolher Arquivo
+                            </label>
+
+                            <button 
+                                onClick={() => setShowInstructions(!showInstructions)}
+                                className="text-[10px] font-bold text-gray-500 hover:text-primary flex items-center gap-1"
+                            >
+                                <Info className="w-3 h-3" />
+                                {showInstructions ? 'Ocultar instruções' : 'Ver campos suportados'}
+                            </button>
+
+                            {showInstructions && (
+                                <div className="w-full text-left bg-surface-highlight/20 p-4 rounded-xl space-y-2 border border-border-color">
+                                    <h5 className="text-[10px] font-black uppercase text-foreground">Mapeamento Inteligente:</h5>
+                                    <ul className="text-[10px] text-gray-400 grid grid-cols-2 gap-x-4 gap-y-1">
+                                        <li>• Frota / Placa / Equip.</li>
+                                        <li>• TAG / Local Inst.</li>
+                                        <li>• Data / Evidência</li>
+                                        <li>• Descrição / Falha</li>
+                                        <li>• Criticidade / Grau</li>
+                                        <li>• Unidade / Projeto</li>
+                                    </ul>
+                                    <p className="text-[9px] text-gray-500 italic mt-2">
+                                        *O sistema tenta identificar automaticamente colunas com nomes similares.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="p-6 space-y-6">
+                            <div className="flex items-center gap-4 bg-green-500/5 p-4 rounded-xl border border-green-500/20">
+                                <div className="w-12 h-12 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center">
+                                    {uploading ? (
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500" />
+                                    ) : (
+                                        <CheckCircle2 className="w-6 h-6" />
+                                    )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="text-xs font-bold text-foreground truncate">
+                                        {file.name}
+                                    </h4>
+                                    <p className="text-[10px] text-gray-500">
+                                        {(file.size / 1024).toFixed(1)} KB • Pronto para importar
+                                    </p>
+                                </div>
+                                <button 
+                                    onClick={() => { setFile(null); setPreviewData(null); }}
+                                    className="text-[10px] font-black text-gray-500 hover:text-red-500 uppercase"
+                                >
+                                    Trocar
+                                </button>
+                            </div>
+
+                            {previewData && (
+                                <div className="space-y-2">
+                                    <h5 className="text-[10px] font-black uppercase text-gray-500 flex items-center gap-2">
+                                        Prévia dos Dados (Top 5)
+                                    </h5>
+                                    <div className="bg-surface rounded-xl border border-border-color overflow-hidden">
+                                        <table className="w-full text-[10px]">
+                                            <thead className="bg-surface-highlight/10 border-b border-border-color">
+                                                <tr>
+                                                    <th className="px-3 py-2 text-left font-bold text-gray-500">Frota</th>
+                                                    <th className="px-3 py-2 text-left font-bold text-gray-500">Atividade</th>
+                                                    <th className="px-3 py-2 text-left font-bold text-gray-500">Unidade</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-border-color">
+                                                {previewData.map((row, i) => (
+                                                    <tr key={i} className="hover:bg-surface-highlight/5">
+                                                        <td className="px-3 py-2 font-mono text-primary">{row.frota || '-'}</td>
+                                                        <td className="px-3 py-2 truncate max-w-[150px]">{row.descricaoAtividade || '-'}</td>
+                                                        <td className="px-3 py-2">{row.unidade || '-'}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+
+                            {uploading && (
+                                <div className="w-full space-y-2">
+                                    <div className="flex justify-between text-[10px] font-black uppercase">
+                                        <span className="text-primary animate-pulse">Processando dados...</span>
+                                        <span className="text-gray-500">{progress}%</span>
+                                    </div>
+                                    <div className="w-full h-1.5 bg-surface-highlight rounded-full overflow-hidden">
+                                        <div 
+                                            className="h-full bg-primary transition-all duration-300 ease-out shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" 
+                                            style={{ width: `${progress}%` }} 
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
 
-                <div className="p-4 border-t border-border-color flex justify-end gap-2 bg-surface-highlight/5">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 text-xs font-black uppercase tracking-widest text-gray-500 hover:text-foreground hover:bg-surface-highlight rounded-lg transition-colors"
-                    >
-                        Cancelar
-                    </button>
-                    <button
-                        onClick={handleImport}
-                        disabled={!file || uploading}
-                        className="px-6 py-2 text-xs font-black uppercase tracking-widest bg-primary text-white rounded-lg shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Importar Dados
-                    </button>
+                <div className="p-4 border-t border-border-color flex justify-between items-center bg-surface-highlight/5">
+                    <div className="flex items-center gap-2 text-amber-500">
+                        <AlertTriangle className="w-3 h-3" />
+                        <span className="text-[9px] font-bold uppercase tracking-tighter">
+                            Evite duplicatas
+                        </span>
+                    </div>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={onClose}
+                            className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-foreground hover:bg-surface-highlight rounded-lg transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={handleImport}
+                            disabled={!file || uploading}
+                            className="px-6 py-2 text-[10px] font-black uppercase tracking-widest bg-primary text-white rounded-lg shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {uploading ? 'Importando...' : 'Iniciar Importação'}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

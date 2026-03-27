@@ -3,7 +3,7 @@
 import { Search, Filter, Calendar, X, Check } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useEffect, useCallback } from 'react'
-import SearchInput from './SearchInput'
+import SearchInput from '@/app/dashboard/pcm/os/SearchInput'
 
 export default function OsFilters() {
     const router = useRouter()
@@ -26,10 +26,12 @@ export default function OsFilters() {
         })
         
         router.push(`/dashboard/pcm/os?${params.toString()}`)
+        router.refresh()
     }, [router, searchParams])
 
     const clearFilters = () => {
         router.push('/dashboard/pcm/os')
+        router.refresh()
     }
 
     const hasFilters = currentStatus || currentTipo || searchQuery

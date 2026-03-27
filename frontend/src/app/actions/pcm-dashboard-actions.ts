@@ -21,7 +21,12 @@ export async function getPCMSummary() {
       // Totais para os cards
       prisma.veiculo.count(),
       prisma.ordemServico.count({ where: { status: 'ABERTA' } }),
-      prisma.backlog.count({ where: { status: 'PENDENTE' } }),
+      prisma.backlog.count({ 
+        where: { 
+          status: 'PENDENTE',
+          NOT: { origem: { equals: 'CORRETIVA', mode: 'insensitive' } }
+        } 
+      }),
       prisma.pneu.count({ where: { sulcoAtualMm: { lt: 4 } } }),
       prisma.checklistResposta.count({ 
         where: { 

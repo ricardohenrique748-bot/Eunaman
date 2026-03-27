@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowUpRight, ArrowDownRight, Activity, Wrench, AlertTriangle, CheckCircle2, Clock, FileText, Settings, AlertCircle, Filter, Search, Calendar, Share2 } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, Activity, Wrench, AlertTriangle, CheckCircle2, Clock, FileText, Settings, AlertCircle, Filter, Search, Calendar, Share2, Hash } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -70,7 +70,20 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
     const [localFilters, setLocalFilters] = useState(filters)
 
     useEffect(() => {
-        setLocalFilters(filters)
+        // Se as datas não vierem no filtro inicial (URL), definimos o mês atual como padrão visual
+        if (!filters.dataInicio || !filters.dataFim) {
+            const now = new Date()
+            const first = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+            const last = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+            
+            setLocalFilters(prev => ({
+                ...prev,
+                dataInicio: prev.dataInicio || first,
+                dataFim: prev.dataFim || last
+            }))
+        } else {
+            setLocalFilters(filters)
+        }
     }, [filters])
 
     const [selectedVehicle, setSelectedVehicle] = useState<any>(null)
@@ -95,7 +108,6 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
     }
 
     const applyFilters = useCallback(() => {
-        console.log('[Client] Aplicando filtros locais:', localFilters)
         const params = new URLSearchParams()
         if (localFilters.dataInicio) params.set('dataInicio', localFilters.dataInicio)
         if (localFilters.dataFim) params.set('dataFim', localFilters.dataFim)
@@ -105,7 +117,6 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
         if (localFilters.tipo) params.set('tipo', localFilters.tipo)
         if (isVisitor) params.set('visitor', 'true')
         const finalUrl = `/dashboard?${params.toString()}`
-        console.log('[Client] Redirecionando para:', finalUrl)
         router.push(finalUrl)
     }, [localFilters, router, isVisitor])
 
@@ -156,6 +167,19 @@ export default function DashboardClient({ metrics, chartData, preventiveData, re
                             placeholder="Buscar placa..."
                             value={localFilters.placa || ''}
                             onChange={e => setLocalFilters(prev => ({ ...prev, placa: e.target.value }))}
+                            className="w-full bg-surface-highlight border border-border-color rounded-xl pl-9 pr-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all"
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-1.5 flex-1 min-w-[120px]">
+                    <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Nº OS</label>
+                    <div className="relative">
+                        <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                        <input
+                            placeholder="Ex: 123"
+                            value={localFilters.os || ''}
+                            onChange={e => setLocalFilters(prev => ({ ...prev, os: e.target.value }))}
                             className="w-full bg-surface-highlight border border-border-color rounded-xl pl-9 pr-3 py-2 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all"
                         />
                     </div>

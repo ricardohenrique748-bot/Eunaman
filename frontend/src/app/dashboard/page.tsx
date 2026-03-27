@@ -5,20 +5,21 @@ import { redirect } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
 
-export default async function DashboardPage(props: any) {
+export default async function DashboardPage(props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
     const session = await getSession()
     if (session?.perfil === 'OPERACIONAL') {
         redirect('/dashboard/pcm/checklist')
     }
 
-    const searchParams = props.searchParams
-    const params = await searchParams
-    console.log('[Page] RAW PROPS:', props)
-    console.log('[Page] searchParams resolvidos:', params)
+    const resolvedParams = await props.searchParams
+    console.log('[Page] searchParams resolvidos:', resolvedParams)
 
     // Robust extraction to handle strings or arrays
     const getVal = (key: string) => {
-        const val = params[key]
+        if (!resolvedParams) return undefined
+        const val = resolvedParams[key]
         return Array.isArray(val) ? val[0] : val
     }
 
@@ -33,7 +34,8 @@ export default async function DashboardPage(props: any) {
 
     console.log('[Page] Filtros Aplicados:', filters)
 
-    const { data } = await getDashboardMetrics(filters)
+    const result = await getDashboardMetrics(filters)
+    const data = result?.data
 
     // Fallback if data fails
     const metrics = data?.kpis || {

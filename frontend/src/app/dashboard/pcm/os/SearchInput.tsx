@@ -19,6 +19,7 @@ export default function SearchInput({ defaultValue }: { defaultValue: string }) 
                     params.delete('q')
                 }
                 router.push(`/dashboard/pcm/os?${params.toString()}`)
+                router.refresh()
             }
         }, 500) // Debounce 500ms
 

@@ -1,0 +1,98 @@
+﻿
+> frontend@0.1.0 build
+> next build
+
+Ôû▓ Next.js 16.1.4 (Turbopack)
+- Environments: .env.local, .env
+
+  Creating an optimized production build ...
+node.exe : 
+No linha:1 caractere:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo          : 
+    NotSpecified: (:String)   
+  [], RemoteException
+    + FullyQualifiedErrorId : 
+    NativeCommandError
+ 
+> Build error occurred
+Error: Turbopack build failed 
+with 1 errors:
+./src/app/dashboard/pcm/os/PCM
+OrdersContent.tsx:6:1
+Module not found: Can't 
+resolve './OsFilters'
+[0m [90m 4 |[39m 
+[36mimport[39m 
+[33mLink[39m [36mfrom[39m 
+[32m'next/link'[39m
+ [90m 5 |[39m 
+[36mimport[39m 
+[33mOsTable[39m 
+[36mfrom[39m 
+[32m'./OsTable'[39m
+[31m[1m>[22m[39m[90m 6 
+|[39m [36mimport[39m 
+[33mOsFilters[39m 
+[36mfrom[39m 
+[32m'./OsFilters'[39m
+ [90m   |[39m [31m[1m^[22
+m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m
+ [90m 7 |[39m 
+[36mimport[39m 
+[33mOsStatsCards[39m 
+[36mfrom[39m 
+[32m'./OsStatsCards'[39m
+ [90m 8 |[39m
+ [90m 9 |[39m 
+[36minterface[39m [33mPCMOr
+dersContentProps[39m {[0m
+
+
+
+Import trace:
+  Server Component:
+    ./src/app/dashboard/pcm/os
+/PCMOrdersContent.tsx
+    ./src/app/dashboard/pcm/os
+/page.tsx
+
+https://nextjs.org/docs/messag
+es/module-not-found
+
+
+    at <unknown> (./src/app/da
+shboard/pcm/os/PCMOrdersConten
+t.tsx:6:1)
+    at <unknown> (https://next
+js.org/docs/messages/module-no
+t-found)
+
