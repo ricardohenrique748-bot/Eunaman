@@ -299,7 +299,7 @@ export default function BacklogClient({ initialData }: { initialData: any[] }) {
 
                             if (result.success) {
                                 successCount += (result.count || 0)
-                                duplicateCount += (result.duplicates || 0)
+                                duplicateCount += ((result as any).duplicates || 0)
                             } else {
                                 console.error('Chunk error:', result.error)
                                 // If one chunk fails, we continue trying others? Or stop?

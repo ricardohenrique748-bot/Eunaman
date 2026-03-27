@@ -32,7 +32,7 @@ export default function BacklogList({ data, onEdit, onDelete }: BacklogListProps
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border-color/50">
-                        {filtered.map((item) => (
+                        {data.map((item) => (
                             <tr key={item.id} className="hover:bg-surface-highlight/50 transition-colors group">
                                 <td className="p-3 text-xs font-medium text-gray-500">
                                     {item.dataEvidencia ? new Date(item.dataEvidencia).toLocaleDateString('pt-BR') : '-'}
