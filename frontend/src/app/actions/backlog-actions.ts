@@ -1,6 +1,7 @@
 'use server'
 
 import prisma from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 
 export interface BacklogItem {
@@ -66,16 +67,16 @@ export async function getBacklogItems(params?: {
     where.NOT = {
       origem: {
         equals: 'CORRETIVA',
-        mode: 'insensitive'
+        mode: Prisma.QueryMode.insensitive
       }
     }
 
     if (params?.search) {
       where.OR = [
-        { frota: { contains: params.search, mode: 'insensitive' } },
-        { tag: { contains: params.search, mode: 'insensitive' } },
-        { descricaoAtividade: { contains: params.search, mode: 'insensitive' } },
-        { os: { contains: params.search, mode: 'insensitive' } },
+        { frota: { contains: params.search, mode: Prisma.QueryMode.insensitive } },
+        { tag: { contains: params.search, mode: Prisma.QueryMode.insensitive } },
+        { descricaoAtividade: { contains: params.search, mode: Prisma.QueryMode.insensitive } },
+        { os: { contains: params.search, mode: Prisma.QueryMode.insensitive } },
       ]
     }
 
@@ -102,7 +103,7 @@ export async function getUnidades() {
       where: { 
         NOT: [
           { unidade: null },
-          { origem: { equals: 'CORRETIVA', mode: 'insensitive' } }
+          { origem: { equals: 'CORRETIVA', mode: Prisma.QueryMode.insensitive } }
         ]
       }
     })
@@ -115,9 +116,9 @@ export async function getUnidades() {
 
 export async function getResumoBacklog() {
   try {
-    const where = {
+    const where: Prisma.BacklogWhereInput = {
       NOT: {
-        origem: { equals: 'CORRETIVA', mode: 'insensitive' }
+        origem: { equals: 'CORRETIVA', mode: Prisma.QueryMode.insensitive }
       }
     }
 
